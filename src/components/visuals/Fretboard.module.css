@@ -1,0 +1,56 @@
+.fretboardContainer {
+  width: 100%;
+  overflow-x: auto;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.fretboardSvg {
+  display: block;
+  min-width: max-content;
+}
+
+.clickArea {
+  cursor: pointer;
+  transition: fill 0.1s ease;
+  fill: transparent;
+}
+
+.clickArea:hover {
+  fill: rgba(255, 255, 255, 0.25);
+}
+
+.noteDot {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: transform 0.1s ease;
+}
+
+.noteDot:hover {
+  transform: scale(1.1);
+}
+
+/* Mobile: show scroll hint */
+@media (max-width: 768px) {
+  .fretboardContainer {
+    /* Fade out on right edge to hint at scrolling */
+    mask-image: linear-gradient(
+      to right,
+      black 0%,
+      black 85%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      black 0%,
+      black 85%,
+      transparent 100%
+    );
+  }
+
+  .fretboardContainer:hover,
+  .fretboardContainer:focus-within {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+}
