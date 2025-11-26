@@ -1,73 +1,67 @@
-# React + TypeScript + Vite
+# Guitar Theory Visualizer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive web app for exploring guitar chords, voicings, and music theory.
 
-Currently, two official plugins are available:
+**Live Demo:** https://guitar-visualizer-iota.vercel.app/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **Interactive Fretboard** - Click to place notes on a 12-fret, 6-string guitar
+- **Real-time Chord Detection** - Automatically identifies chords as you build them
+- **Algorithmic Chord Solver** - Select any chord and get practical, playable voicings
+- **Audio Playback** - Hear your chords with real guitar samples
+  - Block (all notes at once)
+  - Strum (quick sweep)
+  - Arpeggio (melodic sequence)
+- **Interval Color Coding** - Visual feedback showing Root, 3rd, 5th, 7th
+- **Two Modes:**
+  - *Free-form* - Explore by placing notes manually
+  - *Chord Selection* - Pick root + quality, browse voicings
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- React 18 + TypeScript + Vite
+- Zustand (state management)
+- Tonal.js (music theory)
+- Tone.js (audio engine)
+- CSS Modules
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Philosophy
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**"Solve, Don't Store"** - Chord voicings are calculated algorithmically using a sliding window approach with hand-span constraints, rather than stored in static databases.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Development
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+
+# Run tests
+npm run test
+
+# Build for production
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## How It Works
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Chord Solver
+The solver scans the fretboard in 4-fret windows (typical hand span) and scores voicings based on:
+- Open position preference
+- Open string usage
+- Root note in bass
+- Playability (contiguous strings, minimal stretch)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Audio Engine
+Uses Tone.js with a Sampler loaded with acoustic guitar samples, routed through Reverb and Limiter for natural sound.
+
+## License
+
+MIT
+
+---
+
+Made with ☕ and 🎸 by Alex in PDX
