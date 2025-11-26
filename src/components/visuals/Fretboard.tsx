@@ -17,8 +17,6 @@ import styles from './Fretboard.module.css';
 /** Calculate the note at a given string and fret */
 function getNoteAtPosition(stringIndex: number, fret: number): string {
   const openNote = STANDARD_TUNING[stringIndex];
-  const note = Note.transpose(openNote, `${fret}m2`.replace('m2', 'M2').replace('1M2', 'm2'));
-  // Use semitone transposition for accuracy
   const midi = Note.midi(openNote);
   if (midi === null) return '';
   const newMidi = midi + fret;
@@ -254,7 +252,7 @@ export function Fretboard() {
       const noteName = getNoteName(fullNote);
 
       // Determine color based on interval from root
-      let color = COLORS.intervals.extension;
+      let color: string = COLORS.intervals.extension;
       let interval = -1;
 
       if (colorRoot) {
