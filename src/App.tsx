@@ -79,7 +79,7 @@ function App() {
       </main>
 
       <footer className="footer">
-        <p>Click on the fretboard to place notes</p>
+        <p>Made with ☕ and 🎸 by Alex in PDX</p>
       </footer>
     </div>
   );
