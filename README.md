@@ -63,27 +63,29 @@ Uses Tone.js with a Sampler loaded with acoustic guitar samples, routed through 
 ### Up Next
 | Feature | Description |
 |---------|-------------|
-| 🎹 Piano Keyboard | Interactive piano with two-way fretboard binding |
-| 🔄 Inversion Selection | Choose specific chord inversions (root, 1st, 2nd) |
+| UI Enhancements | Mobile first style design that is easy to use, has a full screen mode, works in portrait or landscape. |
+| Chord Logic Improvements | refine the chord selection and voicing to be more traditional shapes. Incorporate CAGED? |
+| Alternate Tuning Support | Allow selection of common tunings from drop down, or editing the string directly for custom tunings, chord shapes adapt relative to pitch. |
+| String count selection | Support for bass (4 or 5 string) and both 7 and 8 string guitars.|
+| Piano Keyboard | Interactive piano with two-way fretboard binding. |
+| Inversion Selection | Choose specific chord inversions (root, 1st, 2nd). |
 
 ### Planned
 | Feature | Description |
 |---------|-------------|
-| 🎸 CAGED System | Organize voicings by CAGED shapes |
-| 📁 Voicing Categories | Group by Open, Barre, Partial, Jazz |
-| ⭐ Difficulty Ratings | Easy/Medium/Hard based on stretch & barre |
-| 💾 Save Voicings | Save and recall favorite chord shapes |
-| 🔍 Chord Search | Filter and search chord library |
-| 📝 Chord Progressions | Build and save chord sequences |
-| 🕐 Recently Used | Quick access to recent chords |
+| CAGED System | Organize voicings by CAGED shapes |
+| 
+| Save Voicings | Save and recall favorite chord shapes |
+| Chord Progressions | Build and save chord sequences that can play back |
+| Recently Used | Quick access to recent chords |
 
 ### Ideas / Exploring
 | Feature | Description |
 |---------|-------------|
-| 🎵 Scale Overlay | Show scale patterns on fretboard |
-| 🎤 Audio Input | Detect chords from microphone |
-| 📱 PWA Support | Offline-capable mobile app |
-| 🌙 Dark/Light Theme | Theme toggle |
+| Scale Overlay | Show scale patterns on fretboard |
+| Audio Input | Detect chords from microphone |
+| PWA Support | Offline-capable mobile app |
+| Dark/Light Theme | Theme toggle |
 
 ---
 
