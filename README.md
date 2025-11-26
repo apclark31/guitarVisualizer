@@ -58,6 +58,35 @@ The solver scans the fretboard in 4-fret windows (typical hand span) and scores 
 ### Audio Engine
 Uses Tone.js with a Sampler loaded with acoustic guitar samples, routed through Reverb and Limiter for natural sound.
 
+## Roadmap
+
+### Up Next
+| Feature | Description |
+|---------|-------------|
+| 🎹 Piano Keyboard | Interactive piano with two-way fretboard binding |
+| 🔄 Inversion Selection | Choose specific chord inversions (root, 1st, 2nd) |
+
+### Planned
+| Feature | Description |
+|---------|-------------|
+| 🎸 CAGED System | Organize voicings by CAGED shapes |
+| 📁 Voicing Categories | Group by Open, Barre, Partial, Jazz |
+| ⭐ Difficulty Ratings | Easy/Medium/Hard based on stretch & barre |
+| 💾 Save Voicings | Save and recall favorite chord shapes |
+| 🔍 Chord Search | Filter and search chord library |
+| 📝 Chord Progressions | Build and save chord sequences |
+| 🕐 Recently Used | Quick access to recent chords |
+
+### Ideas / Exploring
+| Feature | Description |
+|---------|-------------|
+| 🎵 Scale Overlay | Show scale patterns on fretboard |
+| 🎤 Audio Input | Detect chords from microphone |
+| 📱 PWA Support | Offline-capable mobile app |
+| 🌙 Dark/Light Theme | Theme toggle |
+
+---
+
 ## License
 
 MIT
