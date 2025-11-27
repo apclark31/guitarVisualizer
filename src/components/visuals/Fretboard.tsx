@@ -307,9 +307,8 @@ export function Fretboard() {
     <div className={styles.fretboardWrapper}>
       <div className={styles.fretboardContainer}>
         <svg
-          width={width}
-          height={height}
           viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="xMidYMid meet"
           className={styles.fretboardSvg}
         >
           {/* Background */}

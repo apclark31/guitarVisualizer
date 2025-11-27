@@ -6,16 +6,16 @@
 .fretboardContainer {
   width: 100%;
   overflow-x: auto;
-  background-color: #1c1917;
+  background-color: transparent;
   border-radius: 12px;
-  padding: 12px;
-  border: 1px solid #292524;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+  padding: 8px 0;
 }
 
 .fretboardSvg {
   display: block;
-  min-width: max-content;
+  width: 100%;
+  height: auto;
+  min-width: 700px; /* Minimum for readability, triggers scroll on small screens */
 }
 
 .clickArea {

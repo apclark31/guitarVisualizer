@@ -1,5 +1,5 @@
 // Color theme for the chord visualizer
-// Modern dark mode with interval-based color coding
+// Balanced dark theme - not too dark, warm and inviting
 
 export const COLORS = {
   // Interval colors (with glow-friendly values)
@@ -11,23 +11,23 @@ export const COLORS = {
     extension: '#a1a1aa', // Zinc-400 (neutral)
   },
 
-  // Fretboard colors (darker, more sophisticated)
+  // Fretboard colors (warmer, more visible)
   fretboard: {
-    wood: '#292524',        // Stone-800 (dark charcoal with warmth)
-    fret: '#a1a1aa',        // Zinc-400 (silver frets)
-    nut: '#e7e5e4',         // Stone-200 (bone color)
-    string: '#a1a1aa',      // Zinc-400 (steel strings)
-    marker: '#1c1917',      // Stone-900 (inset markers)
-    background: '#0c0a09',  // Stone-950
+    wood: '#3d3533',        // Warmer brown-gray
+    fret: '#d4d4d8',        // Zinc-300 (brighter silver frets)
+    nut: '#fafaf9',         // Stone-50 (bright bone)
+    string: '#d4d4d8',      // Zinc-300 (brighter strings)
+    marker: '#292524',      // Stone-800 (subtle inset markers)
+    background: '#1c1917',  // Stone-900
   },
 
-  // UI colors (Zinc palette)
+  // UI colors (lighter, more balanced)
   ui: {
-    background: '#09090b',  // Zinc-950
-    surface: '#18181b',     // Zinc-900
-    border: '#3f3f46',      // Zinc-700
+    background: '#171717',  // Neutral-900 (lighter than pure black)
+    surface: '#262626',     // Neutral-800
+    border: '#525252',      // Neutral-600
     text: '#fafafa',        // Zinc-50
-    textMuted: '#71717a',   // Zinc-500
+    textMuted: '#a3a3a3',   // Neutral-400 (brighter muted text)
     primary: '#3b82f6',     // Blue-500
     primaryHover: '#2563eb',// Blue-600
     success: '#22c55e',     // Green-500
