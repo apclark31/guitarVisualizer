@@ -1,9 +1,16 @@
+.fretboardWrapper {
+  position: relative;
+  width: 100%;
+}
+
 .fretboardContainer {
   width: 100%;
   overflow-x: auto;
-  background-color: #1a1a1a;
-  border-radius: 8px;
-  padding: 10px;
+  background-color: #1c1917;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #292524;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
 }
 
 .fretboardSvg {
@@ -18,39 +25,64 @@
 }
 
 .clickArea:hover {
-  fill: rgba(255, 255, 255, 0.25);
+  fill: rgba(255, 255, 255, 0.15);
 }
 
+/* Glowing note dots */
 .noteDot {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  transition: transform 0.1s ease;
+  transition: transform 0.1s ease, filter 0.1s ease;
 }
 
-.noteDot:hover {
-  transform: scale(1.1);
+.noteDotRoot {
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
 }
 
-/* Mobile: show scroll hint */
+.noteDotThird {
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6));
+}
+
+.noteDotFifth {
+  filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
+}
+
+.noteDotSeventh {
+  filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.6));
+}
+
+.noteDotDefault {
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.5));
+}
+
+/* Scroll hint gradient overlay */
+.scrollHint {
+  display: none;
+}
+
+/* Mobile styles */
 @media (max-width: 768px) {
   .fretboardContainer {
-    /* Fade out on right edge to hint at scrolling */
-    mask-image: linear-gradient(
-      to right,
-      black 0%,
-      black 85%,
-      transparent 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to right,
-      black 0%,
-      black 85%,
-      transparent 100%
-    );
+    padding: 8px;
+    border-radius: 8px;
   }
 
-  .fretboardContainer:hover,
-  .fretboardContainer:focus-within {
-    mask-image: none;
-    -webkit-mask-image: none;
+  /* Show scroll hint on mobile */
+  .scrollHint {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 40px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(9, 9, 11, 0.9)
+    );
+    pointer-events: none;
+    border-radius: 0 12px 12px 0;
+  }
+
+  .scrollHintScrolled {
+    display: none;
   }
 }

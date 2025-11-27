@@ -28,12 +28,14 @@ function getNoteName(fullNote: string): string {
   return Note.pitchClass(fullNote) || fullNote;
 }
 
+/** String thickness by index (0=low E, 5=high E) */
+const STRING_THICKNESS = [2.5, 2.0, 1.6, 1.3, 1.0, 0.8];
+
 export function Fretboard() {
   const { guitarStringState, setFret, clearString, displayMode, targetRoot, detectedChord } = useMusicStore();
   const { playFretNote, isLoaded } = useAudioEngine();
 
   // Determine the root note to use for interval coloring
-  // Priority: selected chord root > detected chord root > null (neutral colors)
   const colorRoot = targetRoot || (detectedChord?.bassNote) || null;
 
   // Calculate SVG dimensions
@@ -46,9 +48,8 @@ export function Fretboard() {
     return DIM.PADDING + DIM.NUT_WIDTH + (fret - 0.5) * DIM.FRET_SPACING;
   };
 
-  // Y position for a given string (0 = Low E at bottom visually, but top in SVG)
+  // Y position for a given string (0 = Low E at bottom visually)
   const getStringY = (stringIndex: number): number => {
-    // Flip so Low E is at bottom
     return DIM.PADDING + (STRING_COUNT - 1 - stringIndex) * DIM.STRING_SPACING;
   };
 
@@ -56,12 +57,9 @@ export function Fretboard() {
   const handleFretClick = (stringIndex: StringIndex, fret: number) => {
     const currentFret = guitarStringState[stringIndex];
     if (currentFret === fret) {
-      // Toggle off if same fret clicked
       clearString(stringIndex);
     } else {
-      // Set new fret (overwrites existing)
       setFret(stringIndex, fret);
-      // Play the note
       if (isLoaded) {
         playFretNote(stringIndex, fret);
       }
@@ -72,13 +70,13 @@ export function Fretboard() {
   const renderFrets = () => {
     const frets = [];
 
-    // Nut (fret 0)
+    // Nut (fret 0) - thicker, bone colored
     frets.push(
       <rect
         key="nut"
         x={DIM.PADDING}
         y={DIM.PADDING - 5}
-        width={DIM.NUT_WIDTH}
+        width={DIM.NUT_WIDTH + 2}
         height={height - DIM.PADDING * 2 + 10}
         fill={COLORS.fretboard.nut}
         rx={2}
@@ -103,7 +101,7 @@ export function Fretboard() {
     return frets;
   };
 
-  // Render position markers (dots)
+  // Render position markers (dots) - now darker/inset
   const renderMarkers = () => {
     const markers = [];
     const centerY = height / 2;
@@ -114,7 +112,6 @@ export function Fretboard() {
       const x = DIM.PADDING + DIM.NUT_WIDTH + (fret - 0.5) * DIM.FRET_SPACING;
 
       if (DOUBLE_MARKER_FRETS.includes(fret as typeof DOUBLE_MARKER_FRETS[number])) {
-        // Double dot at 12th fret
         markers.push(
           <circle
             key={`marker-${fret}-1`}
@@ -132,7 +129,6 @@ export function Fretboard() {
           />
         );
       } else {
-        // Single dot
         markers.push(
           <circle
             key={`marker-${fret}`}
@@ -148,14 +144,13 @@ export function Fretboard() {
     return markers;
   };
 
-  // Render strings
+  // Render strings with varying thickness
   const renderStrings = () => {
     const strings = [];
 
     for (let i = 0; i < STRING_COUNT; i++) {
       const y = getStringY(i);
-      // String thickness varies (thicker for lower strings)
-      const thickness = 1 + (STRING_COUNT - 1 - i) * 0.3;
+      const thickness = STRING_THICKNESS[i];
 
       strings.push(
         <line
@@ -173,7 +168,7 @@ export function Fretboard() {
     return strings;
   };
 
-  // Render string labels (tuning notes on the left)
+  // Render string labels
   const renderStringLabels = () => {
     return TUNING_NOTES.map((note, i) => (
       <text
@@ -212,7 +207,7 @@ export function Fretboard() {
     return numbers;
   };
 
-  // Render clickable areas for each fret position
+  // Render clickable areas
   const renderClickAreas = () => {
     const areas = [];
 
@@ -238,7 +233,7 @@ export function Fretboard() {
     return areas;
   };
 
-  // Render active notes (dots on pressed frets)
+  // Render active notes with glow effects
   const renderActiveNotes = () => {
     const notes = [];
 
@@ -251,22 +246,32 @@ export function Fretboard() {
       const fullNote = getNoteAtPosition(stringIndex, fret);
       const noteName = getNoteName(fullNote);
 
-      // Determine color based on interval from root
+      // Determine color and glow class based on interval
       let color: string = COLORS.intervals.extension;
       let interval = -1;
+      let glowClass = styles.noteDotDefault;
 
       if (colorRoot) {
         const rootMidi = Note.midi(colorRoot + '4') || 60;
         const noteMidi = Note.midi(fullNote) || 60;
         interval = (noteMidi - rootMidi + 120) % 12;
 
-        if (interval === 0) color = COLORS.intervals.root;
-        else if (interval === 3 || interval === 4) color = COLORS.intervals.third;
-        else if (interval === 7) color = COLORS.intervals.fifth;
-        else if (interval === 10 || interval === 11) color = COLORS.intervals.seventh;
+        if (interval === 0) {
+          color = COLORS.intervals.root;
+          glowClass = styles.noteDotRoot;
+        } else if (interval === 3 || interval === 4) {
+          color = COLORS.intervals.third;
+          glowClass = styles.noteDotThird;
+        } else if (interval === 7) {
+          color = COLORS.intervals.fifth;
+          glowClass = styles.noteDotFifth;
+        } else if (interval === 10 || interval === 11) {
+          color = COLORS.intervals.seventh;
+          glowClass = styles.noteDotSeventh;
+        }
       } else {
-        // No root context - use primary color for all notes
         color = COLORS.ui.primary;
+        glowClass = styles.noteDotDefault;
       }
 
       notes.push(
@@ -276,7 +281,7 @@ export function Fretboard() {
             cy={y}
             r={DIM.DOT_RADIUS}
             fill={color}
-            className={styles.noteDot}
+            className={`${styles.noteDot} ${glowClass}`}
           />
           <text
             x={x}
@@ -299,44 +304,48 @@ export function Fretboard() {
   };
 
   return (
-    <div className={styles.fretboardContainer}>
-      <svg
-        width={width}
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-        className={styles.fretboardSvg}
-      >
-        {/* Background */}
-        <rect
-          x={DIM.PADDING + DIM.NUT_WIDTH}
-          y={DIM.PADDING - 10}
-          width={FRET_COUNT * DIM.FRET_SPACING}
-          height={height - DIM.PADDING * 2 + 20}
-          fill={COLORS.fretboard.wood}
-          rx={4}
-        />
+    <div className={styles.fretboardWrapper}>
+      <div className={styles.fretboardContainer}>
+        <svg
+          width={width}
+          height={height}
+          viewBox={`0 0 ${width} ${height}`}
+          className={styles.fretboardSvg}
+        >
+          {/* Background */}
+          <rect
+            x={DIM.PADDING + DIM.NUT_WIDTH}
+            y={DIM.PADDING - 10}
+            width={FRET_COUNT * DIM.FRET_SPACING}
+            height={height - DIM.PADDING * 2 + 20}
+            fill={COLORS.fretboard.wood}
+            rx={4}
+          />
 
-        {/* Position markers */}
-        {renderMarkers()}
+          {/* Position markers */}
+          {renderMarkers()}
 
-        {/* Frets */}
-        {renderFrets()}
+          {/* Frets */}
+          {renderFrets()}
 
-        {/* Strings */}
-        {renderStrings()}
+          {/* Strings */}
+          {renderStrings()}
 
-        {/* String labels */}
-        {renderStringLabels()}
+          {/* String labels */}
+          {renderStringLabels()}
 
-        {/* Fret numbers */}
-        {renderFretNumbers()}
+          {/* Fret numbers */}
+          {renderFretNumbers()}
 
-        {/* Active notes (rendered before click areas so clicks pass through) */}
-        {renderActiveNotes()}
+          {/* Active notes */}
+          {renderActiveNotes()}
 
-        {/* Clickable areas (invisible, on top) */}
-        {renderClickAreas()}
-      </svg>
+          {/* Clickable areas */}
+          {renderClickAreas()}
+        </svg>
+      </div>
+      {/* Scroll hint gradient (mobile only) */}
+      <div className={styles.scrollHint} />
     </div>
   );
 }
