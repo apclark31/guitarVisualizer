@@ -246,32 +246,47 @@ export function Fretboard() {
       const fullNote = getNoteAtPosition(stringIndex, fret);
       const noteName = getNoteName(fullNote);
 
-      // Determine color and glow class based on interval
+      // Determine color and interval label based on semitone distance from root
       let color: string = COLORS.intervals.extension;
-      let interval = -1;
-      let glowClass = styles.noteDotDefault;
+      let semitones = -1;
+      let intervalLabel = '';
+
+      // Map semitones to interval degree labels
+      const getIntervalLabel = (semi: number): string => {
+        const labels: Record<number, string> = {
+          0: 'R',
+          1: '♭2',
+          2: '2',
+          3: '♭3',
+          4: '3',
+          5: '4',
+          6: '♭5',
+          7: '5',
+          8: '♯5',
+          9: '6',
+          10: '♭7',
+          11: '7',
+        };
+        return labels[semi] ?? String(semi);
+      };
 
       if (colorRoot) {
         const rootMidi = Note.midi(colorRoot + '4') || 60;
         const noteMidi = Note.midi(fullNote) || 60;
-        interval = (noteMidi - rootMidi + 120) % 12;
+        semitones = (noteMidi - rootMidi + 120) % 12;
+        intervalLabel = getIntervalLabel(semitones);
 
-        if (interval === 0) {
+        if (semitones === 0) {
           color = COLORS.intervals.root;
-          glowClass = styles.noteDotRoot;
-        } else if (interval === 3 || interval === 4) {
+        } else if (semitones === 3 || semitones === 4) {
           color = COLORS.intervals.third;
-          glowClass = styles.noteDotThird;
-        } else if (interval === 7) {
+        } else if (semitones === 7) {
           color = COLORS.intervals.fifth;
-          glowClass = styles.noteDotFifth;
-        } else if (interval === 10 || interval === 11) {
+        } else if (semitones === 10 || semitones === 11) {
           color = COLORS.intervals.seventh;
-          glowClass = styles.noteDotSeventh;
         }
       } else {
         color = COLORS.ui.primary;
-        glowClass = styles.noteDotDefault;
       }
 
       notes.push(
@@ -281,7 +296,7 @@ export function Fretboard() {
             cy={y}
             r={DIM.DOT_RADIUS}
             fill={color}
-            className={`${styles.noteDot} ${glowClass}`}
+            className={styles.noteDot}
           />
           <text
             x={x}
@@ -292,9 +307,9 @@ export function Fretboard() {
             fontWeight="bold"
             fontFamily="monospace"
           >
-            {displayMode === 'notes' || interval === -1
+            {displayMode === 'notes' || semitones === -1
               ? noteName
-              : interval === 0 ? 'R' : interval}
+              : intervalLabel}
           </text>
         </g>
       );

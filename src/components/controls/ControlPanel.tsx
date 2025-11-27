@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { useAudioEngine } from '../../hooks/useAudioEngine';
 import { CHROMATIC_NOTES, CHORD_QUALITIES } from '../../config/constants';
-import type { PlaybackMode } from '../../types';
+import type { PlaybackMode, StringIndex } from '../../types';
 import styles from './ControlPanel.module.css';
 
 export function ControlPanel() {
@@ -28,27 +29,22 @@ export function ControlPanel() {
 
   const handleRootChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newRoot = e.target.value;
-    // Only trigger solver if both root and quality are selected
     if (newRoot && targetQuality) {
       setTargetChord(newRoot, targetQuality);
     } else if (newRoot && !targetQuality) {
-      // If quality not yet selected, default to Major
       setTargetChord(newRoot, 'Major');
     }
   };
 
   const handleQualityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newQuality = e.target.value;
-    // Only trigger solver if both root and quality are selected
     if (targetRoot && newQuality) {
       setTargetChord(targetRoot, newQuality);
     } else if (!targetRoot && newQuality) {
-      // If root not yet selected, default to C
       setTargetChord('C', newQuality);
     }
   };
 
-  // Check if we're in free-form mode (no chord selected)
   const isFreeFormMode = !targetRoot || !targetQuality;
 
   const handlePrevVoicing = () => {
@@ -63,8 +59,40 @@ export function ControlPanel() {
     }
   };
 
+  const toggleDisplayMode = () => {
+    setDisplayMode(displayMode === 'notes' ? 'intervals' : 'notes');
+  };
+
+  const togglePlaybackMode = () => {
+    setPlaybackMode(playbackMode === 'strum' ? 'block' : 'strum');
+  };
+
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    // Build query string from guitar state
+    const parts: string[] = [];
+    for (let i = 0; i < 6; i++) {
+      const fret = guitarStringState[i as StringIndex];
+      if (fret !== null) {
+        parts.push(`${i}-${fret}`);
+      }
+    }
+
+    const url = `${window.location.origin}${window.location.pathname}?s=${parts.join(',')}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
   return (
     <div className={styles.controlPanel}>
+      {/* Row 1: Chord Selection */}
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>Chord Selection</h3>
         <div className={styles.row}>
@@ -102,8 +130,10 @@ export function ControlPanel() {
         </div>
       </div>
 
+      {/* Row 1: Voicing */}
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>Voicing</h3>
+        <div className={styles.voicingSpacer} />
         <div className={styles.voicingNav}>
           <button
             onClick={handlePrevVoicing}
@@ -136,40 +166,41 @@ export function ControlPanel() {
         </div>
       </div>
 
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Display</h3>
-        <div className={styles.toggleGroup}>
-          <button
-            onClick={() => setDisplayMode('notes')}
-            className={`${styles.toggleButton} ${displayMode === 'notes' ? styles.active : ''}`}
-          >
-            Notes
-          </button>
-          <button
-            onClick={() => setDisplayMode('intervals')}
-            className={`${styles.toggleButton} ${displayMode === 'intervals' ? styles.active : ''}`}
-          >
-            Intervals
-          </button>
+      {/* Row 2: Toggles (Display + Playback side by side) */}
+      <div className={styles.togglesRow}>
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Display</h3>
+          <div className={styles.toggleRow}>
+            <span className={styles.toggleLabel}>Intervals</span>
+            <div
+              className={`${styles.toggleSwitch} ${displayMode === 'intervals' ? styles.active : ''}`}
+              onClick={toggleDisplayMode}
+              role="switch"
+              aria-checked={displayMode === 'intervals'}
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && toggleDisplayMode()}
+            />
+          </div>
+        </div>
+
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Playback</h3>
+          <div className={styles.toggleRow}>
+            <span className={styles.toggleLabel}>Block</span>
+            <div
+              className={`${styles.toggleSwitch} ${playbackMode === 'block' ? styles.active : ''}`}
+              onClick={togglePlaybackMode}
+              role="switch"
+              aria-checked={playbackMode === 'block'}
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && togglePlaybackMode()}
+            />
+          </div>
         </div>
       </div>
 
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Playback Mode</h3>
-        <div className={styles.toggleGroup}>
-          {(['block', 'strum', 'arpeggio'] as PlaybackMode[]).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setPlaybackMode(mode)}
-              className={`${styles.toggleButton} ${playbackMode === mode ? styles.active : ''}`}
-            >
-              {mode.charAt(0).toUpperCase() + mode.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className={styles.section}>
+      {/* Row 3: Action Buttons */}
+      <div className={styles.buttonsRow}>
         <button
           onClick={() => playChord()}
           disabled={!isLoaded || !hasNotes}
@@ -177,12 +208,18 @@ export function ControlPanel() {
         >
           {!isLoaded ? 'Loading...' : 'Play Chord'}
         </button>
-      </div>
-
-      <div className={styles.section}>
-        <button onClick={clearAllStrings} className={styles.clearButton}>
-          Clear All
-        </button>
+        <div className={styles.secondaryButtons}>
+          <button
+            onClick={handleShare}
+            disabled={!hasNotes}
+            className={styles.shareButton}
+          >
+            {copied ? 'Copied!' : 'Share'}
+          </button>
+          <button onClick={clearAllStrings} className={styles.clearButton}>
+            Clear All
+          </button>
+        </div>
       </div>
     </div>
   );
