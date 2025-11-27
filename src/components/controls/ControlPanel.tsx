@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { useAudioEngine } from '../../hooks/useAudioEngine';
 import { CHROMATIC_NOTES, CHORD_QUALITIES } from '../../config/constants';
-import type { PlaybackMode, StringIndex } from '../../types';
+import type { StringIndex } from '../../types';
 import styles from './ControlPanel.module.css';
 
 export function ControlPanel() {
