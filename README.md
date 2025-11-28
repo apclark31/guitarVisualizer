@@ -9,11 +9,9 @@ An interactive web app for exploring guitar chords, voicings, and music theory.
 - **Interactive Fretboard** - Click to place notes on a 12-fret, 6-string guitar
 - **Real-time Chord Detection** - Automatically identifies chords as you build them
 - **Algorithmic Chord Solver** - Select any chord and get practical, playable voicings
-- **Audio Playback** - Hear your chords with real guitar samples
-  - Block (all notes at once)
-  - Strum (quick sweep)
-  - Arpeggio (melodic sequence)
-- **Interval Color Coding** - Visual feedback showing Root, 3rd, 5th, 7th
+- **Audio Playback** - Hear your chords with real guitar samples (Block or Strum)
+- **Interval Color Coding** - Visual feedback showing Root, 3rd, 5th, 7th with proper notation
+- **URL Sharing** - Share your chord with a link, loads automatically for recipients
 - **Two Modes:**
   - *Free-form* - Explore by placing notes manually
   - *Chord Selection* - Pick root + quality, browse voicings
@@ -63,12 +61,12 @@ Uses Tone.js with a Sampler loaded with acoustic guitar samples, routed through 
 ### Up Next
 | Feature | Description |
 |---------|-------------|
-| UI Enhancements | Mobile first style design that is easy to use, has a full screen mode, works in portrait or landscape.|
-| Chord Logic Improvements | refine the chord selection and voicing to be more traditional shapes. Incorporate CAGED? |
-| Alternate Tuning Support | Allow selection of common tunings from drop down, or editing the string directly for custom tunings, chord shapes adapt relative to pitch. |
-| String count/instrument selection | Support for bass (4 or 5 string) and both 7 and 8 string guitars.|
-| Piano Keyboard | Interactive piano with two-way fretboard binding. |
-| Inversion Selection | Choose specific chord inversions (root, 1st, 2nd). |
+| Chord Database Integration | Integrate chords-db library for traditional voicing shapes |
+| Chord Logic Improvements | Refine chord selection and voicing to be more traditional shapes. Incorporate CAGED? |
+| Alternate Tuning Support | Allow selection of common tunings from drop down, or editing the string directly for custom tunings |
+| String count/instrument selection | Support for bass (4 or 5 string) and both 7 and 8 string guitars |
+| Piano Keyboard | Interactive piano with two-way fretboard binding |
+| Inversion Selection | Choose specific chord inversions (root, 1st, 2nd) |
 
 ### Planned
 | Feature | Description |
@@ -82,9 +80,8 @@ Uses Tone.js with a Sampler loaded with acoustic guitar samples, routed through 
 ### Ideas / Exploring
 | Feature | Description |
 |---------|-------------|
-| Improve design, look and feel | Updated visual appearance |
 | Audio Input | Detect chords from microphone |
-| PWA Support | Offline-capable mobile app |
+| PWA Icons | Add app icons for full PWA support |
 | Dark/Light Theme | Theme toggle |
 
 ---
