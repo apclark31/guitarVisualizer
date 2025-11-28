@@ -19,6 +19,10 @@ export interface ChordVoicing {
   highestFret: number;
   /** Note names in this voicing */
   noteNames: string[];
+  /** Lowest sounding note name (for slash chord detection) */
+  bassNote?: string;
+  /** True if bass note differs from root (slash chord) */
+  isInversion?: boolean;
 }
 
 /** Playback modes for audio */

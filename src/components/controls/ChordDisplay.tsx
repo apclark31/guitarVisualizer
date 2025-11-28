@@ -23,15 +23,31 @@ function getPlayedNotesDisplay(guitarState: Record<StringIndex, number | null>):
 }
 
 export function ChordDisplay() {
-  const { targetRoot, targetQuality, detectedChord, guitarStringState } = useMusicStore();
+  const {
+    targetRoot,
+    targetQuality,
+    detectedChord,
+    guitarStringState,
+    availableVoicings,
+    currentVoicingIndex,
+  } = useMusicStore();
 
   const playedNotes = getPlayedNotesDisplay(guitarStringState);
+
+  // Get current voicing for inversion detection
+  const currentVoicing = availableVoicings[currentVoicingIndex];
 
   // Determine what to display
   const getChordDisplay = () => {
     if (targetRoot && targetQuality) {
+      // Check if current voicing is an inversion (slash chord)
+      const isInversion = currentVoicing?.isInversion && currentVoicing?.bassNote;
+      const chordName = isInversion
+        ? `${targetRoot} ${targetQuality}/${currentVoicing.bassNote}`
+        : `${targetRoot} ${targetQuality}`;
+
       return {
-        main: `${targetRoot} ${targetQuality}`,
+        main: chordName,
         sub: playedNotes || null,
       };
     }

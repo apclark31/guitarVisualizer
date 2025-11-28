@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { AppState, StringIndex, FretNumber, DisplayMode, PlaybackMode, GuitarStringState, DetectedChordInfo } from '../types';
-import { getBestVoicings } from '../lib/chord-solver';
+import { getVoicingsForChord } from '../lib/chord-data';
 import { detectChord } from '../lib/chord-detector';
 
 /** Initial guitar state - all strings muted */
@@ -64,8 +64,8 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   // Actions
   setTargetChord: (root: string, quality: string) => {
-    // Run the solver to get available voicings
-    const voicings = getBestVoicings(root, quality);
+    // Get voicings from chords-db (falls back to solver)
+    const voicings = getVoicingsForChord(root, quality);
 
     // Auto-select the first voicing if available
     const firstVoicing = voicings[0];
