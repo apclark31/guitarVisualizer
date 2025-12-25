@@ -25,7 +25,7 @@ const SILENT_MP3_BASE64 =
 
 let audioElement: HTMLAudioElement | null = null;
 let isUnlocked = false;
-let isPlaying = false;
+let isInitialized = false;
 
 /**
  * Check if we're on iOS (Safari or Chrome, both use WebKit)
@@ -38,9 +38,12 @@ export function isIOS(): boolean {
 }
 
 /**
- * Create the hidden audio element for silent playback
+ * Create and preload the audio element
+ * Called on page load, before any user interaction
  */
-function createSilentAudio(): HTMLAudioElement {
+function initAudioElement(): void {
+  if (isInitialized || typeof document === 'undefined') return;
+
   const audio = document.createElement('audio');
 
   // Set source to silent MP3
@@ -49,14 +52,37 @@ function createSilentAudio(): HTMLAudioElement {
   // Loop continuously to keep media session active
   audio.loop = true;
 
-  // Preload
+  // Preload eagerly
   audio.preload = 'auto';
 
   // Required for iOS
   audio.setAttribute('playsinline', '');
   audio.setAttribute('webkit-playsinline', '');
 
-  return audio;
+  // Add to DOM immediately (hidden)
+  audio.style.display = 'none';
+  document.body.appendChild(audio);
+
+  // Force load
+  audio.load();
+
+  audioElement = audio;
+  isInitialized = true;
+
+  console.log('iOS audio element initialized and preloaded');
+}
+
+/**
+ * Initialize on module load if in browser
+ */
+if (typeof window !== 'undefined') {
+  // Wait for DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAudioElement);
+  } else {
+    // DOM already ready
+    initAudioElement();
+  }
 }
 
 /**
@@ -64,17 +90,23 @@ function createSilentAudio(): HTMLAudioElement {
  * This forces iOS to use the media channel instead of ringer channel
  */
 async function startSilentAudio(): Promise<boolean> {
+  // Ensure element exists
   if (!audioElement) {
-    audioElement = createSilentAudio();
+    initAudioElement();
   }
 
-  if (isPlaying) {
+  if (!audioElement) {
+    console.warn('Could not create audio element');
+    return false;
+  }
+
+  // Check if already playing
+  if (!audioElement.paused) {
     return true;
   }
 
   try {
     await audioElement.play();
-    isPlaying = true;
     console.log('Silent audio playing - iOS media channel active');
     return true;
   } catch (error) {
@@ -123,9 +155,8 @@ export function isAudioUnlocked(): boolean {
  * Stop the silent audio (call when leaving page or cleaning up)
  */
 export function stopSilentAudio(): void {
-  if (audioElement && isPlaying) {
+  if (audioElement && !audioElement.paused) {
     audioElement.pause();
-    isPlaying = false;
   }
 }
 
