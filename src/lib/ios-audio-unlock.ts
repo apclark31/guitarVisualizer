@@ -1,41 +1,31 @@
 /**
  * iOS Audio Unlock Utility
  *
- * On iOS, Web Audio is treated as "Ambient" audio which respects the silent switch.
- * Playing an unmuted video elevates the audio session to "Playback" category,
- * which ignores the physical silent switch.
+ * On iOS, Web Audio uses the "ringer" channel which respects the silent switch.
+ * HTML <audio> elements use the "media" channel which ignores silent mode.
+ *
+ * By playing a silent audio track continuously via <audio>, we force iOS
+ * to treat the entire audio session as media playback.
+ *
+ * Based on: https://github.com/swevans/unmute
  *
  * This must be called from a user gesture (click/touch).
  */
 
-// Minimal silent MP4 with audio track (base64 encoded)
-// This is a ~1KB silent video that tricks iOS into Playback mode
-const SILENT_VIDEO_BASE64 =
-  'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAA' +
-  'NBtZGF0AAACoAYF//+c3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE2NCByMzEwOCAzMWUxO' +
-  'WY5IC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAyMyAtIGh0dHA6L' +
-  'y93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTMgZGVib' +
-  'G9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9M' +
-  'S4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4e' +
-  'DhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNld' +
-  'D0tMiB0aHJlYWRzPTEgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZ' +
-  'GVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhP' +
-  'TAgYmZyYW1lcz0zIGJfcHlyYW1pZD0yIGJfYWRhcHQ9MSBiX2JpYXM9MCBkaXJlY3Q9MSB3ZWlna' +
-  'HRiPTEgb3Blbl9nb3A9MCB3ZWlnaHRwPTIga2V5aW50PTI1MCBrZXlpbnRfbWluPTI1IHNjZW5lY' +
-  '3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZ' +
-  'j0yMyBxY29tcD0wLjYwIHFwbWluPTAgcXBtYXg9NjkgcXBzdGVwPTQgaXBfcmF0aW89MS40MCBhc' +
-  'T0xOjEuMDAAgAAAAA9liIQAV/0TAAYdeBTXzg8AAALZbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAADA' +
-  'AADIAAB9AAAAAAAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAgAAAAAAAAAAAAAAA' +
-  'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAI0dHJhawAAAFx0a2hkAAAAAwAAAAAAAAAAAAAAAQAAA' +
-  'AAAACAAAAAAAAAAAAAAAAAAAAAAAEAAAAABAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAABA' +
-  'AAAAGxwMT0AAAB4bWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAKABVxAAAAAAALWhkbHIAA' +
-  'AAAAAAAAHNvdW4AAAAAAAAAAAAAAAAAAABTb3VuZEhhbmRsZXIAAAABI21pbmYAAAAQc21oZAAAA' +
-  'AAAAAAAAAAAACR4aW5mAAAAABRodHRwOi8vd3d3Lm1wNHJhLm9yZwAAACBkYXRhAQAAAAAAAAABA' +
-  'AAAAAAAAAEAAAAAAAADOHVkdGEAAAAwbWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAA' +
-  'AAAAAAAAAAAAAAA';
+// Tiny silent MP3 - base64 encoded (~1KB)
+// Source: https://gist.github.com/novwhisky/8a1a0168b94f3b6abfaa
+const SILENT_MP3_BASE64 =
+  'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0VAAAAPAAADTGF2ZjU2LjM2LjEwMAAAAAAAAAAAAAAA' +
+  '//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAw' +
+  'MDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v//' +
+  '//////////////////////////////8AAAAATGF2YzU2LjQxAAAAAAAAAAAAAAAAJAAAAAAAAAAA' +
+  'ASDs90hvAAAAAAAAAAAAAAAAAAAA//MUZAAAAAGkAAAAAAAAA0gAAAAATEFN//MUZAMAAAGkAAAA' +
+  'AAAAA0gAAAAARTMu//MUZAYAAAGkAAAAAAAAA0gAAAAAOTku//MUZAkAAAGkAAAAAAAAA0gAAAAA' +
+  'NVVV';
 
-let unlockVideoElement: HTMLVideoElement | null = null;
+let audioElement: HTMLAudioElement | null = null;
 let isUnlocked = false;
+let isPlaying = false;
 
 /**
  * Check if we're on iOS (Safari or Chrome, both use WebKit)
@@ -48,75 +38,78 @@ export function isIOS(): boolean {
 }
 
 /**
- * Create the hidden video element for audio unlock
+ * Create the hidden audio element for silent playback
  */
-function createUnlockVideo(): HTMLVideoElement {
-  const video = document.createElement('video');
+function createSilentAudio(): HTMLAudioElement {
+  const audio = document.createElement('audio');
 
-  // Set attributes for iOS compatibility
-  video.setAttribute('playsinline', '');
-  video.setAttribute('webkit-playsinline', '');
-  video.setAttribute('preload', 'auto');
+  // Set source to silent MP3
+  audio.src = SILENT_MP3_BASE64;
 
-  // Critical: must NOT be muted to trigger Playback mode
-  video.muted = false;
-  video.volume = 0.001; // Nearly silent but not muted
+  // Loop continuously to keep media session active
+  audio.loop = true;
 
-  // Hide but keep in DOM
-  video.style.position = 'fixed';
-  video.style.top = '-1px';
-  video.style.left = '-1px';
-  video.style.width = '1px';
-  video.style.height = '1px';
-  video.style.opacity = '0.01';
-  video.style.pointerEvents = 'none';
-  video.style.zIndex = '-1000';
+  // Preload
+  audio.preload = 'auto';
 
-  // Set source
-  video.src = SILENT_VIDEO_BASE64;
+  // Required for iOS
+  audio.setAttribute('playsinline', '');
+  audio.setAttribute('webkit-playsinline', '');
 
-  // Loop to keep session alive
-  video.loop = true;
-
-  return video;
+  return audio;
 }
 
 /**
- * Unlock iOS audio by playing a silent video
+ * Start playing the silent audio track
+ * This forces iOS to use the media channel instead of ringer channel
+ */
+async function startSilentAudio(): Promise<boolean> {
+  if (!audioElement) {
+    audioElement = createSilentAudio();
+  }
+
+  if (isPlaying) {
+    return true;
+  }
+
+  try {
+    await audioElement.play();
+    isPlaying = true;
+    console.log('Silent audio playing - iOS media channel active');
+    return true;
+  } catch (error) {
+    console.warn('Failed to start silent audio:', error);
+    return false;
+  }
+}
+
+/**
+ * Unlock iOS audio by starting silent audio playback
  * Must be called from a user gesture (click/touch)
  *
  * @returns Promise that resolves when audio is unlocked
  */
 export async function unlockIOSAudio(): Promise<boolean> {
-  // Skip if already unlocked or not on iOS
+  // Skip if already unlocked
   if (isUnlocked) {
     return true;
   }
 
-  // On non-iOS, just mark as unlocked
+  // On non-iOS, just mark as unlocked (no silent audio needed)
   if (!isIOS()) {
     isUnlocked = true;
     return true;
   }
 
-  try {
-    // Create video element if needed
-    if (!unlockVideoElement) {
-      unlockVideoElement = createUnlockVideo();
-      document.body.appendChild(unlockVideoElement);
-    }
+  // Start the silent audio track
+  const success = await startSilentAudio();
 
-    // Attempt to play
-    await unlockVideoElement.play();
-
+  if (success) {
     isUnlocked = true;
     console.log('iOS audio unlocked - silent switch bypassed');
-
-    return true;
-  } catch (error) {
-    console.warn('iOS audio unlock failed:', error);
-    return false;
   }
+
+  return success;
 }
 
 /**
@@ -127,13 +120,23 @@ export function isAudioUnlocked(): boolean {
 }
 
 /**
- * Clean up the unlock video element (call on unmount if needed)
+ * Stop the silent audio (call when leaving page or cleaning up)
  */
-export function disposeUnlockVideo(): void {
-  if (unlockVideoElement) {
-    unlockVideoElement.pause();
-    unlockVideoElement.remove();
-    unlockVideoElement = null;
+export function stopSilentAudio(): void {
+  if (audioElement && isPlaying) {
+    audioElement.pause();
+    isPlaying = false;
+  }
+}
+
+/**
+ * Clean up the audio element entirely
+ */
+export function disposeUnlockAudio(): void {
+  stopSilentAudio();
+  if (audioElement) {
+    audioElement.src = '';
+    audioElement = null;
   }
   isUnlocked = false;
 }
