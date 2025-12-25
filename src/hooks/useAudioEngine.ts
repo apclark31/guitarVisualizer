@@ -11,6 +11,7 @@ import { useMusicStore } from '../store/useMusicStore';
 import { GUITAR_SAMPLER_CONFIG } from '../config/instruments';
 import { STANDARD_TUNING, PLAYBACK_TIMING } from '../config/constants';
 import { Note } from '@tonaljs/tonal';
+import { unlockIOSAudio } from '../lib/ios-audio-unlock';
 import type { StringIndex, PlaybackMode } from '../types';
 
 /** Get the full note name at a string/fret position */
@@ -74,6 +75,10 @@ export function useAudioEngine() {
 
   // Start audio context (must be called from user interaction)
   const startAudio = useCallback(async () => {
+    // Unlock iOS audio first (bypasses silent switch)
+    await unlockIOSAudio();
+
+    // Then start Tone.js audio context
     if (Tone.getContext().state !== 'running') {
       await Tone.start();
       console.log('Audio context started');
