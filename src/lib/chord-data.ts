@@ -77,10 +77,38 @@ function areEnharmonic(note1: string, note2: string): boolean {
 }
 
 /**
+ * Parse fret string to array of numbers
+ * "x32010" → [-1, 3, 2, 0, 1, 0]
+ * Handles (10), (11), etc. for high frets
+ */
+function parseFretString(fretStr: string): number[] {
+  const result: number[] = [];
+  let i = 0;
+  while (i < fretStr.length) {
+    if (fretStr[i] === 'x') {
+      result.push(-1);
+      i++;
+    } else if (fretStr[i] === '(') {
+      // Handle (10), (11), etc.
+      const end = fretStr.indexOf(')', i);
+      const num = parseInt(fretStr.slice(i + 1, end), 10);
+      result.push(num);
+      i = end + 1;
+    } else {
+      result.push(parseInt(fretStr[i], 10));
+      i++;
+    }
+  }
+  return result;
+}
+
+/**
  * Convert a chords-db position to our ChordVoicing format
  */
 function convertPosition(position: ChordsDbPosition, root: string): ChordVoicing {
-  const frets: FretNumber[] = position.frets.map((fret) => {
+  const parsedFrets = parseFretString(position.frets);
+
+  const frets: FretNumber[] = parsedFrets.map((fret) => {
     if (fret === -1) return null; // Muted string
     // chords-db uses baseFret to indicate position on neck
     // fret value is relative to baseFret (1 = baseFret position)

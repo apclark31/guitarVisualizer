@@ -5,10 +5,10 @@
 
 /** A single chord voicing/position on the fretboard */
 export interface ChordsDbPosition {
-  /** Fret numbers for each string (low E to high E). -1 = muted string */
-  frets: number[];
-  /** Finger numbers for each string. 0 = open/not fingered */
-  fingers: number[];
+  /** Fret string for each string. 'x' = muted, '0'-'9' = fret, '(10)' = fret 10+ */
+  frets: string;
+  /** Finger string for each string. '0' = open/not fingered */
+  fingers: string;
   /** The fret number where position 1 starts (for positions up the neck) */
   baseFret: number;
   /** Fret numbers that are barred */

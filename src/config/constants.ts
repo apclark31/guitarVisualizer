@@ -81,3 +81,40 @@ export const FRETBOARD_DIMENSIONS = {
   /** Radius of fret position markers */
   MARKER_RADIUS: 6,
 } as const;
+
+/** Voicing type filter options for dropdown */
+export const VOICING_FILTER_OPTIONS = [
+  { value: 'all', label: 'All Voicings' },
+  { value: 'triads', label: 'Triads' },
+  { value: 'shells', label: 'Shells' },
+  { value: 'full', label: 'Full' },
+] as const;
+
+/** Shell voicing interval patterns (semitones from root) */
+export const SHELL_PATTERNS: Record<string, readonly number[]> = {
+  'shell-major': [0, 4, 11],     // R-3-7
+  'shell-minor': [0, 3, 10],     // R-b3-b7
+  'shell-dominant': [0, 4, 10],  // R-3-b7
+} as const;
+
+/** Triad interval patterns (semitones from root) */
+export const TRIAD_PATTERNS: Record<string, readonly number[]> = {
+  'major': [0, 4, 7],   // R-3-5
+  'minor': [0, 3, 7],   // R-b3-5
+  'dim': [0, 3, 6],     // R-b3-b5
+  'aug': [0, 4, 8],     // R-3-#5
+} as const;
+
+/** Chord quality complexity for ranking (lower = simpler) */
+export const QUALITY_COMPLEXITY: Record<string, number> = {
+  'Major': 1,
+  'Minor': 2,
+  'Dominant 7': 3,
+  'Major 7': 4,
+  'Minor 7': 5,
+  'Diminished': 6,
+  'Augmented': 7,
+  'Sus2': 8,
+  'Sus4': 9,
+  'Power (5)': 10,
+} as const;

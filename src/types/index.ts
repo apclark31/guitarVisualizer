@@ -3,6 +3,30 @@
 /** String index: 0 = Low E, 5 = High E */
 export type StringIndex = 0 | 1 | 2 | 3 | 4 | 5;
 
+/** Voicing type classification */
+export type VoicingType =
+  | 'shell-major'    // R-3-7 or R-7-3 for maj7
+  | 'shell-minor'    // R-b3-b7
+  | 'shell-dominant' // R-3-b7
+  | 'triad'          // R-3-5 or R-b3-5
+  | 'partial'        // Some chord tones but not a recognized pattern
+  | 'full'           // 4+ unique notes
+  | 'unknown';
+
+/** Filter options for voicing type dropdown */
+export type VoicingFilterType = 'all' | 'triads' | 'shells' | 'full';
+
+/** A chord suggestion with ranking metadata */
+export interface ChordSuggestion {
+  root: string;
+  quality: string;
+  displayName: string;
+  confidence: number;
+  voicingType: VoicingType;
+  missingIntervals: string[];
+  presentIntervals: string[];
+}
+
 /** Fret number: 0 = open, 1-22 = fretted, null = muted */
 export type FretNumber = number | null;
 
@@ -61,6 +85,11 @@ export interface AppState {
   // Detected chord (from manual placement)
   detectedChord: DetectedChordInfo | null;
 
+  // Suggestions (from voicing analyzer)
+  suggestions: ChordSuggestion[];
+  voicingType: VoicingType | null;
+  voicingTypeFilter: VoicingFilterType;
+
   // UI State
   displayMode: DisplayMode;
   isCustomShape: boolean;
@@ -81,4 +110,7 @@ export interface AppState {
   setPlaybackMode: (mode: PlaybackMode) => void;
   setVolume: (volume: number) => void;
   setAudioLoaded: (loaded: boolean) => void;
+  applySuggestion: (suggestion: ChordSuggestion) => void;
+  applyContext: (suggestion: ChordSuggestion) => void;
+  setVoicingTypeFilter: (filter: VoicingFilterType) => void;
 }

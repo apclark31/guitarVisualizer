@@ -1,7 +1,20 @@
 import { create } from 'zustand';
-import type { AppState, StringIndex, FretNumber, DisplayMode, PlaybackMode, GuitarStringState, DetectedChordInfo } from '../types';
+import type {
+  AppState,
+  StringIndex,
+  FretNumber,
+  DisplayMode,
+  PlaybackMode,
+  GuitarStringState,
+  DetectedChordInfo,
+  VoicingType,
+  VoicingFilterType,
+  ChordSuggestion,
+  ChordVoicing,
+} from '../types';
 import { getVoicingsForChord } from '../lib/chord-data';
 import { detectChord } from '../lib/chord-detector';
+import { analyzeVoicing } from '../lib/voicing-analyzer';
 
 /** Initial guitar state - all strings muted */
 const initialGuitarState: GuitarStringState = {
@@ -37,6 +50,32 @@ function runChordDetection(guitarState: GuitarStringState): DetectedChordInfo | 
   };
 }
 
+/** Find voicing that best matches user's current fret positions */
+function findMatchingVoicing(
+  currentState: GuitarStringState,
+  voicings: ChordVoicing[]
+): ChordVoicing | null {
+  let bestMatch: ChordVoicing | null = null;
+  let bestScore = 0;
+
+  for (const voicing of voicings) {
+    let score = 0;
+    for (let i = 0; i < 6; i++) {
+      const userFret = currentState[i as StringIndex];
+      const voicingFret = voicing.frets[i];
+      if (userFret !== null && userFret === voicingFret) {
+        score++;
+      }
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = voicing;
+    }
+  }
+
+  return bestMatch;
+}
+
 export const useMusicStore = create<AppState>((set, get) => ({
   // User Selection (Target) - empty by default (free-form mode)
   targetRoot: '',
@@ -51,6 +90,11 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   // Detected chord (from manual placement)
   detectedChord: null,
+
+  // Suggestions (from voicing analyzer)
+  suggestions: [],
+  voicingType: null,
+  voicingTypeFilter: 'all',
 
   // UI State
   displayMode: 'notes',
@@ -108,10 +152,28 @@ export const useMusicStore = create<AppState>((set, get) => ({
       ...get().guitarStringState,
       [stringIndex]: fret,
     };
+
+    // Count notes for suggestion analysis
+    const noteCount = Object.values(newGuitarState).filter(f => f !== null).length;
+
+    // Run detection
+    const detectedChord = runChordDetection(newGuitarState);
+
+    // Run suggestion analysis if 2+ notes
+    let suggestions: ChordSuggestion[] = [];
+    let voicingType: VoicingType | null = null;
+    if (noteCount >= 2) {
+      const analysis = analyzeVoicing(newGuitarState);
+      suggestions = analysis.suggestions;
+      voicingType = analysis.voicingType;
+    }
+
     set({
       guitarStringState: newGuitarState,
       isCustomShape: true,
-      detectedChord: runChordDetection(newGuitarState),
+      detectedChord,
+      suggestions,
+      voicingType,
       // Clear target chord when manually editing
       targetRoot: '',
       targetQuality: '',
@@ -124,10 +186,25 @@ export const useMusicStore = create<AppState>((set, get) => ({
       ...get().guitarStringState,
       [stringIndex]: null,
     };
+
+    // Count notes for suggestion analysis
+    const noteCount = Object.values(newGuitarState).filter(f => f !== null).length;
+
+    // Run suggestion analysis if 2+ notes
+    let suggestions: ChordSuggestion[] = [];
+    let voicingType: VoicingType | null = null;
+    if (noteCount >= 2) {
+      const analysis = analyzeVoicing(newGuitarState);
+      suggestions = analysis.suggestions;
+      voicingType = analysis.voicingType;
+    }
+
     set({
       guitarStringState: newGuitarState,
       isCustomShape: true,
       detectedChord: runChordDetection(newGuitarState),
+      suggestions,
+      voicingType,
     });
   },
 
@@ -136,6 +213,8 @@ export const useMusicStore = create<AppState>((set, get) => ({
       guitarStringState: { ...initialGuitarState },
       isCustomShape: true,
       detectedChord: null,
+      suggestions: [],
+      voicingType: null,
       targetRoot: '',
       targetQuality: '',
       availableVoicings: [],
@@ -156,5 +235,51 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   setAudioLoaded: (loaded: boolean) => {
     set({ isAudioLoaded: loaded });
+  },
+
+  applySuggestion: (suggestion: ChordSuggestion) => {
+    const { guitarStringState } = get();
+    const voicings = getVoicingsForChord(suggestion.root, suggestion.quality);
+
+    // Try to find a voicing that preserves user's current fret positions
+    const matchingVoicing = findMatchingVoicing(guitarStringState, voicings);
+    const selectedIndex = matchingVoicing
+      ? voicings.indexOf(matchingVoicing)
+      : 0;
+    const selectedVoicing = voicings[selectedIndex] || voicings[0];
+
+    if (selectedVoicing) {
+      set({
+        targetRoot: suggestion.root,
+        targetQuality: suggestion.quality,
+        availableVoicings: voicings,
+        currentVoicingIndex: selectedIndex,
+        guitarStringState: voicingToGuitarState(selectedVoicing.frets),
+        isCustomShape: false,
+        suggestions: [],
+        voicingType: null,
+        detectedChord: null,
+      });
+    }
+  },
+
+  applyContext: (suggestion: ChordSuggestion) => {
+    // Keep user's current frets, just set the chord context for display
+    const voicings = getVoicingsForChord(suggestion.root, suggestion.quality);
+
+    set({
+      targetRoot: suggestion.root,
+      targetQuality: suggestion.quality,
+      availableVoicings: voicings,
+      currentVoicingIndex: -1, // -1 indicates custom/user shape
+      isCustomShape: true,
+      suggestions: [],
+      voicingType: null,
+      detectedChord: null,
+    });
+  },
+
+  setVoicingTypeFilter: (filter: VoicingFilterType) => {
+    set({ voicingTypeFilter: filter });
   },
 }));

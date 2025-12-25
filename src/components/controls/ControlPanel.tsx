@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { useAudioEngine } from '../../hooks/useAudioEngine';
-import { CHROMATIC_NOTES, CHORD_QUALITIES } from '../../config/constants';
-import type { StringIndex } from '../../types';
+import { CHROMATIC_NOTES, CHORD_QUALITIES, VOICING_FILTER_OPTIONS } from '../../config/constants';
+import type { StringIndex, VoicingFilterType } from '../../types';
 import styles from './ControlPanel.module.css';
 
 export function ControlPanel() {
@@ -20,6 +20,8 @@ export function ControlPanel() {
     isCustomShape,
     clearAllStrings,
     guitarStringState,
+    voicingTypeFilter,
+    setVoicingTypeFilter,
   } = useMusicStore();
 
   const { isLoaded, playChord } = useAudioEngine();
@@ -43,6 +45,10 @@ export function ControlPanel() {
     } else if (!targetRoot && newQuality) {
       setTargetChord('C', newQuality);
     }
+  };
+
+  const handleVoicingFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setVoicingTypeFilter(e.target.value as VoicingFilterType);
   };
 
   const isFreeFormMode = !targetRoot || !targetQuality;
@@ -123,6 +129,21 @@ export function ControlPanel() {
               {CHORD_QUALITIES.map((quality) => (
                 <option key={quality} value={quality}>
                   {quality}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className={styles.label}>
+            Voicing
+            <select
+              value={voicingTypeFilter}
+              onChange={handleVoicingFilterChange}
+              className={styles.select}
+            >
+              {VOICING_FILTER_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>
