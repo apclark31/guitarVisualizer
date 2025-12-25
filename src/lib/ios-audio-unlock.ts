@@ -86,10 +86,10 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Start playing the silent audio track
+ * Start playing the silent audio track (SYNCHRONOUS - don't break gesture chain)
  * This forces iOS to use the media channel instead of ringer channel
  */
-async function startSilentAudio(): Promise<boolean> {
+function startSilentAudio(): void {
   // Ensure element exists
   if (!audioElement) {
     initAudioElement();
@@ -97,51 +97,44 @@ async function startSilentAudio(): Promise<boolean> {
 
   if (!audioElement) {
     console.warn('Could not create audio element');
-    return false;
+    return;
   }
 
   // Check if already playing
   if (!audioElement.paused) {
-    return true;
+    return;
   }
 
-  try {
-    await audioElement.play();
+  // Play synchronously - do NOT await, keep in same call stack as user gesture
+  audioElement.play().then(() => {
     console.log('Silent audio playing - iOS media channel active');
-    return true;
-  } catch (error) {
+  }).catch((error) => {
     console.warn('Failed to start silent audio:', error);
-    return false;
-  }
+  });
 }
 
 /**
- * Unlock iOS audio by starting silent audio playback
+ * Unlock iOS audio by starting silent audio playback (SYNCHRONOUS)
  * Must be called from a user gesture (click/touch)
  *
- * @returns Promise that resolves when audio is unlocked
+ * IMPORTANT: This is intentionally synchronous to stay in the same
+ * call stack as the user gesture. Standalone PWA mode on iOS requires this.
  */
-export async function unlockIOSAudio(): Promise<boolean> {
+export function unlockIOSAudio(): void {
   // Skip if already unlocked
   if (isUnlocked) {
-    return true;
+    return;
   }
 
   // On non-iOS, just mark as unlocked (no silent audio needed)
   if (!isIOS()) {
     isUnlocked = true;
-    return true;
+    return;
   }
 
-  // Start the silent audio track
-  const success = await startSilentAudio();
-
-  if (success) {
-    isUnlocked = true;
-    console.log('iOS audio unlocked - silent switch bypassed');
-  }
-
-  return success;
+  // Start the silent audio track (synchronously)
+  startSilentAudio();
+  isUnlocked = true;
 }
 
 /**

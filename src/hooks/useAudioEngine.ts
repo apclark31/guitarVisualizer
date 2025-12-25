@@ -75,8 +75,8 @@ export function useAudioEngine() {
 
   // Start audio context (must be called from user interaction)
   const startAudio = useCallback(async () => {
-    // Unlock iOS audio first (bypasses silent switch)
-    await unlockIOSAudio();
+    // Unlock iOS audio SYNCHRONOUSLY first (must stay in gesture call stack)
+    unlockIOSAudio();
 
     // Then start Tone.js audio context
     if (Tone.getContext().state !== 'running') {
