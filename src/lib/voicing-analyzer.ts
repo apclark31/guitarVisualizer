@@ -245,9 +245,6 @@ function generateSuggestions(pitchClasses: string[], bassNote: string): ChordSug
     const matches = matchChordQualities(potentialRoot, pitchClasses);
     for (const match of matches) {
       if (match.present.length >= 2) {
-        const intervals = pitchClasses.map(pc => getSemitoneDistance(potentialRoot, pc));
-        const voicingType = detectVoicingType([0, ...intervals]); // Include root in type detection
-
         const displayName = potentialRoot + getChordSymbol(match.quality);
 
         suggestions.push({
