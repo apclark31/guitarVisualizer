@@ -84,7 +84,7 @@ export const FRETBOARD_DIMENSIONS = {
 
 /** Voicing type filter options for dropdown */
 export const VOICING_FILTER_OPTIONS = [
-  { value: 'all', label: 'All Voicings' },
+  { value: 'all', label: '--' },
   { value: 'triads', label: 'Triads' },
   { value: 'shells', label: 'Shells' },
   { value: 'full', label: 'Full' },

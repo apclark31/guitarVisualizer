@@ -110,7 +110,7 @@ export interface AppState {
   setPlaybackMode: (mode: PlaybackMode) => void;
   setVolume: (volume: number) => void;
   setAudioLoaded: (loaded: boolean) => void;
-  applySuggestion: (suggestion: ChordSuggestion) => void;
+  applySuggestion: (suggestion: ChordSuggestion, filterOverride?: VoicingFilterType) => void;
   applyContext: (suggestion: ChordSuggestion) => void;
   setVoicingTypeFilter: (filter: VoicingFilterType) => void;
 }

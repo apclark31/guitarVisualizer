@@ -12,8 +12,33 @@ import {
   FRET_COUNT,
   MAX_HAND_SPAN,
   QUALITY_TO_SYMBOL,
+  TRIAD_PATTERNS,
 } from '../config/constants';
 import type { ChordVoicing, FretNumber } from '../types';
+
+/**
+ * String sets for closed-position triads (bass to treble)
+ * Code indices: 0=Low E, 1=A, 2=D, 3=G, 4=B, 5=High E
+ *
+ * We iterate from bass strings upward, finding triads on each adjacent 3-string group.
+ * Within each group, the lowest index string carries the bass note of the voicing.
+ */
+const TRIAD_STRING_SETS = [
+  [0, 1, 2], // Strings 6-5-4 (Low E, A, D) - bass on Low E
+  [1, 2, 3], // Strings 5-4-3 (A, D, G) - bass on A
+  [2, 3, 4], // Strings 4-3-2 (D, G, B) - bass on D
+  [3, 4, 5], // Strings 3-2-1 (G, B, High E) - bass on G
+] as const;
+
+/**
+ * Inversion patterns: which interval goes on each string (low to high)
+ * Each number is an index into the chord notes array [R, 3rd, 5th]
+ */
+const TRIAD_INVERSIONS = [
+  { name: 'root', pattern: [0, 1, 2] },     // R-3-5 (root position)
+  { name: '1st', pattern: [1, 2, 0] },      // 3-5-R (1st inversion)
+  { name: '2nd', pattern: [2, 0, 1] },      // 5-R-3 (2nd inversion)
+] as const;
 
 /** Get MIDI note number for a string/fret position */
 function getMidiAt(stringIndex: number, fret: number): number {
@@ -358,4 +383,177 @@ export function getBestVoicings(root: string, quality: string, limit = 12): Chor
   topVoicings.sort((a, b) => a.lowestFret - b.lowestFret);
 
   return topVoicings;
+}
+
+/**
+ * Get the triad quality from a chord quality name
+ * Maps 7th chord qualities to their underlying triad
+ */
+function getTriadQuality(quality: string): 'major' | 'minor' | 'dim' | 'aug' | null {
+  const qualityMap: Record<string, 'major' | 'minor' | 'dim' | 'aug'> = {
+    'Major': 'major',
+    'Minor': 'minor',
+    'Dominant 7': 'major',    // Dom7 has major triad (R-3-5)
+    'Major 7': 'major',
+    'Minor 7': 'minor',
+    'Diminished': 'dim',
+    'Augmented': 'aug',
+    'Sus2': 'major',          // Treat as major shape for now
+    'Sus4': 'major',          // Treat as major shape for now
+    'Power (5)': 'major',     // Power chord - no 3rd
+  };
+  return qualityMap[quality] || null;
+}
+
+/**
+ * Find the fret on a string that produces a specific pitch class
+ * Returns all matching frets within the fret range
+ */
+function findFretsForNote(
+  stringIndex: number,
+  targetNote: string,
+  minFret: number,
+  maxFret: number
+): number[] {
+  const frets: number[] = [];
+  const targetPc = normalizePitchClass(targetNote);
+
+  for (let fret = minFret; fret <= maxFret; fret++) {
+    const noteAtFret = getNoteAt(stringIndex, fret);
+    if (normalizePitchClass(noteAtFret) === targetPc) {
+      frets.push(fret);
+    }
+  }
+
+  return frets;
+}
+
+/**
+ * Solve for closed-position triad voicings
+ *
+ * Generates triads on adjacent string sets with all inversions:
+ * - Strings 1-2-3 (High E, B, G) - indices 5, 4, 3
+ * - Strings 2-3-4 (B, G, D) - indices 4, 3, 2
+ *
+ * @param root - Root note (e.g., "C", "F#")
+ * @param quality - Chord quality (e.g., "Major", "Minor")
+ * @returns Array of triad voicings sorted by position
+ */
+export function solveTriadVoicings(root: string, quality: string): ChordVoicing[] {
+  // Get the triad quality
+  const triadQuality = getTriadQuality(quality);
+  if (!triadQuality) {
+    console.warn(`Cannot determine triad quality for: ${quality}`);
+    return [];
+  }
+
+  // Get the interval pattern (semitones from root)
+  const pattern = TRIAD_PATTERNS[triadQuality];
+  if (!pattern) {
+    return [];
+  }
+
+  // Calculate the three notes of the triad
+  const rootMidi = Note.midi(root + '4');
+  if (rootMidi === null) {
+    console.warn(`Invalid root note: ${root}`);
+    return [];
+  }
+
+  const triadNotes = pattern.map(semitones => {
+    const midi = rootMidi + semitones;
+    return Note.pitchClass(Note.fromMidi(midi)) || '';
+  });
+
+  const voicings: ChordVoicing[] = [];
+
+  // For each string set
+  for (const stringSet of TRIAD_STRING_SETS) {
+    // For each inversion
+    for (const inversion of TRIAD_INVERSIONS) {
+      // Get the notes in order for this inversion (low string to high string)
+      // stringSet is [low, mid, high] in terms of string index (0=Low E = lowest pitch)
+      // notesForStrings[0] = bass note, [1] = middle, [2] = highest
+      const notesForStrings = inversion.pattern.map(idx => triadNotes[idx]);
+
+      // Find all positions up the neck
+      for (let baseFret = 0; baseFret <= FRET_COUNT; baseFret++) {
+        const maxFret = Math.min(baseFret + MAX_HAND_SPAN, FRET_COUNT);
+
+        // Find frets for each string in the set
+        // stringSet[0] = lowest pitch string (bass), stringSet[2] = highest pitch
+        const lowStringIdx = stringSet[0];  // Bass string (e.g., Low E=0)
+        const midStringIdx = stringSet[1];  // Middle string (e.g., A=1)
+        const highStringIdx = stringSet[2]; // Highest pitch string (e.g., D=2)
+
+        const lowFrets = findFretsForNote(lowStringIdx, notesForStrings[0], baseFret, maxFret);
+        const midFrets = findFretsForNote(midStringIdx, notesForStrings[1], baseFret, maxFret);
+        const highFrets = findFretsForNote(highStringIdx, notesForStrings[2], baseFret, maxFret);
+
+        // Try all combinations
+        for (const lowFret of lowFrets) {
+          for (const midFret of midFrets) {
+            for (const highFret of highFrets) {
+              // Check hand span
+              const frettedPositions = [lowFret, midFret, highFret].filter(f => f > 0);
+              if (frettedPositions.length > 1) {
+                const span = Math.max(...frettedPositions) - Math.min(...frettedPositions);
+                if (span > MAX_HAND_SPAN) continue;
+              }
+
+              // Build the full 6-string fret array (muted strings = null)
+              const frets: FretNumber[] = [null, null, null, null, null, null];
+              frets[lowStringIdx] = lowFret;
+              frets[midStringIdx] = midFret;
+              frets[highStringIdx] = highFret;
+
+              // Get note names for played strings
+              const noteNames = [
+                Note.fromMidi(getMidiAt(lowStringIdx, lowFret)),
+                Note.fromMidi(getMidiAt(midStringIdx, midFret)),
+                Note.fromMidi(getMidiAt(highStringIdx, highFret)),
+              ];
+
+              const playedFrets = [lowFret, midFret, highFret];
+              const lowestFret = Math.min(...playedFrets);
+              const highestFret = Math.max(...playedFrets);
+
+              // Determine bass note and if it's an inversion
+              const bassNote = Note.pitchClass(Note.fromMidi(getMidiAt(lowStringIdx, lowFret))) || '';
+              const isInversion = !areEnharmonic(bassNote, root);
+
+              voicings.push({
+                frets,
+                lowestFret,
+                highestFret,
+                noteNames,
+                bassNote,
+                isInversion,
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Deduplicate
+  const unique = deduplicateVoicings(voicings);
+
+  // Sort by string set (bass strings first), then by fret position
+  unique.sort((a, b) => {
+    // Find the lowest string index used in each voicing
+    const aLowestString = a.frets.findIndex(f => f !== null);
+    const bLowestString = b.frets.findIndex(f => f !== null);
+
+    // Sort by string set first (lower string index = bass = first)
+    if (aLowestString !== bLowestString) {
+      return aLowestString - bLowestString;
+    }
+
+    // Within same string set, sort by fret position
+    return a.lowestFret - b.lowestFret;
+  });
+
+  return unique;
 }

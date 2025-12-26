@@ -1,5 +1,5 @@
 import { useMusicStore } from '../../store/useMusicStore';
-import type { ChordSuggestion, VoicingType } from '../../types';
+import type { ChordSuggestion, VoicingType, VoicingFilterType } from '../../types';
 import styles from './SuggestionModal.module.css';
 
 interface SuggestionModalProps {
@@ -9,7 +9,7 @@ interface SuggestionModalProps {
   onClose: () => void;
 }
 
-/** Format voicing type for display */
+/** Format voicing type for display in header */
 function formatVoicingType(type: VoicingType): string {
   const labels: Record<VoicingType, string> = {
     'shell-major': 'Major Shell',
@@ -21,6 +21,28 @@ function formatVoicingType(type: VoicingType): string {
     'unknown': 'Unknown',
   };
   return labels[type] || type;
+}
+
+/** Get short tag label for suggestion list */
+function getTypeTag(type: VoicingType): string {
+  const tags: Record<VoicingType, string> = {
+    'shell-major': 'shell',
+    'shell-minor': 'shell',
+    'shell-dominant': 'shell',
+    'triad': 'triad',
+    'partial': 'partial',
+    'full': 'full',
+    'unknown': '',
+  };
+  return tags[type] || '';
+}
+
+/** Map VoicingType to VoicingFilterType for the dropdown */
+function getFilterForVoicingType(type: VoicingType): VoicingFilterType {
+  if (type === 'triad') return 'triads';
+  if (type.startsWith('shell-')) return 'shells';
+  if (type === 'full') return 'full';
+  return 'all'; // partial, unknown -> default
 }
 
 /** Check if voicing type is a shell */
@@ -46,8 +68,8 @@ export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose
     onClose();
   };
 
-  const handleApplyChord = (suggestion: ChordSuggestion) => {
-    applySuggestion(suggestion);
+  const handleApplyChord = (suggestion: ChordSuggestion, filter: VoicingFilterType) => {
+    applySuggestion(suggestion, filter);
     onClose();
   };
 
@@ -103,39 +125,47 @@ export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose
         <p className={styles.guidance}>{getGuidanceText()}</p>
 
         <div className={styles.suggestionList}>
-          {suggestions.slice(0, 6).map((suggestion, index) => (
-            <div key={`${suggestion.root}-${suggestion.quality}-${index}`} className={styles.suggestionItem}>
-              <div className={styles.suggestionInfo}>
-                <span className={styles.chordName}>
-                  {suggestion.root} {suggestion.quality}
-                </span>
-                <span className={styles.intervals}>
-                  {suggestion.presentIntervals.join(' · ')}
-                  {suggestion.missingIntervals.length > 0 && (
-                    <span className={styles.missing}>
-                      {' '}(missing: {suggestion.missingIntervals.join(', ')})
-                    </span>
-                  )}
-                </span>
+          {suggestions.slice(0, 6).map((suggestion, index) => {
+            const typeTag = getTypeTag(suggestion.voicingType);
+            const filter = getFilterForVoicingType(suggestion.voicingType);
+
+            return (
+              <div key={`${suggestion.root}-${suggestion.quality}-${index}`} className={styles.suggestionItem}>
+                <div className={styles.suggestionInfo}>
+                  <span className={styles.chordName}>
+                    {suggestion.root} {suggestion.quality}
+                    {typeTag && (
+                      <span className={styles.typeTag}>[{typeTag}]</span>
+                    )}
+                  </span>
+                  <span className={styles.intervals}>
+                    {suggestion.presentIntervals.join(' · ')}
+                    {suggestion.missingIntervals.length > 0 && (
+                      <span className={styles.missing}>
+                        {' '}(missing: {suggestion.missingIntervals.join(', ')})
+                      </span>
+                    )}
+                  </span>
+                </div>
+                <div className={styles.buttonGroup}>
+                  <button
+                    className={styles.contextButton}
+                    onClick={() => handleApplyContext(suggestion)}
+                    title="Keep your notes, set chord context"
+                  >
+                    Context
+                  </button>
+                  <button
+                    className={styles.applyButton}
+                    onClick={() => handleApplyChord(suggestion, filter)}
+                    title={`Load ${typeTag || 'voicing'} from library`}
+                  >
+                    Chord
+                  </button>
+                </div>
               </div>
-              <div className={styles.buttonGroup}>
-                <button
-                  className={styles.contextButton}
-                  onClick={() => handleApplyContext(suggestion)}
-                  title="Keep your notes, set chord context"
-                >
-                  Context
-                </button>
-                <button
-                  className={styles.applyButton}
-                  onClick={() => handleApplyChord(suggestion)}
-                  title="Apply full voicing from library"
-                >
-                  Chord
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {suggestions.length === 0 && (

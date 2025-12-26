@@ -7,9 +7,9 @@
 
 import { Note } from '@tonaljs/tonal';
 import { findChord, type ChordsDbPosition } from '../data/chords-db';
-import { getBestVoicings } from './chord-solver';
+import { getBestVoicings, solveTriadVoicings } from './chord-solver';
 import { STANDARD_TUNING } from '../config/constants';
-import type { ChordVoicing, FretNumber } from '../types';
+import type { ChordVoicing, FretNumber, VoicingFilterType } from '../types';
 
 /**
  * Map our UI quality names to chords-db suffixes
@@ -159,13 +159,22 @@ function convertPosition(position: ChordsDbPosition, root: string): ChordVoicing
  * @param root - Root note (e.g., "C", "F#", "Bb")
  * @param quality - Chord quality from UI (e.g., "Major", "Minor 7")
  * @param limit - Maximum number of voicings to return
+ * @param filter - Voicing type filter (all, triads, shells, full)
  * @returns Array of chord voicings sorted by fret position
  */
 export function getVoicingsForChord(
   root: string,
   quality: string,
-  limit = 12
+  limit = 12,
+  filter: VoicingFilterType = 'all'
 ): ChordVoicing[] {
+  // If triads filter is active, use the triad solver directly
+  if (filter === 'triads') {
+    return solveTriadVoicings(root, quality).slice(0, limit);
+  }
+
+  // TODO: When shells solver is implemented, handle 'shells' filter here
+
   const suffix = QUALITY_TO_SUFFIX[quality];
 
   if (!suffix) {

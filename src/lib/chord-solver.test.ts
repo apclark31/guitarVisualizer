@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { solveChordShapes, getBestVoicings } from './chord-solver';
+import { solveChordShapes, getBestVoicings, solveTriadVoicings } from './chord-solver';
 import { MAX_HAND_SPAN } from '../config/constants';
 
 describe('chord-solver', () => {
@@ -184,6 +184,154 @@ describe('chord-solver', () => {
       );
 
       expect(hasClassicA).toBe(true);
+    });
+  });
+
+  describe('solveTriadVoicings', () => {
+    it('should find C Major triads', () => {
+      const voicings = solveTriadVoicings('C', 'Major');
+
+      expect(voicings.length).toBeGreaterThan(0);
+
+      // Each voicing should have exactly 3 notes played
+      voicings.forEach(v => {
+        const playedCount = v.frets.filter(f => f !== null).length;
+        expect(playedCount).toBe(3);
+      });
+    });
+
+    it('should only use adjacent 3-string sets from bass to treble', () => {
+      const voicings = solveTriadVoicings('G', 'Major');
+
+      voicings.forEach(v => {
+        const playedStrings = v.frets
+          .map((f, i) => f !== null ? i : -1)
+          .filter(i => i !== -1);
+
+        expect(playedStrings.length).toBe(3);
+
+        // Check it's one of the 4 valid string sets (bass to treble):
+        // [0,1,2] = Low E, A, D
+        // [1,2,3] = A, D, G
+        // [2,3,4] = D, G, B
+        // [3,4,5] = G, B, High E
+        const isSet654 = playedStrings.includes(0) && playedStrings.includes(1) && playedStrings.includes(2);
+        const isSet543 = playedStrings.includes(1) && playedStrings.includes(2) && playedStrings.includes(3);
+        const isSet432 = playedStrings.includes(2) && playedStrings.includes(3) && playedStrings.includes(4);
+        const isSet321 = playedStrings.includes(3) && playedStrings.includes(4) && playedStrings.includes(5);
+
+        expect(isSet654 || isSet543 || isSet432 || isSet321).toBe(true);
+      });
+    });
+
+    it('should include all three inversions', () => {
+      const voicings = solveTriadVoicings('C', 'Major');
+
+      // C Major triad: C, E, G
+      // We should find voicings with different bass notes
+      const bassNotes = new Set(voicings.map(v => v.bassNote));
+
+      // Should have C (root), E (1st inv), G (2nd inv) as bass notes
+      expect(bassNotes.has('C')).toBe(true);
+      expect(bassNotes.has('E')).toBe(true);
+      expect(bassNotes.has('G')).toBe(true);
+    });
+
+    it('should mark inversions correctly', () => {
+      const voicings = solveTriadVoicings('C', 'Major');
+
+      voicings.forEach(v => {
+        if (v.bassNote === 'C') {
+          expect(v.isInversion).toBe(false);
+        } else {
+          expect(v.isInversion).toBe(true);
+        }
+      });
+    });
+
+    it('should respect hand span constraint', () => {
+      const voicings = solveTriadVoicings('D', 'Minor');
+
+      voicings.forEach(v => {
+        const frettedPositions = v.frets.filter((f): f is number => f !== null && f > 0);
+
+        if (frettedPositions.length > 1) {
+          const span = Math.max(...frettedPositions) - Math.min(...frettedPositions);
+          expect(span).toBeLessThanOrEqual(MAX_HAND_SPAN);
+        }
+      });
+    });
+
+    it('should handle minor triads', () => {
+      const voicings = solveTriadVoicings('A', 'Minor');
+
+      expect(voicings.length).toBeGreaterThan(0);
+
+      // A Minor triad: A, C, E
+      const bassNotes = new Set(voicings.map(v => v.bassNote));
+      expect(bassNotes.has('A')).toBe(true);
+      expect(bassNotes.has('C')).toBe(true);
+      expect(bassNotes.has('E')).toBe(true);
+    });
+
+    it('should handle diminished triads', () => {
+      const voicings = solveTriadVoicings('B', 'Diminished');
+
+      expect(voicings.length).toBeGreaterThan(0);
+
+      // B Dim triad: B, D, F
+      const bassNotes = new Set(voicings.map(v => v.bassNote));
+      expect(bassNotes.has('B')).toBe(true);
+      expect(bassNotes.has('D')).toBe(true);
+      expect(bassNotes.has('F')).toBe(true);
+    });
+
+    it('should handle augmented triads', () => {
+      const voicings = solveTriadVoicings('C', 'Augmented');
+
+      expect(voicings.length).toBeGreaterThan(0);
+
+      // C Aug triad: C, E, G#
+      // Note: G# might be stored as Ab depending on Tonal.js
+      voicings.forEach(v => {
+        expect(v.frets.filter(f => f !== null).length).toBe(3);
+      });
+    });
+
+    it('should extract triads from 7th chord qualities', () => {
+      // Dominant 7 should give major triad shapes
+      const dom7Triads = solveTriadVoicings('G', 'Dominant 7');
+      expect(dom7Triads.length).toBeGreaterThan(0);
+
+      // Minor 7 should give minor triad shapes
+      const m7Triads = solveTriadVoicings('E', 'Minor 7');
+      expect(m7Triads.length).toBeGreaterThan(0);
+    });
+
+    it('should return empty for invalid quality', () => {
+      const voicings = solveTriadVoicings('C', 'InvalidQuality');
+      expect(voicings).toEqual([]);
+    });
+
+    it('should sort by string set first, then by fret position', () => {
+      const voicings = solveTriadVoicings('E', 'Major');
+
+      // Find the lowest string index for each voicing
+      const getLowestString = (v: { frets: (number | null)[] }) =>
+        v.frets.findIndex(f => f !== null);
+
+      for (let i = 1; i < voicings.length; i++) {
+        const prevString = getLowestString(voicings[i - 1]);
+        const currString = getLowestString(voicings[i]);
+
+        if (currString === prevString) {
+          // Same string set - should be sorted by fret
+          expect(voicings[i].lowestFret).toBeGreaterThanOrEqual(voicings[i - 1].lowestFret);
+        } else {
+          // Different string set - higher string index should come after
+          expect(currString).toBeGreaterThan(prevString);
+        }
+      }
     });
   });
 });

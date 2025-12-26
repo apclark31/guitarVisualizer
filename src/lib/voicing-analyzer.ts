@@ -106,8 +106,18 @@ function getSemitoneDistance(fromNote: string, toNote: string): number {
   return ((toMidi - fromMidi) % 12 + 12) % 12;
 }
 
-/** Try to match pitch classes to a known chord quality */
-function matchChordQuality(root: string, pitchClasses: string[]): { quality: string; missing: string[]; present: string[] } | null {
+/** Match result for a chord quality */
+interface ChordMatch {
+  quality: string;
+  missing: string[];
+  present: string[];
+  isExactMatch: boolean;
+}
+
+/** Try to match pitch classes to known chord qualities - returns ALL matches */
+function matchChordQualities(root: string, pitchClasses: string[]): ChordMatch[] {
+  const matches: ChordMatch[] = [];
+
   // Calculate intervals from the potential root
   const intervals = pitchClasses.map(pc => getSemitoneDistance(root, pc));
   const normalizedIntervals = normalizeIntervals(intervals);
@@ -139,11 +149,13 @@ function matchChordQuality(root: string, pitchClasses: string[]): { quality: str
         .filter(i => !normalizedIntervals.includes(i))
         .map(i => getIntervalLabel(i));
 
-      return { quality, missing, present };
+      const isExactMatch = missing.length === 0;
+
+      matches.push({ quality, missing, present, isExactMatch });
     }
   }
 
-  return null;
+  return matches;
 }
 
 /** Get Tonal.js chord symbol from quality name */
@@ -171,23 +183,56 @@ function generateSuggestions(pitchClasses: string[], bassNote: string): ChordSug
   for (const potentialRoot of pitchClasses) {
     // Calculate intervals from this root
     const intervals = pitchClasses.map(pc => getSemitoneDistance(potentialRoot, pc));
-    const voicingType = detectVoicingType(intervals);
+    const detectedVoicingType = detectVoicingType(intervals);
 
-    // Try to match known chord qualities
-    const match = matchChordQuality(potentialRoot, pitchClasses);
+    // Get ALL matching chord qualities
+    const matches = matchChordQualities(potentialRoot, pitchClasses);
 
-    if (match) {
+    for (const match of matches) {
       const displayName = potentialRoot + getChordSymbol(match.quality);
+      const baseConfidence = calculateConfidence(potentialRoot, bassNote, match.quality, match.present.length);
 
+      // Determine the voicing type for this specific match
+      // - Exact match (no missing notes): use detected type (triad, shell, etc.)
+      // - Partial match (missing notes): label as 'partial' for extended chords
+      const voicingType = match.isExactMatch ? detectedVoicingType : 'partial';
+
+      // Add the detected voicing type entry
       suggestions.push({
         root: potentialRoot,
         quality: match.quality,
         displayName: displayName || `${potentialRoot} ${match.quality}`,
-        confidence: calculateConfidence(potentialRoot, bassNote, match.quality, match.present.length),
+        confidence: match.isExactMatch ? baseConfidence : baseConfidence - 10,
         voicingType,
         missingIntervals: match.missing,
         presentIntervals: match.present,
       });
+
+      // For exact triad matches, also offer a "full" voicing option from chords-db
+      if (match.isExactMatch && detectedVoicingType === 'triad') {
+        suggestions.push({
+          root: potentialRoot,
+          quality: match.quality,
+          displayName: displayName || `${potentialRoot} ${match.quality}`,
+          confidence: baseConfidence - 5,
+          voicingType: 'full',
+          missingIntervals: match.missing,
+          presentIntervals: match.present,
+        });
+      }
+
+      // For exact shell matches, also offer a "full" voicing option
+      if (match.isExactMatch && detectedVoicingType.startsWith('shell-')) {
+        suggestions.push({
+          root: potentialRoot,
+          quality: match.quality,
+          displayName: displayName || `${potentialRoot} ${match.quality}`,
+          confidence: baseConfidence - 5,
+          voicingType: 'full',
+          missingIntervals: match.missing,
+          presentIntervals: match.present,
+        });
+      }
     }
   }
 
@@ -197,22 +242,24 @@ function generateSuggestions(pitchClasses: string[], bassNote: string): ChordSug
   for (const potentialRoot of allNotes) {
     if (pitchClasses.includes(potentialRoot)) continue; // Already checked
 
-    const match = matchChordQuality(potentialRoot, pitchClasses);
-    if (match && match.present.length >= 2) {
-      const intervals = pitchClasses.map(pc => getSemitoneDistance(potentialRoot, pc));
-      const voicingType = detectVoicingType([0, ...intervals]); // Include root in type detection
+    const matches = matchChordQualities(potentialRoot, pitchClasses);
+    for (const match of matches) {
+      if (match.present.length >= 2) {
+        const intervals = pitchClasses.map(pc => getSemitoneDistance(potentialRoot, pc));
+        const voicingType = detectVoicingType([0, ...intervals]); // Include root in type detection
 
-      const displayName = potentialRoot + getChordSymbol(match.quality);
+        const displayName = potentialRoot + getChordSymbol(match.quality);
 
-      suggestions.push({
-        root: potentialRoot,
-        quality: match.quality,
-        displayName: displayName || `${potentialRoot} ${match.quality}`,
-        confidence: calculateConfidence(potentialRoot, bassNote, match.quality, match.present.length) - 20, // Penalty for missing root
-        voicingType,
-        missingIntervals: ['R', ...match.missing],
-        presentIntervals: match.present,
-      });
+        suggestions.push({
+          root: potentialRoot,
+          quality: match.quality,
+          displayName: displayName || `${potentialRoot} ${match.quality}`,
+          confidence: calculateConfidence(potentialRoot, bassNote, match.quality, match.present.length) - 20, // Penalty for missing root
+          voicingType: 'partial', // Always partial when root is missing
+          missingIntervals: ['R', ...match.missing],
+          presentIntervals: match.present,
+        });
+      }
     }
   }
 

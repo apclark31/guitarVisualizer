@@ -108,8 +108,9 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   // Actions
   setTargetChord: (root: string, quality: string) => {
-    // Get voicings from chords-db (falls back to solver)
-    const voicings = getVoicingsForChord(root, quality);
+    const { voicingTypeFilter } = get();
+    // Get voicings from chords-db (falls back to solver), respecting filter
+    const voicings = getVoicingsForChord(root, quality, 12, voicingTypeFilter);
 
     // Auto-select the first voicing if available
     const firstVoicing = voicings[0];
@@ -215,6 +216,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
       detectedChord: null,
       suggestions: [],
       voicingType: null,
+      voicingTypeFilter: 'all', // Reset filter to default
       targetRoot: '',
       targetQuality: '',
       availableVoicings: [],
@@ -237,9 +239,12 @@ export const useMusicStore = create<AppState>((set, get) => ({
     set({ isAudioLoaded: loaded });
   },
 
-  applySuggestion: (suggestion: ChordSuggestion) => {
-    const { guitarStringState } = get();
-    const voicings = getVoicingsForChord(suggestion.root, suggestion.quality);
+  applySuggestion: (suggestion: ChordSuggestion, filterOverride?: VoicingFilterType) => {
+    const { guitarStringState, voicingTypeFilter } = get();
+
+    // Determine filter: use override if provided, otherwise current filter
+    const filter = filterOverride ?? voicingTypeFilter;
+    const voicings = getVoicingsForChord(suggestion.root, suggestion.quality, 12, filter);
 
     // Try to find a voicing that preserves user's current fret positions
     const matchingVoicing = findMatchingVoicing(guitarStringState, voicings);
@@ -258,6 +263,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
         isCustomShape: false,
         suggestions: [],
         voicingType: null,
+        voicingTypeFilter: filter, // Update filter to match selection
         detectedChord: null,
       });
     }
@@ -265,7 +271,8 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   applyContext: (suggestion: ChordSuggestion) => {
     // Keep user's current frets, just set the chord context for display
-    const voicings = getVoicingsForChord(suggestion.root, suggestion.quality);
+    const { voicingTypeFilter } = get();
+    const voicings = getVoicingsForChord(suggestion.root, suggestion.quality, 12, voicingTypeFilter);
 
     set({
       targetRoot: suggestion.root,
@@ -280,6 +287,25 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   setVoicingTypeFilter: (filter: VoicingFilterType) => {
-    set({ voicingTypeFilter: filter });
+    const { targetRoot, targetQuality } = get();
+
+    // If a chord is already selected, re-fetch voicings with new filter
+    if (targetRoot && targetQuality) {
+      const voicings = getVoicingsForChord(targetRoot, targetQuality, 12, filter);
+      const firstVoicing = voicings[0];
+      const guitarState = firstVoicing
+        ? voicingToGuitarState(firstVoicing.frets)
+        : { ...initialGuitarState };
+
+      set({
+        voicingTypeFilter: filter,
+        availableVoicings: voicings,
+        currentVoicingIndex: 0,
+        guitarStringState: guitarState,
+        isCustomShape: false,
+      });
+    } else {
+      set({ voicingTypeFilter: filter });
+    }
   },
 }));
