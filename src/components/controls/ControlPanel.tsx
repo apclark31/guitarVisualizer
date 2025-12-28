@@ -1,15 +1,13 @@
 import { useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { useAudioEngine } from '../../hooks/useAudioEngine';
-import { CHROMATIC_NOTES, CHORD_QUALITIES, VOICING_FILTER_OPTIONS } from '../../config/constants';
-import type { StringIndex, VoicingFilterType } from '../../types';
+import type { StringIndex } from '../../types';
 import styles from './ControlPanel.module.css';
 
 export function ControlPanel() {
   const {
     targetRoot,
     targetQuality,
-    setTargetChord,
     displayMode,
     setDisplayMode,
     playbackMode,
@@ -20,36 +18,12 @@ export function ControlPanel() {
     isCustomShape,
     clearAllStrings,
     guitarStringState,
-    voicingTypeFilter,
-    setVoicingTypeFilter,
   } = useMusicStore();
 
   const { isLoaded, playChord } = useAudioEngine();
 
   // Check if there are any notes to play
   const hasNotes = Object.values(guitarStringState).some(fret => fret !== null);
-
-  const handleRootChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newRoot = e.target.value;
-    if (newRoot && targetQuality) {
-      setTargetChord(newRoot, targetQuality);
-    } else if (newRoot && !targetQuality) {
-      setTargetChord(newRoot, 'Major');
-    }
-  };
-
-  const handleQualityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newQuality = e.target.value;
-    if (targetRoot && newQuality) {
-      setTargetChord(targetRoot, newQuality);
-    } else if (!targetRoot && newQuality) {
-      setTargetChord('C', newQuality);
-    }
-  };
-
-  const handleVoicingFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setVoicingTypeFilter(e.target.value as VoicingFilterType);
-  };
 
   const isFreeFormMode = !targetRoot || !targetQuality;
 
@@ -98,60 +72,7 @@ export function ControlPanel() {
 
   return (
     <div className={styles.controlPanel}>
-      {/* Row 1: Chord Selection */}
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Chord Selection</h3>
-        <div className={styles.row}>
-          <label className={styles.label}>
-            Root
-            <select
-              value={targetRoot}
-              onChange={handleRootChange}
-              className={styles.select}
-            >
-              <option value="">--</option>
-              {CHROMATIC_NOTES.map((note) => (
-                <option key={note} value={note}>
-                  {note}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className={styles.label}>
-            Quality
-            <select
-              value={targetQuality}
-              onChange={handleQualityChange}
-              className={styles.select}
-            >
-              <option value="">--</option>
-              {CHORD_QUALITIES.map((quality) => (
-                <option key={quality} value={quality}>
-                  {quality}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className={styles.label}>
-            Voicing
-            <select
-              value={voicingTypeFilter}
-              onChange={handleVoicingFilterChange}
-              className={styles.select}
-            >
-              {VOICING_FILTER_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </div>
-
-      {/* Row 1: Voicing */}
+      {/* Row 1: Voicing Navigation */}
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>Voicing</h3>
         <div className={styles.voicingSpacer} />

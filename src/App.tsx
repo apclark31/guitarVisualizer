@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { Fretboard } from './components/visuals/Fretboard';
 import { ControlPanel } from './components/controls/ControlPanel';
-import { ChordDisplay } from './components/controls/ChordDisplay';
+import { ChordHeader } from './components/controls/ChordHeader';
+import { AppHeader } from './components/layout/AppHeader';
 import { useMusicStore } from './store/useMusicStore';
 import type { StringIndex } from './types';
 import './App.css';
@@ -41,27 +42,27 @@ function App() {
 
   return (
     <div className="app">
-      <header className="header">
-        <h1 className="title">Guitar Theory Visualizer</h1>
-      </header>
+      <AppHeader />
 
-      <div className="chordBar">
-        <ChordDisplay />
+      <div className="content">
+        <div className="chordBar">
+          <ChordHeader />
+        </div>
+
+        <main className="main">
+          <section className="visualizer">
+            <Fretboard />
+          </section>
+        </main>
+
+        <div className="controlsBar">
+          <ControlPanel />
+        </div>
+
+        <footer className="footer">
+          <p>Made with ☕ and 🎸 by Alex in PDX</p>
+        </footer>
       </div>
-
-      <div className="controlsBar">
-        <ControlPanel />
-      </div>
-
-      <main className="main">
-        <section className="visualizer">
-          <Fretboard />
-        </section>
-      </main>
-
-      <footer className="footer">
-        <p>Made with ☕ and 🎸 by Alex in PDX</p>
-      </footer>
     </div>
   );
 }

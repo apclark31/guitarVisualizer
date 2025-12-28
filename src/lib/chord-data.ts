@@ -13,29 +13,60 @@ import type { ChordVoicing, FretNumber, VoicingFilterType } from '../types';
 
 /**
  * Map our UI quality names to chords-db suffixes
+ *
+ * Note: chords-db uses specific suffix naming conventions.
+ * If a chord isn't in the database, the solver will be used as fallback.
  */
 const QUALITY_TO_SUFFIX: Record<string, string> = {
+  // Basic
   'Major': 'major',
   'Minor': 'minor',
+  'Power (5)': '5',
+  'Diminished': 'dim',
+  'Augmented': 'aug',
+  // Suspended
+  'Sus2': 'sus2',
+  'Sus4': 'sus4',
+  '7sus4': '7sus4',
+  // 7th
   'Dominant 7': '7',
   'Major 7': 'maj7',
   'Minor 7': 'm7',
-  'Diminished': 'dim',
-  'Augmented': 'aug',
-  'Sus2': 'sus2',
-  'Sus4': 'sus4',
-  'Power (5)': '5',
-  // Extended chords (may fall back to solver)
+  'Minor 7♭5': 'm7b5',
   'Diminished 7': 'dim7',
-  'Add9': 'add9',
-  'Minor Add9': 'madd9',
-  '9': '9',
+  'Minor-Major 7': 'mmaj7',
+  'Augmented 7': 'aug7',
+  'Major 7♯5': 'maj7#5',
+  'Major 7♭5': 'maj7b5',
+  // 6th
+  'Major 6': '6',
+  'Minor 6': 'm6',
+  '6/9': '69',
+  'Minor 6/9': 'm69',
+  // Add
+  'Add 9': 'add9',
+  'Add 11': 'add11',
+  'Minor Add 9': 'madd9',
+  // 9th
+  'Dominant 9': '9',
   'Major 9': 'maj9',
   'Minor 9': 'm9',
-  '11': '11',
-  '13': '13',
-  '6': '6',
-  '69': '69',
+  'Minor-Major 9': 'mmaj9',
+  'Augmented 9': 'aug9',
+  '9♭5': '9b5',
+  '9♯11': '9#11',
+  // Extended
+  'Dominant 11': '11',
+  'Major 11': 'maj11',
+  'Minor 11': 'm11',
+  'Minor-Major 11': 'mmaj11',
+  'Dominant 13': '13',
+  'Major 13': 'maj13',
+  // Altered
+  '7♯9': '7#9',
+  '7♭9': '7b9',
+  '7♭5': '7b5',
+  'Altered': 'alt',
 };
 
 /**

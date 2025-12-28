@@ -7,7 +7,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   background-color: #171717;
   color: #ffffff;
@@ -20,21 +20,15 @@ body {
   min-height: 100vh;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 16px 24px;
+}
+
+/* Content wrapper - 14px below header for separation */
+.content {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-}
-
-/* Header - compact */
-.header {
-  text-align: center;
-}
-
-.title {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-  color: #a1a1aa;
-  letter-spacing: 0.5px;
+  padding: 14px 24px 16px;
+  flex: 1;
 }
 
 /* Chord Display Bar */
@@ -51,7 +45,6 @@ body {
 
 /* Main content - fretboard */
 .main {
-  flex: 1;
   display: flex;
   flex-direction: column;
 }
@@ -68,30 +61,23 @@ body {
   padding: 12px;
   color: #52525b;
   font-size: 13px;
+  margin-top: auto; /* Push to bottom */
 }
 
 /* Mobile Layout */
 @media (max-width: 768px) {
-  .app {
-    padding: 12px 0;
+  .content {
+    padding: 14px 12px 12px;
     gap: 8px;
   }
 
-  .header {
-    padding: 0 12px;
-  }
-
-  .title {
-    font-size: 16px;
-  }
-
   .chordBar {
-    padding: 0 12px;
+    padding: 0;
   }
 
   .main {
     flex: none;
-    padding: 0 12px;
+    padding: 0;
   }
 
   .controlsBar {
@@ -102,10 +88,9 @@ body {
     padding: 12px;
   }
 
-  /* Reorder: header, chord, fretboard, controls, footer */
-  .header { order: 1; }
-  .chordBar { order: 2; }
-  .main { order: 3; }
-  .controlsBar { order: 4; }
-  .footer { order: 5; }
+  /* Reorder: chord, fretboard, controls, footer */
+  .chordBar { order: 1; }
+  .main { order: 2; }
+  .controlsBar { order: 3; }
+  .footer { order: 4; }
 }

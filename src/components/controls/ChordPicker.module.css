@@ -1,0 +1,286 @@
+/* ChordPicker - Multi-column chord selector */
+
+.container {
+  position: relative;
+  width: 100%;
+}
+
+/* Trigger button */
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface, #333333);
+  border: 1px solid var(--color-border, #525252);
+  border-radius: 6px;
+  color: var(--color-text, #e5e5e5);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  height: 38px;
+}
+
+.trigger:hover {
+  border-color: var(--color-border-hover, #3b82f6);
+}
+
+.trigger:focus {
+  outline: none;
+  border-color: var(--color-accent, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.triggerText {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.triggerIcon {
+  margin-left: 0.5rem;
+  opacity: 0.6;
+  font-size: 0.8rem;
+}
+
+/* Picker dropdown (desktop) - use fixed position modal */
+.picker {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 480px;
+  max-width: 95vw;
+  background: var(--color-surface, #262626);
+  border: 1px solid var(--color-border, #404040);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Desktop close button */
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  background: var(--color-surface-hover, #333333);
+  border: none;
+  border-radius: 50%;
+  color: var(--color-text-muted, #a3a3a3);
+  font-size: 0.875rem;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.closeButton:hover {
+  background: var(--color-border, #404040);
+  color: var(--color-text, #e5e5e5);
+}
+
+/* Column headers */
+.headers {
+  display: grid;
+  grid-template-columns: 80px 100px 1fr;
+  border-bottom: 1px solid var(--color-border, #404040);
+  background: var(--color-surface-dark, #1f1f1f);
+  border-radius: 12px 12px 0 0;
+  padding-top: 0.25rem;
+}
+
+.header {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #a3a3a3);
+  text-align: left;
+}
+
+/* Columns container */
+.columns {
+  display: grid;
+  grid-template-columns: 80px 100px 1fr;
+  height: 280px;
+  flex: 1;
+}
+
+/* Individual column */
+.column {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-right: 1px solid var(--color-border, #404040);
+  scroll-behavior: smooth;
+}
+
+.column:last-child {
+  border-right: none;
+}
+
+/* Scrollbar styling */
+.column::-webkit-scrollbar {
+  width: 6px;
+}
+
+.column::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.column::-webkit-scrollbar-thumb {
+  background: var(--color-border, #404040);
+  border-radius: 3px;
+}
+
+.column::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover, #525252);
+}
+
+/* Option buttons */
+.option {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text, #e5e5e5);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.option:hover {
+  background: var(--color-surface-hover, #333333);
+}
+
+.option.active {
+  background: var(--color-accent-bg, rgba(59, 130, 246, 0.15));
+  color: var(--color-accent, #3b82f6);
+  font-weight: 600;
+}
+
+/* Apply button - fixed at bottom */
+.applyButton {
+  display: block;
+  width: 100%;
+  padding: 0.875rem;
+  background: var(--color-accent, #3b82f6);
+  border: none;
+  border-radius: 0 0 12px 12px;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.applyButton:hover {
+  background: var(--color-accent-hover, #2563eb);
+}
+
+.applyButton:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Backdrop overlay */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* =============================================
+   Mobile Styles - Bottom sheet modal
+   ============================================= */
+
+@media (max-width: 768px) {
+  .picker {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    transform: none;
+    border-radius: 16px 16px 0 0;
+    border-bottom: none;
+    max-height: 70vh;
+  }
+
+  .closeButton {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .headers {
+    grid-template-columns: 70px 110px 1fr;
+    padding-top: 0.5rem;
+    border-radius: 16px 16px 0 0;
+  }
+
+  /* Mobile headers - larger and more prominent than options */
+  .header {
+    padding: 0.875rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #a1a1aa;
+  }
+
+  .columns {
+    grid-template-columns: 70px 110px 1fr;
+    height: 300px;
+  }
+
+  /* Larger touch targets on mobile */
+  .option {
+    padding: 0.875rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .applyButton {
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 0;
+  }
+}
+
+/* Animation for type column when family changes */
+.column:last-child {
+  transition: opacity 0.15s ease;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .column {
+    scroll-behavior: auto;
+  }
+
+  .column:last-child {
+    transition: none;
+  }
+
+  .option,
+  .trigger,
+  .applyButton {
+    transition: none;
+  }
+}

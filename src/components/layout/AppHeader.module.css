@@ -1,0 +1,206 @@
+/* AppHeader - Transparent header with drawer menu */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: transparent;
+}
+
+.brand {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #e5e5e5;
+  letter-spacing: -0.01em;
+}
+
+/* Hamburger menu button */
+.menuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+.menuButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 20px;
+  height: 14px;
+}
+
+.hamburgerLine {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: #e5e5e5;
+  border-radius: 1px;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+/* Drawer */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 85vw;
+  background: #1a1a1a;
+  border-left: 1px solid #2a2a2a;
+  z-index: 999;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawerOpen {
+  transform: translateX(0);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.drawerBrand {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.closeIcon {
+  font-size: 1.5rem;
+  color: #a3a3a3;
+  line-height: 1;
+}
+
+/* Navigation list */
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0;
+  flex: 1;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  color: #a3a3a3;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  border-left: 3px solid transparent;
+}
+
+.navLink:hover {
+  color: #e5e5e5;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.navLinkActive {
+  color: #3b82f6;
+  border-left-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.navLinkDisabled {
+  color: #525252;
+  cursor: default;
+}
+
+.navLinkDisabled:hover {
+  color: #525252;
+  background: transparent;
+}
+
+.comingSoon {
+  margin-left: auto;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #525252;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.githubIcon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px 16px;
+  }
+
+  .brand {
+    font-size: 1.125rem;
+  }
+
+  .drawer {
+    width: 260px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .drawer,
+  .overlay,
+  .menuButton,
+  .closeButton,
+  .navLink {
+    transition: none;
+  }
+}

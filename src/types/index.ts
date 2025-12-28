@@ -1,5 +1,10 @@
 // Core music types for the chord visualizer
 
+import type { ChordFamily } from '../config/constants';
+
+/** Re-export ChordFamily for convenience */
+export type { ChordFamily } from '../config/constants';
+
 /** String index: 0 = Low E, 5 = High E */
 export type StringIndex = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -73,6 +78,7 @@ export interface DetectedChordInfo {
 export interface AppState {
   // User Selection (Target)
   targetRoot: string;
+  targetFamily: ChordFamily | '';
   targetQuality: string;
 
   // Solver Output
@@ -102,6 +108,7 @@ export interface AppState {
 
   // Actions
   setTargetChord: (root: string, quality: string) => void;
+  setChord: (root: string, family: ChordFamily, quality: string) => void;
   setVoicingIndex: (index: number) => void;
   setFret: (stringIndex: StringIndex, fret: FretNumber) => void;
   clearString: (stringIndex: StringIndex) => void;

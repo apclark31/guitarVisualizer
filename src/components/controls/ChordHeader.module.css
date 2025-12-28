@@ -1,0 +1,216 @@
+/* ChordHeader - Unified chord identity + picker */
+
+.chordHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  background-color: #262626;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+  overflow: hidden;
+}
+
+/* Identity section - chord name, notes, subtext (header area) */
+.identitySection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  height: 72px; /* Fixed height to prevent DOM shift */
+  padding: 0 20px;
+  width: 100%;
+  background-color: #1f1f1f; /* Slightly darker to distinguish */
+}
+
+.mainRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #a1a1aa;
+}
+
+.titleSelected {
+  font-size: 24px;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.notes {
+  font-size: 14px;
+  color: #71717a;
+}
+
+.subtext {
+  font-size: 13px;
+  color: #52525b;
+}
+
+.subtextEmpty {
+  font-size: 14px;
+  color: #71717a;
+}
+
+.voicingBadge {
+  font-size: 11px;
+  font-weight: 500;
+  color: #a1a1aa;
+  background-color: #3f3f46;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.infoBubble {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #3b82f6;
+  background-color: transparent;
+  color: #3b82f6;
+  font-size: 12px;
+  font-weight: 600;
+  font-style: italic;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.infoBubble:hover {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+/* Controls row - picker + voicing dropdown (input area) */
+.controlsRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  width: 100%;
+  padding: 12px 16px 14px;
+  background-color: #262626;
+  border-top: 1px solid #333333;
+}
+
+.picker {
+  flex: 1;
+  min-width: 0;
+}
+
+.voicingLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 0 0 110px;
+  min-width: 0;
+}
+
+.voicingLabelText {
+  font-size: 11px;
+  color: #71717a;
+}
+
+.voicingSelect {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #525252;
+  background-color: #333333;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  width: 100%;
+  height: 38px;
+}
+
+.voicingSelect:hover {
+  border-color: #3b82f6;
+}
+
+.voicingSelect:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .chordHeader {
+    border-radius: 8px;
+    max-width: 100%;
+  }
+
+  .identitySection {
+    gap: 2px;
+    height: 60px; /* Fixed height for mobile */
+    padding: 0 16px;
+  }
+
+  .mainRow {
+    gap: 8px;
+  }
+
+  .title {
+    font-size: 16px;
+  }
+
+  .titleSelected {
+    font-size: 20px;
+  }
+
+  .notes {
+    font-size: 13px;
+  }
+
+  .subtext {
+    font-size: 12px;
+  }
+
+  .voicingBadge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  /* Controls row: picker takes ~68%, voicing ~30% */
+  .controlsRow {
+    gap: 8px;
+    padding: 10px 12px 12px;
+  }
+
+  .picker {
+    flex: 0 0 68%;
+  }
+
+  .voicingLabel {
+    flex: 0 0 30%;
+  }
+
+  .voicingSelect {
+    font-size: 13px;
+    padding: 8px 6px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .infoBubble {
+    transition: none;
+  }
+
+  .voicingSelect {
+    transition: none;
+  }
+}

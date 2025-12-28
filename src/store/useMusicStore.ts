@@ -11,10 +11,12 @@ import type {
   VoicingFilterType,
   ChordSuggestion,
   ChordVoicing,
+  ChordFamily,
 } from '../types';
 import { getVoicingsForChord } from '../lib/chord-data';
 import { detectChord } from '../lib/chord-detector';
 import { analyzeVoicing } from '../lib/voicing-analyzer';
+import { getFamilyForType } from '../config/constants';
 
 /** Initial guitar state - all strings muted */
 const initialGuitarState: GuitarStringState = {
@@ -79,6 +81,7 @@ function findMatchingVoicing(
 export const useMusicStore = create<AppState>((set, get) => ({
   // User Selection (Target) - empty by default (free-form mode)
   targetRoot: '',
+  targetFamily: '',
   targetQuality: '',
 
   // Solver Output
@@ -112,6 +115,9 @@ export const useMusicStore = create<AppState>((set, get) => ({
     // Get voicings from chords-db (falls back to solver), respecting filter
     const voicings = getVoicingsForChord(root, quality, 12, voicingTypeFilter);
 
+    // Derive family from quality
+    const family = getFamilyForType(quality) || '';
+
     // Auto-select the first voicing if available
     const firstVoicing = voicings[0];
     const guitarState = firstVoicing
@@ -120,12 +126,36 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
     set({
       targetRoot: root,
+      targetFamily: family,
       targetQuality: quality,
       availableVoicings: voicings,
       currentVoicingIndex: 0,
       isCustomShape: false,
       guitarStringState: guitarState,
       detectedChord: null, // Clear detection when using solver
+    });
+  },
+
+  setChord: (root: string, family: ChordFamily, quality: string) => {
+    const { voicingTypeFilter } = get();
+    // Get voicings from chords-db (falls back to solver), respecting filter
+    const voicings = getVoicingsForChord(root, quality, 12, voicingTypeFilter);
+
+    // Auto-select the first voicing if available
+    const firstVoicing = voicings[0];
+    const guitarState = firstVoicing
+      ? voicingToGuitarState(firstVoicing.frets)
+      : { ...initialGuitarState };
+
+    set({
+      targetRoot: root,
+      targetFamily: family,
+      targetQuality: quality,
+      availableVoicings: voicings,
+      currentVoicingIndex: 0,
+      isCustomShape: false,
+      guitarStringState: guitarState,
+      detectedChord: null,
     });
   },
 
@@ -177,6 +207,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
       voicingType,
       // Clear target chord when manually editing
       targetRoot: '',
+      targetFamily: '',
       targetQuality: '',
       availableVoicings: [],
     });
@@ -218,6 +249,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
       voicingType: null,
       voicingTypeFilter: 'all', // Reset filter to default
       targetRoot: '',
+      targetFamily: '',
       targetQuality: '',
       availableVoicings: [],
     });
@@ -246,6 +278,9 @@ export const useMusicStore = create<AppState>((set, get) => ({
     const filter = filterOverride ?? voicingTypeFilter;
     const voicings = getVoicingsForChord(suggestion.root, suggestion.quality, 12, filter);
 
+    // Derive family from quality
+    const family = getFamilyForType(suggestion.quality) || '';
+
     // Try to find a voicing that preserves user's current fret positions
     const matchingVoicing = findMatchingVoicing(guitarStringState, voicings);
     const selectedIndex = matchingVoicing
@@ -256,6 +291,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
     if (selectedVoicing) {
       set({
         targetRoot: suggestion.root,
+        targetFamily: family,
         targetQuality: suggestion.quality,
         availableVoicings: voicings,
         currentVoicingIndex: selectedIndex,
@@ -274,8 +310,12 @@ export const useMusicStore = create<AppState>((set, get) => ({
     const { voicingTypeFilter } = get();
     const voicings = getVoicingsForChord(suggestion.root, suggestion.quality, 12, voicingTypeFilter);
 
+    // Derive family from quality
+    const family = getFamilyForType(suggestion.quality) || '';
+
     set({
       targetRoot: suggestion.root,
+      targetFamily: family,
       targetQuality: suggestion.quality,
       availableVoicings: voicings,
       currentVoicingIndex: -1, // -1 indicates custom/user shape
