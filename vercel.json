@@ -1,0 +1,27 @@
+{
+  "rewrites": [
+    {
+      "source": "/chordCompass",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/chordCompass/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/chordCompass/assets/:path*",
+      "destination": "/assets/:path*"
+    },
+    {
+      "source": "/chordCompass/:path*",
+      "destination": "/:path*"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/chordCompass/",
+      "permanent": false
+    }
+  ]
+}

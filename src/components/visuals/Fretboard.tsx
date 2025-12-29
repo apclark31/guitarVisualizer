@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { useAudioEngine } from '../../hooks/useAudioEngine';
 import {
@@ -34,9 +35,49 @@ const STRING_THICKNESS = [2.5, 2.0, 1.6, 1.3, 1.0, 0.8];
 export function Fretboard() {
   const { guitarStringState, setFret, clearString, displayMode, targetRoot, detectedChord } = useMusicStore();
   const { playFretNote, isLoaded } = useAudioEngine();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Determine the root note to use for interval coloring
   const colorRoot = targetRoot || (detectedChord?.bassNote) || null;
+
+  // Auto-scroll to keep active frets visible when voicing changes
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Get all active fret positions (non-null, non-zero for more useful centering)
+    const activeFrets = Object.values(guitarStringState).filter(
+      (fret): fret is number => fret !== null && fret > 0
+    );
+
+    if (activeFrets.length === 0) return;
+
+    // Find the center of the voicing
+    const minFret = Math.min(...activeFrets);
+    const maxFret = Math.max(...activeFrets);
+    const centerFret = (minFret + maxFret) / 2;
+
+    // Calculate the x position of the center fret in SVG coordinates
+    const centerX = DIM.PADDING + DIM.NUT_WIDTH + (centerFret - 0.5) * DIM.FRET_SPACING;
+
+    // Get the scale factor (SVG width vs actual container scroll width)
+    const svgWidth = DIM.PADDING * 2 + DIM.NUT_WIDTH + FRET_COUNT * DIM.FRET_SPACING;
+    const scrollWidth = container.scrollWidth;
+    const scale = scrollWidth / svgWidth;
+
+    // Calculate target scroll position to center the voicing
+    const scaledCenterX = centerX * scale;
+    const containerWidth = container.clientWidth;
+    const targetScroll = scaledCenterX - containerWidth / 2;
+
+    // Only scroll on mobile (when there's actual overflow)
+    if (scrollWidth > containerWidth) {
+      container.scrollTo({
+        left: Math.max(0, targetScroll),
+        behavior: 'smooth',
+      });
+    }
+  }, [guitarStringState]);
 
   // Calculate SVG dimensions
   const width = DIM.PADDING * 2 + DIM.NUT_WIDTH + FRET_COUNT * DIM.FRET_SPACING;
@@ -320,7 +361,7 @@ export function Fretboard() {
 
   return (
     <div className={styles.fretboardWrapper}>
-      <div className={styles.fretboardContainer}>
+      <div className={styles.fretboardContainer} ref={containerRef}>
         <svg
           viewBox={`0 0 ${width} ${height}`}
           preserveAspectRatio="xMidYMid meet"
