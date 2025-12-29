@@ -2,19 +2,19 @@
   "name": "Chord Compass | Fret Atlas",
   "short_name": "Chord Compass",
   "description": "Demystifying the guitar fretboard and music theory in an intuitive and approachable way.",
-  "start_url": "/chordCompass/",
+  "start_url": "/chordcompass/",
   "display": "standalone",
   "background_color": "#09090b",
   "theme_color": "#3b82f6",
   "orientation": "any",
   "icons": [
     {
-      "src": "/chordCompass/icon-192.png",
+      "src": "/chordcompass/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/chordCompass/icon-512.png",
+      "src": "/chordcompass/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

@@ -1,26 +1,26 @@
 {
   "rewrites": [
     {
-      "source": "/chordCompass",
+      "source": "/chordcompass",
       "destination": "/index.html"
     },
     {
-      "source": "/chordCompass/",
+      "source": "/chordcompass/",
       "destination": "/index.html"
     },
     {
-      "source": "/chordCompass/assets/:path*",
+      "source": "/chordcompass/assets/:path*",
       "destination": "/assets/:path*"
     },
     {
-      "source": "/chordCompass/:path*",
+      "source": "/chordcompass/:path*",
       "destination": "/:path*"
     }
   ],
   "redirects": [
     {
       "source": "/",
-      "destination": "/chordCompass/",
+      "destination": "/chordcompass/",
       "permanent": false
     }
   ]
