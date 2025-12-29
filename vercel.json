@@ -22,6 +22,16 @@
       "source": "/",
       "destination": "/chordcompass/",
       "permanent": false
+    },
+    {
+      "source": "/chordCompass",
+      "destination": "/chordcompass/",
+      "permanent": true
+    },
+    {
+      "source": "/chordCompass/:path*",
+      "destination": "/chordcompass/:path*",
+      "permanent": true
     }
   ]
 }
