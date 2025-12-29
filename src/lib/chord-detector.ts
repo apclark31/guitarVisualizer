@@ -9,8 +9,8 @@ import { STANDARD_TUNING } from '../config/constants';
 import type { GuitarStringState, StringIndex } from '../types';
 
 /** Get the full note name (with octave) at a string/fret position */
-function getNoteAtPosition(stringIndex: number, fret: number): string {
-  const openMidi = Note.midi(STANDARD_TUNING[stringIndex]);
+function getNoteAtPosition(stringIndex: number, fret: number, tuning: readonly string[]): string {
+  const openMidi = Note.midi(tuning[stringIndex]);
   if (openMidi === null) return '';
   return Note.fromMidi(openMidi + fret);
 }
@@ -35,15 +35,20 @@ export interface DetectedChord {
 
 /**
  * Detect the chord from the current fretboard state
+ * @param guitarState - The current fret positions
+ * @param tuning - Optional tuning array (defaults to standard tuning)
  */
-export function detectChord(guitarState: GuitarStringState): DetectedChord | null {
+export function detectChord(
+  guitarState: GuitarStringState,
+  tuning: readonly string[] = STANDARD_TUNING
+): DetectedChord | null {
   // Collect all played notes
   const playedNotes: { note: string; pitchClass: string; stringIndex: number }[] = [];
 
   for (let i = 0; i < 6; i++) {
     const fret = guitarState[i as StringIndex];
     if (fret !== null) {
-      const note = getNoteAtPosition(i, fret);
+      const note = getNoteAtPosition(i, fret, tuning);
       playedNotes.push({
         note,
         pitchClass: getPitchClass(note),

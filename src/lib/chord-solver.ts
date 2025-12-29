@@ -41,15 +41,15 @@ const TRIAD_INVERSIONS = [
 ] as const;
 
 /** Get MIDI note number for a string/fret position */
-function getMidiAt(stringIndex: number, fret: number): number {
-  const openMidi = Note.midi(STANDARD_TUNING[stringIndex]);
-  if (openMidi === null) throw new Error(`Invalid tuning note: ${STANDARD_TUNING[stringIndex]}`);
+function getMidiAt(stringIndex: number, fret: number, tuning: readonly string[]): number {
+  const openMidi = Note.midi(tuning[stringIndex]);
+  if (openMidi === null) throw new Error(`Invalid tuning note: ${tuning[stringIndex]}`);
   return openMidi + fret;
 }
 
 /** Get note name (pitch class) at a string/fret position */
-function getNoteAt(stringIndex: number, fret: number): string {
-  const midi = getMidiAt(stringIndex, fret);
+function getNoteAt(stringIndex: number, fret: number, tuning: readonly string[]): string {
+  const midi = getMidiAt(stringIndex, fret, tuning);
   const note = Note.fromMidi(midi);
   return Note.pitchClass(note) || '';
 }
@@ -71,12 +71,13 @@ function findChordTonesOnString(
   stringIndex: number,
   targetNotes: string[],
   minFret: number,
-  maxFret: number
+  maxFret: number,
+  tuning: readonly string[]
 ): number[] {
   const validFrets: number[] = [];
 
   for (let fret = minFret; fret <= maxFret; fret++) {
-    const noteAtFret = getNoteAt(stringIndex, fret);
+    const noteAtFret = getNoteAt(stringIndex, fret, tuning);
     if (targetNotes.some(target => areEnharmonic(noteAtFret, target))) {
       validFrets.push(fret);
     }
@@ -111,13 +112,14 @@ function generateCombinations(
 /** Check if a voicing contains all required notes */
 function hasRequiredNotes(
   frets: (number | null)[],
-  requiredNotes: string[]
+  requiredNotes: string[],
+  tuning: readonly string[]
 ): boolean {
   const presentNotes = new Set<number>();
 
   frets.forEach((fret, stringIndex) => {
     if (fret !== null) {
-      const pitchClass = normalizePitchClass(getNoteAt(stringIndex, fret));
+      const pitchClass = normalizePitchClass(getNoteAt(stringIndex, fret, tuning));
       presentNotes.add(pitchClass);
     }
   });
@@ -160,12 +162,12 @@ function getHighestFret(frets: (number | null)[]): number {
 }
 
 /** Get note names for all played positions in a voicing */
-function getVoicingNotes(frets: (number | null)[]): string[] {
+function getVoicingNotes(frets: (number | null)[], tuning: readonly string[]): string[] {
   const notes: string[] = [];
 
   frets.forEach((fret, stringIndex) => {
     if (fret !== null) {
-      const fullNote = Note.fromMidi(getMidiAt(stringIndex, fret));
+      const fullNote = Note.fromMidi(getMidiAt(stringIndex, fret, tuning));
       notes.push(fullNote);
     }
   });
@@ -224,9 +226,14 @@ function deduplicateVoicings(voicings: ChordVoicing[]): ChordVoicing[] {
  *
  * @param root - Root note (e.g., "C", "F#")
  * @param quality - Chord quality (e.g., "Major", "Minor 7")
+ * @param tuning - Optional tuning array (defaults to standard tuning)
  * @returns Array of valid voicings sorted by lowest fret position
  */
-export function solveChordShapes(root: string, quality: string): ChordVoicing[] {
+export function solveChordShapes(
+  root: string,
+  quality: string,
+  tuning: readonly string[] = STANDARD_TUNING
+): ChordVoicing[] {
   // Get chord symbol (e.g., "Major" -> "M")
   const symbol = QUALITY_TO_SYMBOL[quality] || quality;
   const chordName = root + symbol;
@@ -261,7 +268,8 @@ export function solveChordShapes(root: string, quality: string): ChordVoicing[] 
         stringIndex,
         targetNotes,
         windowStart === 0 ? 0 : windowStart,
-        windowEnd
+        windowEnd,
+        tuning
       );
 
       // Add muted option (null) for each string
@@ -280,12 +288,12 @@ export function solveChordShapes(root: string, quality: string): ChordVoicing[] 
 
       // Must contain essential chord tones
       // For now, require at least the root
-      if (!hasRequiredNotes(frets, [root])) continue;
+      if (!hasRequiredNotes(frets, [root], tuning)) continue;
 
       // Check unique notes - need enough variety
       const uniqueNotes = new Set(
         frets
-          .map((f, i) => f !== null ? normalizePitchClass(getNoteAt(i, f)) : -1)
+          .map((f, i) => f !== null ? normalizePitchClass(getNoteAt(i, f, tuning)) : -1)
           .filter(n => n !== -1)
       );
       if (uniqueNotes.size < minRequiredNotes) continue;
@@ -301,7 +309,7 @@ export function solveChordShapes(root: string, quality: string): ChordVoicing[] 
         frets: frets as FretNumber[],
         lowestFret: getLowestFret(frets),
         highestFret: getHighestFret(frets),
-        noteNames: getVoicingNotes(frets),
+        noteNames: getVoicingNotes(frets, tuning),
       });
     }
   }
@@ -317,8 +325,13 @@ export function solveChordShapes(root: string, quality: string): ChordVoicing[] 
  * Get a limited set of "best" voicings (for UI)
  * Prioritizes practical, human-playable shapes
  */
-export function getBestVoicings(root: string, quality: string, limit = 12): ChordVoicing[] {
-  const allVoicings = solveChordShapes(root, quality);
+export function getBestVoicings(
+  root: string,
+  quality: string,
+  limit = 12,
+  tuning: readonly string[] = STANDARD_TUNING
+): ChordVoicing[] {
+  const allVoicings = solveChordShapes(root, quality, tuning);
 
   const scored = allVoicings.map(v => {
     let score = 0;
@@ -339,7 +352,7 @@ export function getBestVoicings(root: string, quality: string, limit = 12): Chor
     // 4. Prefer root in bass (lowest played string)
     for (let i = 0; i < v.frets.length; i++) {
       if (v.frets[i] !== null) {
-        const bassNote = getNoteAt(i, v.frets[i]!);
+        const bassNote = getNoteAt(i, v.frets[i]!, tuning);
         if (areEnharmonic(bassNote, root)) {
           score += 25;
         }
@@ -413,13 +426,14 @@ function findFretsForNote(
   stringIndex: number,
   targetNote: string,
   minFret: number,
-  maxFret: number
+  maxFret: number,
+  tuning: readonly string[]
 ): number[] {
   const frets: number[] = [];
   const targetPc = normalizePitchClass(targetNote);
 
   for (let fret = minFret; fret <= maxFret; fret++) {
-    const noteAtFret = getNoteAt(stringIndex, fret);
+    const noteAtFret = getNoteAt(stringIndex, fret, tuning);
     if (normalizePitchClass(noteAtFret) === targetPc) {
       frets.push(fret);
     }
@@ -437,9 +451,14 @@ function findFretsForNote(
  *
  * @param root - Root note (e.g., "C", "F#")
  * @param quality - Chord quality (e.g., "Major", "Minor")
+ * @param tuning - Optional tuning array (defaults to standard tuning)
  * @returns Array of triad voicings sorted by position
  */
-export function solveTriadVoicings(root: string, quality: string): ChordVoicing[] {
+export function solveTriadVoicings(
+  root: string,
+  quality: string,
+  tuning: readonly string[] = STANDARD_TUNING
+): ChordVoicing[] {
   // Get the triad quality
   const triadQuality = getTriadQuality(quality);
   if (!triadQuality) {
@@ -486,9 +505,9 @@ export function solveTriadVoicings(root: string, quality: string): ChordVoicing[
         const midStringIdx = stringSet[1];  // Middle string (e.g., A=1)
         const highStringIdx = stringSet[2]; // Highest pitch string (e.g., D=2)
 
-        const lowFrets = findFretsForNote(lowStringIdx, notesForStrings[0], baseFret, maxFret);
-        const midFrets = findFretsForNote(midStringIdx, notesForStrings[1], baseFret, maxFret);
-        const highFrets = findFretsForNote(highStringIdx, notesForStrings[2], baseFret, maxFret);
+        const lowFrets = findFretsForNote(lowStringIdx, notesForStrings[0], baseFret, maxFret, tuning);
+        const midFrets = findFretsForNote(midStringIdx, notesForStrings[1], baseFret, maxFret, tuning);
+        const highFrets = findFretsForNote(highStringIdx, notesForStrings[2], baseFret, maxFret, tuning);
 
         // Try all combinations
         for (const lowFret of lowFrets) {
@@ -509,9 +528,9 @@ export function solveTriadVoicings(root: string, quality: string): ChordVoicing[
 
               // Get note names for played strings
               const noteNames = [
-                Note.fromMidi(getMidiAt(lowStringIdx, lowFret)),
-                Note.fromMidi(getMidiAt(midStringIdx, midFret)),
-                Note.fromMidi(getMidiAt(highStringIdx, highFret)),
+                Note.fromMidi(getMidiAt(lowStringIdx, lowFret, tuning)),
+                Note.fromMidi(getMidiAt(midStringIdx, midFret, tuning)),
+                Note.fromMidi(getMidiAt(highStringIdx, highFret, tuning)),
               ];
 
               const playedFrets = [lowFret, midFret, highFret];
@@ -519,7 +538,7 @@ export function solveTriadVoicings(root: string, quality: string): ChordVoicing[
               const highestFret = Math.max(...playedFrets);
 
               // Determine bass note and if it's an inversion
-              const bassNote = Note.pitchClass(Note.fromMidi(getMidiAt(lowStringIdx, lowFret))) || '';
+              const bassNote = Note.pitchClass(Note.fromMidi(getMidiAt(lowStringIdx, lowFret, tuning))) || '';
               const isInversion = !areEnharmonic(bassNote, root);
 
               voicings.push({

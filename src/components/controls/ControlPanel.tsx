@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { useAudioEngine } from '../../hooks/useAudioEngine';
-import type { StringIndex } from '../../types';
+import { TuningModal } from './TuningModal';
+import { TuningConfirmModal } from './TuningConfirmModal';
+import { encodeTuningForUrl } from '../../config/constants';
+import type { StringIndex, TuningChangeMode } from '../../types';
 import styles from './ControlPanel.module.css';
 
 export function ControlPanel() {
@@ -18,6 +21,9 @@ export function ControlPanel() {
     isCustomShape,
     clearAllStrings,
     guitarStringState,
+    tuning,
+    tuningName,
+    setTuning,
   } = useMusicStore();
 
   const { isLoaded, playChord } = useAudioEngine();
@@ -26,6 +32,38 @@ export function ControlPanel() {
   const hasNotes = Object.values(guitarStringState).some(fret => fret !== null);
 
   const isFreeFormMode = !targetRoot || !targetQuality;
+
+  // Tuning modal state
+  const [showTuningModal, setShowTuningModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingTuning, setPendingTuning] = useState<{ tuning: string[]; name: string } | null>(null);
+
+  // Handle tuning selection from TuningModal
+  const handleTuningSelect = (tuning: string[], name: string) => {
+    // If no notes on fretboard, apply directly with 'clear' mode (acts same as empty)
+    if (!hasNotes) {
+      setTuning(tuning, name, 'clear');
+      return;
+    }
+
+    // Otherwise, show confirm modal for adapt/keep/clear choice
+    setPendingTuning({ tuning, name });
+    setShowConfirmModal(true);
+  };
+
+  // Handle confirm modal selection
+  const handleConfirmSelect = (mode: TuningChangeMode) => {
+    if (pendingTuning) {
+      setTuning(pendingTuning.tuning, pendingTuning.name, mode);
+      setPendingTuning(null);
+    }
+    setShowConfirmModal(false);
+  };
+
+  const handleConfirmCancel = () => {
+    setPendingTuning(null);
+    setShowConfirmModal(false);
+  };
 
   const handlePrevVoicing = () => {
     if (currentVoicingIndex > 0) {
@@ -59,7 +97,17 @@ export function ControlPanel() {
       }
     }
 
-    const url = `${window.location.origin}${window.location.pathname}?s=${parts.join(',')}`;
+    // Build URL with query params
+    const params = new URLSearchParams();
+    params.set('s', parts.join(','));
+
+    // Include tuning if not standard
+    const tuningSlug = encodeTuningForUrl(tuning);
+    if (tuningSlug) {
+      params.set('t', tuningSlug);
+    }
+
+    const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
 
     try {
       await navigator.clipboard.writeText(url);
@@ -72,38 +120,50 @@ export function ControlPanel() {
 
   return (
     <div className={styles.controlPanel}>
-      {/* Row 1: Voicing Navigation */}
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Voicing</h3>
-        <div className={styles.voicingSpacer} />
-        <div className={styles.voicingNav}>
+      {/* Row 1: Voicing Navigation + Tuning */}
+      <div className={styles.voicingTuningRow}>
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Position</h3>
+          <div className={styles.voicingNav}>
+            <button
+              onClick={handlePrevVoicing}
+              disabled={currentVoicingIndex === 0 || availableVoicings.length === 0}
+              className={styles.navButton}
+            >
+              &lt;
+            </button>
+            <span className={styles.voicingLabel}>
+              {isFreeFormMode ? (
+                'Free Play'
+              ) : isCustomShape ? (
+                'Custom'
+              ) : availableVoicings.length > 0 ? (
+                `${currentVoicingIndex + 1} of ${availableVoicings.length}`
+              ) : (
+                'No voicings'
+              )}
+            </span>
+            <button
+              onClick={handleNextVoicing}
+              disabled={
+                currentVoicingIndex >= availableVoicings.length - 1 ||
+                availableVoicings.length === 0
+              }
+              className={styles.navButton}
+            >
+              &gt;
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Tuning</h3>
           <button
-            onClick={handlePrevVoicing}
-            disabled={currentVoicingIndex === 0 || availableVoicings.length === 0}
-            className={styles.navButton}
+            className={styles.tuningButton}
+            onClick={() => setShowTuningModal(true)}
           >
-            &lt;
-          </button>
-          <span className={styles.voicingLabel}>
-            {isFreeFormMode ? (
-              'Free Play'
-            ) : isCustomShape ? (
-              'Custom'
-            ) : availableVoicings.length > 0 ? (
-              `${currentVoicingIndex + 1} of ${availableVoicings.length}`
-            ) : (
-              'No voicings'
-            )}
-          </span>
-          <button
-            onClick={handleNextVoicing}
-            disabled={
-              currentVoicingIndex >= availableVoicings.length - 1 ||
-              availableVoicings.length === 0
-            }
-            className={styles.navButton}
-          >
-            &gt;
+            {tuningName}
+            <span className={styles.tuningIcon}>▾</span>
           </button>
         </div>
       </div>
@@ -163,6 +223,20 @@ export function ControlPanel() {
           </button>
         </div>
       </div>
+
+      {/* Tuning Modals */}
+      <TuningModal
+        isOpen={showTuningModal}
+        onClose={() => setShowTuningModal(false)}
+        onSelectTuning={handleTuningSelect}
+      />
+
+      <TuningConfirmModal
+        isOpen={showConfirmModal}
+        tuningName={pendingTuning?.name || ''}
+        onSelect={handleConfirmSelect}
+        onCancel={handleConfirmCancel}
+      />
     </div>
   );
 }

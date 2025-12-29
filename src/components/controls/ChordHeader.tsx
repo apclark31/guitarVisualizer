@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import { STANDARD_TUNING, VOICING_FILTER_OPTIONS } from '../../config/constants';
+import { VOICING_FILTER_OPTIONS } from '../../config/constants';
 import { Note } from '@tonaljs/tonal';
 import type { StringIndex, VoicingFilterType } from '../../types';
 import { ChordPicker } from './ChordPicker';
@@ -18,12 +18,15 @@ import { SuggestionModal } from './SuggestionModal';
 import styles from './ChordHeader.module.css';
 
 /** Get played notes as a formatted string */
-function getPlayedNotesDisplay(guitarState: Record<StringIndex, number | null>): string {
+function getPlayedNotesDisplay(
+  guitarState: Record<StringIndex, number | null>,
+  tuning: readonly string[]
+): string {
   const notes: string[] = [];
   for (let i = 0; i < 6; i++) {
     const fret = guitarState[i as StringIndex];
     if (fret !== null) {
-      const openMidi = Note.midi(STANDARD_TUNING[i]);
+      const openMidi = Note.midi(tuning[i]);
       if (openMidi) {
         const noteName = Note.pitchClass(Note.fromMidi(openMidi + fret));
         if (noteName && !notes.includes(noteName)) {
@@ -62,10 +65,11 @@ export function ChordHeader() {
     voicingType,
     voicingTypeFilter,
     setVoicingTypeFilter,
+    tuning,
   } = useMusicStore();
 
   const hasSuggestions = suggestions.length > 0;
-  const playedNotes = getPlayedNotesDisplay(guitarStringState);
+  const playedNotes = getPlayedNotesDisplay(guitarStringState, tuning);
   const hasNotes = playedNotes.length > 0;
 
   // Get current voicing for inversion detection

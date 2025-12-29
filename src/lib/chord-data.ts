@@ -72,24 +72,24 @@ const QUALITY_TO_SUFFIX: Record<string, string> = {
 /**
  * Get MIDI note at a string/fret position
  */
-function getMidiAt(stringIndex: number, fret: number): number {
-  const openMidi = Note.midi(STANDARD_TUNING[stringIndex]);
-  if (openMidi === null) throw new Error(`Invalid tuning: ${STANDARD_TUNING[stringIndex]}`);
+function getMidiAt(stringIndex: number, fret: number, tuning: readonly string[] = STANDARD_TUNING): number {
+  const openMidi = Note.midi(tuning[stringIndex]);
+  if (openMidi === null) throw new Error(`Invalid tuning: ${tuning[stringIndex]}`);
   return openMidi + fret;
 }
 
 /**
  * Get note name (with octave) at a string/fret position
  */
-function getNoteAt(stringIndex: number, fret: number): string {
-  return Note.fromMidi(getMidiAt(stringIndex, fret));
+function getNoteAt(stringIndex: number, fret: number, tuning: readonly string[] = STANDARD_TUNING): string {
+  return Note.fromMidi(getMidiAt(stringIndex, fret, tuning));
 }
 
 /**
  * Get pitch class (note name without octave) at a string/fret position
  */
-function getPitchClassAt(stringIndex: number, fret: number): string {
-  return Note.pitchClass(getNoteAt(stringIndex, fret)) || '';
+function getPitchClassAt(stringIndex: number, fret: number, tuning: readonly string[] = STANDARD_TUNING): string {
+  return Note.pitchClass(getNoteAt(stringIndex, fret, tuning)) || '';
 }
 
 /**
@@ -135,8 +135,13 @@ function parseFretString(fretStr: string): number[] {
 
 /**
  * Convert a chords-db position to our ChordVoicing format
+ * Note: chords-db voicings are designed for standard tuning
  */
-function convertPosition(position: ChordsDbPosition, root: string): ChordVoicing {
+function convertPosition(
+  position: ChordsDbPosition,
+  root: string,
+  tuning: readonly string[] = STANDARD_TUNING
+): ChordVoicing {
   const parsedFrets = parseFretString(position.frets);
 
   const frets: FretNumber[] = parsedFrets.map((fret) => {
@@ -152,7 +157,7 @@ function convertPosition(position: ChordsDbPosition, root: string): ChordVoicing
   const noteNames: string[] = [];
   frets.forEach((fret, stringIndex) => {
     if (fret !== null) {
-      noteNames.push(getNoteAt(stringIndex, fret));
+      noteNames.push(getNoteAt(stringIndex, fret, tuning));
     }
   });
 
@@ -165,7 +170,7 @@ function convertPosition(position: ChordsDbPosition, root: string): ChordVoicing
   let bassNote: string | undefined;
   for (let i = 0; i < frets.length; i++) {
     if (frets[i] !== null) {
-      bassNote = getPitchClassAt(i, frets[i]!);
+      bassNote = getPitchClassAt(i, frets[i]!, tuning);
       break;
     }
   }
@@ -184,6 +189,14 @@ function convertPosition(position: ChordsDbPosition, root: string): ChordVoicing
 }
 
 /**
+ * Check if tuning is standard tuning
+ */
+function isStandardTuning(tuning: readonly string[]): boolean {
+  return tuning.length === STANDARD_TUNING.length &&
+    tuning.every((note, i) => note === STANDARD_TUNING[i]);
+}
+
+/**
  * Get all voicings for a chord, using chords-db as primary source
  * and falling back to the algorithmic solver for unsupported chords.
  *
@@ -191,38 +204,45 @@ function convertPosition(position: ChordsDbPosition, root: string): ChordVoicing
  * @param quality - Chord quality from UI (e.g., "Major", "Minor 7")
  * @param limit - Maximum number of voicings to return
  * @param filter - Voicing type filter (all, triads, shells, full)
+ * @param tuning - Optional tuning array (defaults to standard tuning)
  * @returns Array of chord voicings sorted by fret position
  */
 export function getVoicingsForChord(
   root: string,
   quality: string,
   limit = 12,
-  filter: VoicingFilterType = 'all'
+  filter: VoicingFilterType = 'all',
+  tuning: readonly string[] = STANDARD_TUNING
 ): ChordVoicing[] {
   // If triads filter is active, use the triad solver directly
   if (filter === 'triads') {
-    return solveTriadVoicings(root, quality).slice(0, limit);
+    return solveTriadVoicings(root, quality, tuning).slice(0, limit);
   }
 
   // TODO: When shells solver is implemented, handle 'shells' filter here
+
+  // For non-standard tunings, fall back to solver (chords-db is for standard tuning only)
+  if (!isStandardTuning(tuning)) {
+    return getBestVoicings(root, quality, limit, tuning);
+  }
 
   const suffix = QUALITY_TO_SUFFIX[quality];
 
   if (!suffix) {
     // Unknown quality - fall back to solver
     console.warn(`Unknown quality "${quality}", falling back to solver`);
-    return getBestVoicings(root, quality, limit);
+    return getBestVoicings(root, quality, limit, tuning);
   }
 
   const chord = findChord(root, suffix);
 
   if (!chord || chord.positions.length === 0) {
     // Chord not in database - fall back to solver
-    return getBestVoicings(root, quality, limit);
+    return getBestVoicings(root, quality, limit, tuning);
   }
 
-  // Convert all positions to our format
-  const voicings = chord.positions.map(pos => convertPosition(pos, root));
+  // Convert all positions to our format (using standard tuning for note names)
+  const voicings = chord.positions.map(pos => convertPosition(pos, root, tuning));
 
   // Sort by fret position (open chords first)
   voicings.sort((a, b) => a.lowestFret - b.lowestFret);

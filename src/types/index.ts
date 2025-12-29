@@ -2,8 +2,11 @@
 
 import type { ChordFamily } from '../config/constants';
 
-/** Re-export ChordFamily for convenience */
-export type { ChordFamily } from '../config/constants';
+/** Re-export types for convenience */
+export type { ChordFamily, TuningCategory } from '../config/constants';
+
+/** Tuning change mode - how to handle existing voicing when tuning changes */
+export type TuningChangeMode = 'adapt' | 'keep' | 'clear';
 
 /** String index: 0 = Low E, 5 = High E */
 export type StringIndex = 0 | 1 | 2 | 3 | 4 | 5;
@@ -96,6 +99,10 @@ export interface AppState {
   voicingType: VoicingType | null;
   voicingTypeFilter: VoicingFilterType;
 
+  // Tuning State
+  tuning: string[];
+  tuningName: string;
+
   // UI State
   displayMode: DisplayMode;
   isCustomShape: boolean;
@@ -120,4 +127,7 @@ export interface AppState {
   applySuggestion: (suggestion: ChordSuggestion, filterOverride?: VoicingFilterType) => void;
   applyContext: (suggestion: ChordSuggestion) => void;
   setVoicingTypeFilter: (filter: VoicingFilterType) => void;
+
+  // Tuning Actions
+  setTuning: (tuning: string[], name: string, mode: TuningChangeMode) => void;
 }

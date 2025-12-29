@@ -4,8 +4,6 @@ import { useAudioEngine } from '../../hooks/useAudioEngine';
 import {
   FRET_COUNT,
   STRING_COUNT,
-  STANDARD_TUNING,
-  TUNING_NOTES,
   MARKER_FRETS,
   DOUBLE_MARKER_FRETS,
   FRETBOARD_DIMENSIONS as DIM,
@@ -16,8 +14,8 @@ import type { StringIndex } from '../../types';
 import styles from './Fretboard.module.css';
 
 /** Calculate the note at a given string and fret */
-function getNoteAtPosition(stringIndex: number, fret: number): string {
-  const openNote = STANDARD_TUNING[stringIndex];
+function getNoteAtPosition(stringIndex: number, fret: number, tuning: readonly string[]): string {
+  const openNote = tuning[stringIndex];
   const midi = Note.midi(openNote);
   if (midi === null) return '';
   const newMidi = midi + fret;
@@ -33,7 +31,7 @@ function getNoteName(fullNote: string): string {
 const STRING_THICKNESS = [2.5, 2.0, 1.6, 1.3, 1.0, 0.8];
 
 export function Fretboard() {
-  const { guitarStringState, setFret, clearString, displayMode, targetRoot, detectedChord } = useMusicStore();
+  const { guitarStringState, setFret, clearString, displayMode, targetRoot, detectedChord, tuning } = useMusicStore();
   const { playFretNote, isLoaded } = useAudioEngine();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -209,21 +207,24 @@ export function Fretboard() {
     return strings;
   };
 
-  // Render string labels
+  // Render string labels (derived from current tuning)
   const renderStringLabels = () => {
-    return TUNING_NOTES.map((note, i) => (
-      <text
-        key={`label-${i}`}
-        x={DIM.PADDING - 10}
-        y={getStringY(i) + 4}
-        textAnchor="end"
-        fill={COLORS.ui.textMuted}
-        fontSize={12}
-        fontFamily="monospace"
-      >
-        {note}
-      </text>
-    ));
+    return tuning.map((noteWithOctave, i) => {
+      const noteName = Note.pitchClass(noteWithOctave) || noteWithOctave;
+      return (
+        <text
+          key={`label-${i}`}
+          x={DIM.PADDING - 10}
+          y={getStringY(i) + 4}
+          textAnchor="end"
+          fill={COLORS.ui.textMuted}
+          fontSize={12}
+          fontFamily="monospace"
+        >
+          {noteName}
+        </text>
+      );
+    });
   };
 
   // Render fret numbers
@@ -284,7 +285,7 @@ export function Fretboard() {
 
       const x = getFretX(fret);
       const y = getStringY(stringIndex);
-      const fullNote = getNoteAtPosition(stringIndex, fret);
+      const fullNote = getNoteAtPosition(stringIndex, fret, tuning);
       const noteName = getNoteName(fullNote);
 
       // Determine color and interval label based on semitone distance from root

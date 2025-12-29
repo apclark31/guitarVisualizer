@@ -12,11 +12,13 @@ import type {
   ChordSuggestion,
   ChordVoicing,
   ChordFamily,
+  TuningChangeMode,
 } from '../types';
 import { getVoicingsForChord } from '../lib/chord-data';
 import { detectChord } from '../lib/chord-detector';
 import { analyzeVoicing } from '../lib/voicing-analyzer';
-import { getFamilyForType } from '../config/constants';
+import { getFamilyForType, STANDARD_TUNING, FRET_COUNT } from '../config/constants';
+import { Note } from '@tonaljs/tonal';
 
 /** Initial guitar state - all strings muted */
 const initialGuitarState: GuitarStringState = {
@@ -41,8 +43,11 @@ function voicingToGuitarState(frets: (number | null)[]): GuitarStringState {
 }
 
 /** Run chord detection and convert to store format */
-function runChordDetection(guitarState: GuitarStringState): DetectedChordInfo | null {
-  const detected = detectChord(guitarState);
+function runChordDetection(
+  guitarState: GuitarStringState,
+  tuning: readonly string[]
+): DetectedChordInfo | null {
+  const detected = detectChord(guitarState, tuning);
   if (!detected) return null;
   return {
     name: detected.name,
@@ -99,6 +104,10 @@ export const useMusicStore = create<AppState>((set, get) => ({
   voicingType: null,
   voicingTypeFilter: 'all',
 
+  // Tuning State
+  tuning: [...STANDARD_TUNING],
+  tuningName: 'Standard',
+
   // UI State
   displayMode: 'notes',
   isCustomShape: false,
@@ -111,9 +120,9 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   // Actions
   setTargetChord: (root: string, quality: string) => {
-    const { voicingTypeFilter } = get();
+    const { voicingTypeFilter, tuning } = get();
     // Get voicings from chords-db (falls back to solver), respecting filter
-    const voicings = getVoicingsForChord(root, quality, 12, voicingTypeFilter);
+    const voicings = getVoicingsForChord(root, quality, 12, voicingTypeFilter, tuning);
 
     // Derive family from quality
     const family = getFamilyForType(quality) || '';
@@ -137,9 +146,9 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   setChord: (root: string, family: ChordFamily, quality: string) => {
-    const { voicingTypeFilter } = get();
+    const { voicingTypeFilter, tuning } = get();
     // Get voicings from chords-db (falls back to solver), respecting filter
-    const voicings = getVoicingsForChord(root, quality, 12, voicingTypeFilter);
+    const voicings = getVoicingsForChord(root, quality, 12, voicingTypeFilter, tuning);
 
     // Auto-select the first voicing if available
     const firstVoicing = voicings[0];
@@ -179,6 +188,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   setFret: (stringIndex: StringIndex, fret: FretNumber) => {
+    const { tuning } = get();
     const newGuitarState = {
       ...get().guitarStringState,
       [stringIndex]: fret,
@@ -187,14 +197,14 @@ export const useMusicStore = create<AppState>((set, get) => ({
     // Count notes for suggestion analysis
     const noteCount = Object.values(newGuitarState).filter(f => f !== null).length;
 
-    // Run detection
-    const detectedChord = runChordDetection(newGuitarState);
+    // Run detection with current tuning
+    const detectedChord = runChordDetection(newGuitarState, tuning);
 
     // Run suggestion analysis if 2+ notes
     let suggestions: ChordSuggestion[] = [];
     let voicingType: VoicingType | null = null;
     if (noteCount >= 2) {
-      const analysis = analyzeVoicing(newGuitarState);
+      const analysis = analyzeVoicing(newGuitarState, tuning);
       suggestions = analysis.suggestions;
       voicingType = analysis.voicingType;
     }
@@ -214,6 +224,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   clearString: (stringIndex: StringIndex) => {
+    const { tuning } = get();
     const newGuitarState = {
       ...get().guitarStringState,
       [stringIndex]: null,
@@ -226,7 +237,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
     let suggestions: ChordSuggestion[] = [];
     let voicingType: VoicingType | null = null;
     if (noteCount >= 2) {
-      const analysis = analyzeVoicing(newGuitarState);
+      const analysis = analyzeVoicing(newGuitarState, tuning);
       suggestions = analysis.suggestions;
       voicingType = analysis.voicingType;
     }
@@ -234,7 +245,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
     set({
       guitarStringState: newGuitarState,
       isCustomShape: true,
-      detectedChord: runChordDetection(newGuitarState),
+      detectedChord: runChordDetection(newGuitarState, tuning),
       suggestions,
       voicingType,
     });
@@ -272,11 +283,11 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   applySuggestion: (suggestion: ChordSuggestion, filterOverride?: VoicingFilterType) => {
-    const { guitarStringState, voicingTypeFilter } = get();
+    const { guitarStringState, voicingTypeFilter, tuning } = get();
 
     // Determine filter: use override if provided, otherwise current filter
     const filter = filterOverride ?? voicingTypeFilter;
-    const voicings = getVoicingsForChord(suggestion.root, suggestion.quality, 12, filter);
+    const voicings = getVoicingsForChord(suggestion.root, suggestion.quality, 12, filter, tuning);
 
     // Derive family from quality
     const family = getFamilyForType(suggestion.quality) || '';
@@ -307,8 +318,8 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   applyContext: (suggestion: ChordSuggestion) => {
     // Keep user's current frets, just set the chord context for display
-    const { voicingTypeFilter } = get();
-    const voicings = getVoicingsForChord(suggestion.root, suggestion.quality, 12, voicingTypeFilter);
+    const { voicingTypeFilter, tuning } = get();
+    const voicings = getVoicingsForChord(suggestion.root, suggestion.quality, 12, voicingTypeFilter, tuning);
 
     // Derive family from quality
     const family = getFamilyForType(suggestion.quality) || '';
@@ -327,11 +338,11 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   setVoicingTypeFilter: (filter: VoicingFilterType) => {
-    const { targetRoot, targetQuality } = get();
+    const { targetRoot, targetQuality, tuning } = get();
 
     // If a chord is already selected, re-fetch voicings with new filter
     if (targetRoot && targetQuality) {
-      const voicings = getVoicingsForChord(targetRoot, targetQuality, 12, filter);
+      const voicings = getVoicingsForChord(targetRoot, targetQuality, 12, filter, tuning);
       const firstVoicing = voicings[0];
       const guitarState = firstVoicing
         ? voicingToGuitarState(firstVoicing.frets)
@@ -347,5 +358,92 @@ export const useMusicStore = create<AppState>((set, get) => ({
     } else {
       set({ voicingTypeFilter: filter });
     }
+  },
+
+  setTuning: (newTuning: string[], name: string, mode: TuningChangeMode) => {
+    const { tuning: oldTuning, guitarStringState } = get();
+
+    // Check if fretboard has any notes
+    const hasNotes = Object.values(guitarStringState).some(f => f !== null);
+
+    // If no notes, just change tuning
+    if (!hasNotes || mode === 'clear') {
+      set({
+        tuning: newTuning,
+        tuningName: name,
+        guitarStringState: { ...initialGuitarState },
+        detectedChord: null,
+        suggestions: [],
+        voicingType: null,
+        targetRoot: '',
+        targetFamily: '',
+        targetQuality: '',
+        availableVoicings: [],
+        isCustomShape: false,
+      });
+      return;
+    }
+
+    if (mode === 'keep') {
+      // Keep same fret positions, just update tuning
+      // Re-run detection with new tuning context
+      set({
+        tuning: newTuning,
+        tuningName: name,
+        isCustomShape: true,
+        targetRoot: '',
+        targetFamily: '',
+        targetQuality: '',
+        availableVoicings: [],
+      });
+      return;
+    }
+
+    // mode === 'adapt': Transpose frets to maintain pitch
+    const newGuitarState: GuitarStringState = { ...initialGuitarState };
+
+    for (let i = 0; i < 6; i++) {
+      const stringIndex = i as StringIndex;
+      const oldFret = guitarStringState[stringIndex];
+
+      if (oldFret === null) {
+        newGuitarState[stringIndex] = null;
+        continue;
+      }
+
+      const oldOpenMidi = Note.midi(oldTuning[i]);
+      const newOpenMidi = Note.midi(newTuning[i]);
+
+      if (oldOpenMidi === null || newOpenMidi === null) {
+        newGuitarState[stringIndex] = null;
+        continue;
+      }
+
+      // Calculate new fret to maintain the same pitch
+      const delta = oldOpenMidi - newOpenMidi;
+      const newFret = oldFret + delta;
+
+      // Check bounds
+      if (newFret < 0 || newFret > FRET_COUNT) {
+        // Out of bounds - mute this string
+        newGuitarState[stringIndex] = null;
+      } else {
+        newGuitarState[stringIndex] = newFret;
+      }
+    }
+
+    set({
+      tuning: newTuning,
+      tuningName: name,
+      guitarStringState: newGuitarState,
+      isCustomShape: true,
+      targetRoot: '',
+      targetFamily: '',
+      targetQuality: '',
+      availableVoicings: [],
+      detectedChord: null,
+      suggestions: [],
+      voicingType: null,
+    });
   },
 }));

@@ -1,0 +1,122 @@
+/* TuningConfirmModal - Confirmation modal for tuning changes */
+
+/* Backdrop overlay */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1001;
+}
+
+/* Modal container */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1002;
+  width: 320px;
+  max-width: 90vw;
+  background: var(--color-surface, #262626);
+  border: 1px solid var(--color-border, #404040);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  padding: 1.25rem;
+}
+
+/* Title */
+.title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text, #e5e5e5);
+  text-align: center;
+}
+
+/* Options container */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Option button */
+.option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: var(--color-surface-dark, #1f1f1f);
+  border: 1px solid var(--color-border, #404040);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.option:hover {
+  border-color: var(--color-accent, #3b82f6);
+  background: var(--color-accent-bg, rgba(59, 130, 246, 0.1));
+}
+
+.option:active {
+  transform: scale(0.99);
+}
+
+.optionDestructive:hover {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.optionTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text, #e5e5e5);
+  margin-bottom: 0.125rem;
+}
+
+.optionDesc {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #a3a3a3);
+}
+
+/* Cancel button */
+.cancelButton {
+  display: block;
+  width: 100%;
+  padding: 0.625rem;
+  background: transparent;
+  border: 1px solid var(--color-border, #404040);
+  border-radius: 6px;
+  color: var(--color-text-muted, #a3a3a3);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cancelButton:hover {
+  background: var(--color-surface-hover, #333333);
+  color: var(--color-text, #e5e5e5);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .modal {
+    width: 92%;
+    max-width: 92%;
+  }
+
+  .option {
+    padding: 1rem;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .option,
+  .cancelButton {
+    transition: none;
+  }
+}

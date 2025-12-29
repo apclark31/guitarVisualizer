@@ -25,13 +25,7 @@
   margin: 0;
 }
 
-
-/* Voicing spacer - matches label text + gap height */
-.voicingSpacer {
-  height: 11px;
-}
-
-/* Voicing navigation - align with dropdowns */
+/* Position navigation */
 .voicingNav {
   display: flex;
   align-items: center;
@@ -187,6 +181,41 @@
   display: flex;
   gap: 8px;
   width: 100%;
+}
+
+/* Voicing + Tuning row */
+.voicingTuningRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: end;
+}
+
+/* Tuning button */
+.tuningButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 120px;
+  padding: 0 12px;
+  height: 38px;
+  background: #333333;
+  border: 1px solid #525252;
+  border-radius: 6px;
+  color: #e5e5e5;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tuningButton:hover {
+  border-color: #3b82f6;
+}
+
+.tuningIcon {
+  margin-left: 8px;
+  font-size: 10px;
+  opacity: 0.6;
 }
 
 /* Toggles row - both toggles side by side, spans full width */

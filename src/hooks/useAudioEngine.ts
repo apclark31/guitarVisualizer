@@ -9,14 +9,14 @@ import { useEffect, useRef, useCallback } from 'react';
 import * as Tone from 'tone';
 import { useMusicStore } from '../store/useMusicStore';
 import { GUITAR_SAMPLER_CONFIG } from '../config/instruments';
-import { STANDARD_TUNING, PLAYBACK_TIMING } from '../config/constants';
+import { PLAYBACK_TIMING } from '../config/constants';
 import { Note } from '@tonaljs/tonal';
 import { unlockIOSAudio } from '../lib/ios-audio-unlock';
 import type { StringIndex, PlaybackMode } from '../types';
 
 /** Get the full note name at a string/fret position */
-function getNoteAtPosition(stringIndex: number, fret: number): string {
-  const openMidi = Note.midi(STANDARD_TUNING[stringIndex]);
+function getNoteAtPosition(stringIndex: number, fret: number, tuning: readonly string[]): string {
+  const openMidi = Note.midi(tuning[stringIndex]);
   if (openMidi === null) return '';
   return Note.fromMidi(openMidi + fret);
 }
@@ -32,6 +32,7 @@ export function useAudioEngine() {
     volume,
     setAudioLoaded,
     isAudioLoaded,
+    tuning,
   } = useMusicStore();
 
   // Initialize audio chain on mount
@@ -97,11 +98,11 @@ export function useAudioEngine() {
 
   // Play note at a specific string/fret position
   const playFretNote = useCallback(async (stringIndex: StringIndex, fret: number) => {
-    const note = getNoteAtPosition(stringIndex, fret);
+    const note = getNoteAtPosition(stringIndex, fret, tuning);
     if (note) {
       await playNote(note);
     }
-  }, [playNote]);
+  }, [playNote, tuning]);
 
   // Play all active notes based on playback mode
   const playChord = useCallback(async (mode?: PlaybackMode) => {
@@ -114,7 +115,7 @@ export function useAudioEngine() {
     for (let i = 0; i < 6; i++) {
       const fret = guitarStringState[i as StringIndex];
       if (fret !== null) {
-        const note = getNoteAtPosition(i, fret);
+        const note = getNoteAtPosition(i, fret, tuning);
         if (note) notes.push(note);
       }
     }
@@ -159,7 +160,7 @@ export function useAudioEngine() {
         });
         break;
     }
-  }, [guitarStringState, playbackMode, isAudioLoaded, startAudio]);
+  }, [guitarStringState, playbackMode, isAudioLoaded, startAudio, tuning]);
 
   // Stop all currently playing notes
   const stopAll = useCallback(() => {

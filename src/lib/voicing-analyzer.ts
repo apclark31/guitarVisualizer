@@ -34,8 +34,8 @@ export interface VoicingAnalysis {
 }
 
 /** Get the full note name (with octave) at a string/fret position */
-function getNoteAtPosition(stringIndex: number, fret: number): string {
-  const openMidi = Note.midi(STANDARD_TUNING[stringIndex]);
+function getNoteAtPosition(stringIndex: number, fret: number, tuning: readonly string[]): string {
+  const openMidi = Note.midi(tuning[stringIndex]);
   if (openMidi === null) return '';
   return Note.fromMidi(openMidi + fret);
 }
@@ -294,15 +294,20 @@ function rankSuggestions(suggestions: ChordSuggestion[], bassNote: string): Chor
 /**
  * Main analysis function
  * Analyzes the current guitar state and returns voicing type + suggestions
+ * @param guitarState - The current fret positions
+ * @param tuning - Optional tuning array (defaults to standard tuning)
  */
-export function analyzeVoicing(guitarState: GuitarStringState): VoicingAnalysis {
+export function analyzeVoicing(
+  guitarState: GuitarStringState,
+  tuning: readonly string[] = STANDARD_TUNING
+): VoicingAnalysis {
   // Collect played notes
   const playedNotes: { note: string; pitchClass: string; stringIndex: number }[] = [];
 
   for (let i = 0; i < 6; i++) {
     const fret = guitarState[i as StringIndex];
     if (fret !== null) {
-      const note = getNoteAtPosition(i, fret);
+      const note = getNoteAtPosition(i, fret, tuning);
       playedNotes.push({
         note,
         pitchClass: getPitchClass(note),

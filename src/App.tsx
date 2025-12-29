@@ -4,16 +4,27 @@ import { ControlPanel } from './components/controls/ControlPanel';
 import { ChordHeader } from './components/controls/ChordHeader';
 import { AppHeader } from './components/layout/AppHeader';
 import { useMusicStore } from './store/useMusicStore';
+import { decodeTuningFromUrl } from './config/constants';
 import type { StringIndex } from './types';
 import './App.css';
 
 function App() {
-  const { setFret } = useMusicStore();
+  const { setFret, setTuning } = useMusicStore();
 
   // Parse URL params on mount to restore shared chord
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sharedState = params.get('s');
+    const tuningParam = params.get('t');
+
+    // Apply tuning first (before setting frets)
+    if (tuningParam) {
+      const decoded = decodeTuningFromUrl(tuningParam);
+      if (decoded) {
+        // Use 'clear' mode since we're restoring state from URL
+        setTuning(decoded.tuning, decoded.name, 'clear');
+      }
+    }
 
     if (sharedState) {
       // Format: "0-3,1-2,2-0" (string-fret pairs)
@@ -38,7 +49,7 @@ function App() {
       // Clean up URL without reloading
       window.history.replaceState({}, '', window.location.pathname);
     }
-  }, [setFret]);
+  }, [setFret, setTuning]);
 
   return (
     <div className="app">
