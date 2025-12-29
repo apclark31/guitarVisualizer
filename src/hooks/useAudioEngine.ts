@@ -78,10 +78,17 @@ export function useAudioEngine() {
     // Unlock iOS audio SYNCHRONOUSLY first (must stay in gesture call stack)
     unlockIOSAudio();
 
-    // Then start Tone.js audio context
-    if (Tone.getContext().state !== 'running') {
+    // Always try to start/resume Tone.js audio context
+    // iOS PWA can have context in various states (suspended, interrupted)
+    try {
       await Tone.start();
-      console.log('Audio context started');
+      // Also explicitly resume the raw audio context
+      const ctx = Tone.getContext().rawContext;
+      if (ctx.state !== 'running') {
+        await ctx.resume();
+      }
+    } catch (e) {
+      console.warn('Audio context start/resume failed:', e);
     }
   }, []);
 
