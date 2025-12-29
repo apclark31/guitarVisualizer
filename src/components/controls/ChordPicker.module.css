@@ -206,22 +206,23 @@
 }
 
 /* =============================================
-   Mobile Styles - Bottom sheet modal
+   Mobile Styles - Centered modal with margins
    ============================================= */
 
 @media (max-width: 768px) {
   .picker {
     position: fixed;
-    top: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    max-width: 100%;
+    top: 10%;
+    left: 4%;
+    right: 4%;
+    bottom: auto;
+    width: 92%;
+    max-width: 92%;
+    max-height: 80%;
     transform: none;
-    border-radius: 16px 16px 0 0;
-    border-bottom: none;
-    max-height: 70vh;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
   }
 
   .closeButton {
@@ -231,9 +232,9 @@
   }
 
   .headers {
-    grid-template-columns: 70px 110px 1fr;
+    grid-template-columns: 80px 110px 1fr;
     padding-top: 0.5rem;
-    border-radius: 16px 16px 0 0;
+    border-radius: 12px 12px 0 0;
   }
 
   /* Mobile headers - larger and more prominent than options */
@@ -246,20 +247,24 @@
   }
 
   .columns {
-    grid-template-columns: 70px 110px 1fr;
-    height: 300px;
+    grid-template-columns: 80px 110px 1fr;
+    flex: 1;
+    height: auto;
+    min-height: 280px;
+    max-height: 50vh;
   }
 
   /* Larger touch targets on mobile */
   .option {
     padding: 0.875rem 0.75rem;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
   }
 
   .applyButton {
     padding: 1rem;
     font-size: 1rem;
-    border-radius: 0;
+    border-radius: 0 0 12px 12px;
+    flex-shrink: 0;
   }
 }
 

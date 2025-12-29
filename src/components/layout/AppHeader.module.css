@@ -9,11 +9,19 @@
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: 'Inter', sans-serif;
   font-size: 1.25rem;
   font-weight: 600;
   color: #e5e5e5;
   letter-spacing: -0.01em;
+}
+
+.brandIcon {
+  height: 24px;
+  width: auto;
 }
 
 /* Hamburger menu button */
@@ -91,12 +99,19 @@
 }
 
 .drawerBrand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: 'Inter', sans-serif;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
-  color: #71717a;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: #a3a3a3;
+  letter-spacing: 0.01em;
+}
+
+.drawerBrandIcon {
+  height: 22px;
+  width: auto;
 }
 
 .closeButton {
@@ -179,6 +194,11 @@
   height: 18px;
 }
 
+.navIcon {
+  height: 18px;
+  width: auto;
+}
+
 /* Mobile adjustments */
 @media (max-width: 768px) {
   .header {
@@ -187,6 +207,12 @@
 
   .brand {
     font-size: 1.125rem;
+    gap: 6px;
+  }
+
+  .brandIcon {
+    height: 20px;
+    width: auto;
   }
 
   .drawer {

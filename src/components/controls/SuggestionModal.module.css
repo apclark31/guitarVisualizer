@@ -183,20 +183,26 @@
   margin: 0;
 }
 
-/* Mobile adjustments */
+/* Mobile adjustments - centered modal with margins */
 @media (max-width: 768px) {
-  .modal {
-    max-width: 100%;
-    border-radius: 12px 12px 0 0;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    max-height: 70vh;
+  .overlay {
+    align-items: center;
+    justify-content: center;
+    padding: 10% 4%;
   }
 
-  .overlay {
-    align-items: flex-end;
-    padding: 0;
+  .modal {
+    max-width: 100%;
+    width: 100%;
+    border-radius: 12px;
+    position: relative;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .suggestionList {
+    flex: 1;
+    overflow-y: auto;
   }
 }

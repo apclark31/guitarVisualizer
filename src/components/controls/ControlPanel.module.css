@@ -116,12 +116,12 @@
 
 /* Action buttons */
 .playButton {
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 6px;
   border: none;
   background-color: #22c55e;
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -143,7 +143,7 @@
 }
 
 .clearButton {
-  padding: 10px 16px;
+  padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid #525252;
   background-color: transparent;
@@ -161,7 +161,7 @@
 }
 
 .shareButton {
-  padding: 10px 16px;
+  padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid #3b82f6;
   background-color: transparent;
