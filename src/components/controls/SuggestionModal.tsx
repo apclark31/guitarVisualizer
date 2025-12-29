@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import type { ChordSuggestion, VoicingType, VoicingFilterType } from '../../types';
 import styles from './SuggestionModal.module.css';
@@ -61,12 +62,15 @@ function getQualityDisplayName(quality: string): string {
 }
 
 export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose }: SuggestionModalProps) {
-  const { applySuggestion, applyContext } = useMusicStore();
+  const { applySuggestion } = useMusicStore();
 
-  const handleApplyContext = (suggestion: ChordSuggestion) => {
-    applyContext(suggestion);
-    onClose();
-  };
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   const handleApplyChord = (suggestion: ChordSuggestion, filter: VoicingFilterType) => {
     applySuggestion(suggestion, filter);
@@ -102,7 +106,7 @@ export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose
     return (
       <>
         <strong>{playedNotes.replace(/ · /g, ' and ')}</strong> could fit the following chords.
-        Select <strong>Context</strong> to update the display, or <strong>Chord</strong> to load a voicing from the library.
+        Select a chord to load a voicing from the library.
       </>
     );
   };
@@ -125,7 +129,7 @@ export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose
         <p className={styles.guidance}>{getGuidanceText()}</p>
 
         <div className={styles.suggestionList}>
-          {suggestions.slice(0, 6).map((suggestion, index) => {
+          {suggestions.map((suggestion, index) => {
             const typeTag = getTypeTag(suggestion.voicingType);
             const filter = getFilterForVoicingType(suggestion.voicingType);
 
@@ -147,22 +151,13 @@ export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose
                     )}
                   </span>
                 </div>
-                <div className={styles.buttonGroup}>
-                  <button
-                    className={styles.contextButton}
-                    onClick={() => handleApplyContext(suggestion)}
-                    title="Keep your notes, set chord context"
-                  >
-                    Context
-                  </button>
-                  <button
-                    className={styles.applyButton}
-                    onClick={() => handleApplyChord(suggestion, filter)}
-                    title={`Load ${typeTag || 'voicing'} from library`}
-                  >
-                    Chord
-                  </button>
-                </div>
+                <button
+                  className={styles.applyButton}
+                  onClick={() => handleApplyChord(suggestion, filter)}
+                  title={`Load ${typeTag || 'voicing'} from library`}
+                >
+                  Apply
+                </button>
               </div>
             );
           })}

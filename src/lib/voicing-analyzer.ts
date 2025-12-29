@@ -6,7 +6,7 @@
  */
 
 import { Chord, Note } from '@tonaljs/tonal';
-import { STANDARD_TUNING, SHELL_PATTERNS, TRIAD_PATTERNS, QUALITY_COMPLEXITY, CHORD_QUALITIES } from '../config/constants';
+import { STANDARD_TUNING, SHELL_PATTERNS, TRIAD_PATTERNS, QUALITY_COMPLEXITY, CHORD_QUALITIES, QUALITY_TO_SYMBOL } from '../config/constants';
 import type { GuitarStringState, StringIndex, VoicingType, ChordSuggestion } from '../types';
 
 /** Interval labels for display */
@@ -160,19 +160,10 @@ function matchChordQualities(root: string, pitchClasses: string[]): ChordMatch[]
 
 /** Get Tonal.js chord symbol from quality name */
 function getChordSymbol(quality: string): string {
-  const map: Record<string, string> = {
-    'Major': '',
-    'Minor': 'm',
-    'Dominant 7': '7',
-    'Major 7': 'maj7',
-    'Minor 7': 'm7',
-    'Diminished': 'dim',
-    'Augmented': 'aug',
-    'Sus2': 'sus2',
-    'Sus4': 'sus4',
-    'Power (5)': '5',
-  };
-  return map[quality] || '';
+  // Use the full mapping from constants, with special case for Major
+  const symbol = QUALITY_TO_SYMBOL[quality];
+  if (symbol === 'M') return ''; // Tonal uses empty string for major
+  return symbol || '';
 }
 
 /** Generate chord suggestions from placed notes */
@@ -352,6 +343,6 @@ export function analyzeVoicing(guitarState: GuitarStringState): VoicingAnalysis 
     pitchClasses,
     bassNote,
     voicingType,
-    suggestions: suggestions.slice(0, 8), // Limit to top 8
+    suggestions, // Return all matches for scrollable list
   };
 }

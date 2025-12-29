@@ -208,7 +208,7 @@ describe('voicing-analyzer', () => {
       }
     });
 
-    it('should limit suggestions to 8', () => {
+    it('should return all matching suggestions for scrollable list', () => {
       // Place multiple notes that could match many chords
       const state: GuitarStringState = {
         0: 0, // E
@@ -221,7 +221,8 @@ describe('voicing-analyzer', () => {
 
       const analysis = analyzeVoicing(state);
 
-      expect(analysis.suggestions.length).toBeLessThanOrEqual(8);
+      // Should return all matches (no artificial limit)
+      expect(analysis.suggestions.length).toBeGreaterThan(0);
     });
   });
 

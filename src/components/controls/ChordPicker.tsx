@@ -82,6 +82,18 @@ export function ChordPicker({ className }: ChordPickerProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
+  // Lock body scroll when modal is open (mobile)
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   // Scroll active items into view when picker opens
   useEffect(() => {
     if (!isOpen) return;
