@@ -32,7 +32,6 @@ export function useAudioEngine() {
     volume,
     setAudioLoaded,
     isAudioLoaded,
-    tuning,
   } = useMusicStore();
 
   // Initialize audio chain on mount
@@ -98,11 +97,13 @@ export function useAudioEngine() {
 
   // Play note at a specific string/fret position
   const playFretNote = useCallback(async (stringIndex: StringIndex, fret: number) => {
-    const note = getNoteAtPosition(stringIndex, fret, tuning);
+    // Get tuning at call time to avoid dependency array issues with iOS audio unlock
+    const currentTuning = useMusicStore.getState().tuning;
+    const note = getNoteAtPosition(stringIndex, fret, currentTuning);
     if (note) {
       await playNote(note);
     }
-  }, [playNote, tuning]);
+  }, [playNote]);
 
   // Play all active notes based on playback mode
   const playChord = useCallback(async (mode?: PlaybackMode) => {
@@ -110,12 +111,15 @@ export function useAudioEngine() {
 
     if (!samplerRef.current || !isAudioLoaded) return;
 
+    // Get tuning at call time to avoid dependency array issues with iOS audio unlock
+    const currentTuning = useMusicStore.getState().tuning;
+
     // Collect all active notes (low to high for strum direction)
     const notes: string[] = [];
     for (let i = 0; i < 6; i++) {
       const fret = guitarStringState[i as StringIndex];
       if (fret !== null) {
-        const note = getNoteAtPosition(i, fret, tuning);
+        const note = getNoteAtPosition(i, fret, currentTuning);
         if (note) notes.push(note);
       }
     }
@@ -160,7 +164,7 @@ export function useAudioEngine() {
         });
         break;
     }
-  }, [guitarStringState, playbackMode, isAudioLoaded, startAudio, tuning]);
+  }, [guitarStringState, playbackMode, isAudioLoaded, startAudio]);
 
   // Stop all currently playing notes
   const stopAll = useCallback(() => {
