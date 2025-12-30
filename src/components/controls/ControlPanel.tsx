@@ -26,7 +26,7 @@ export function ControlPanel() {
     setTuning,
   } = useMusicStore();
 
-  const { isLoaded, playChord } = useAudioEngine();
+  const { isLoaded, playChord, playNote } = useAudioEngine();
 
   // Check if there are any notes to play
   const hasNotes = Object.values(guitarStringState).some(fret => fret !== null);
@@ -229,6 +229,8 @@ export function ControlPanel() {
         isOpen={showTuningModal}
         onClose={() => setShowTuningModal(false)}
         onSelectTuning={handleTuningSelect}
+        playNote={playNote}
+        isAudioLoaded={isLoaded}
       />
 
       <TuningConfirmModal

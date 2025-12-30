@@ -7,7 +7,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import { useAudioEngine } from '../../hooks/useAudioEngine';
 import {
   TUNING_PRESETS,
   TUNING_CATEGORIES,
@@ -22,6 +21,8 @@ interface TuningModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectTuning: (tuning: string[], name: string) => void;
+  playNote: (note: string) => Promise<void>;
+  isAudioLoaded: boolean;
 }
 
 /** Get tuning presets grouped by category */
@@ -54,9 +55,8 @@ function transposeNote(note: string, semitones: number): string {
   return Note.fromMidi(newMidi);
 }
 
-export function TuningModal({ isOpen, onClose, onSelectTuning }: TuningModalProps) {
+export function TuningModal({ isOpen, onClose, onSelectTuning, playNote, isAudioLoaded }: TuningModalProps) {
   const { tuning } = useMusicStore();
-  const { playNote, isLoaded } = useAudioEngine();
 
   const [activeTab, setActiveTab] = useState<'presets' | 'custom'>('presets');
   const [customTuning, setCustomTuning] = useState<string[]>([...tuning]);
@@ -96,10 +96,10 @@ export function TuningModal({ isOpen, onClose, onSelectTuning }: TuningModalProp
     setCustomTuning(newTuning);
 
     // Play the new note
-    if (isLoaded) {
+    if (isAudioLoaded) {
       playNote(newNote);
     }
-  }, [customTuning, isLoaded, playNote]);
+  }, [customTuning, isAudioLoaded, playNote]);
 
   // Apply custom tuning
   const handleApplyCustom = useCallback(() => {
@@ -183,7 +183,7 @@ export function TuningModal({ isOpen, onClose, onSelectTuning }: TuningModalProp
                       </button>
                       <button
                         className={styles.noteDisplay}
-                        onClick={() => isLoaded && playNote(note)}
+                        onClick={() => isAudioLoaded && playNote(note)}
                         aria-label={`Play ${note}`}
                       >
                         <span className={styles.notePitch}>{pitchClass}</span>
