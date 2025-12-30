@@ -197,6 +197,80 @@ function isStandardTuning(tuning: readonly string[]): boolean {
 }
 
 /**
+ * Adapt a chords-db voicing to a different tuning
+ * by adjusting fret positions to maintain the same pitches.
+ *
+ * For each string, calculates the semitone difference between
+ * standard tuning and the target tuning, then shifts the fret accordingly.
+ */
+function adaptVoicingToTuning(
+  voicing: ChordVoicing,
+  tuning: readonly string[]
+): ChordVoicing | null {
+  const adaptedFrets: FretNumber[] = [];
+
+  for (let i = 0; i < voicing.frets.length; i++) {
+    const fret = voicing.frets[i];
+
+    if (fret === null) {
+      adaptedFrets.push(null);
+      continue;
+    }
+
+    // Get MIDI values for both tunings at this string
+    const standardMidi = Note.midi(STANDARD_TUNING[i]);
+    const targetMidi = Note.midi(tuning[i]);
+
+    if (standardMidi === null || targetMidi === null) {
+      return null; // Invalid tuning
+    }
+
+    // Calculate the fret adjustment needed
+    // If target tuning is lower (e.g., Drop D), we need higher frets
+    const adjustment = standardMidi - targetMidi;
+    const newFret = fret + adjustment;
+
+    // Check if fret is playable (0-24)
+    if (newFret < 0 || newFret > 24) {
+      // This voicing doesn't work in this tuning - skip it
+      return null;
+    }
+
+    adaptedFrets.push(newFret as FretNumber);
+  }
+
+  // Recalculate voicing metadata with adapted frets
+  const noteNames: string[] = [];
+  adaptedFrets.forEach((fret, stringIndex) => {
+    if (fret !== null) {
+      noteNames.push(getNoteAt(stringIndex, fret, tuning));
+    }
+  });
+
+  const playedFrets = adaptedFrets.filter((f): f is number => f !== null);
+  const lowestFret = playedFrets.length > 0 ? Math.min(...playedFrets) : 0;
+  const highestFret = playedFrets.length > 0 ? Math.max(...playedFrets) : 0;
+
+  // Find bass note
+  let bassNote: string | undefined;
+  for (let i = 0; i < adaptedFrets.length; i++) {
+    if (adaptedFrets[i] !== null) {
+      bassNote = getPitchClassAt(i, adaptedFrets[i]!, tuning);
+      break;
+    }
+  }
+
+  return {
+    frets: adaptedFrets,
+    lowestFret,
+    highestFret,
+    noteNames,
+    bassNote,
+    isInversion: voicing.isInversion,
+  };
+}
+
+/**
  * Get all voicings for a chord, using chords-db as primary source
  * and falling back to the algorithmic solver for unsupported chords.
  *
@@ -221,11 +295,6 @@ export function getVoicingsForChord(
 
   // TODO: When shells solver is implemented, handle 'shells' filter here
 
-  // For non-standard tunings, fall back to solver (chords-db is for standard tuning only)
-  if (!isStandardTuning(tuning)) {
-    return getBestVoicings(root, quality, limit, tuning);
-  }
-
   const suffix = QUALITY_TO_SUFFIX[quality];
 
   if (!suffix) {
@@ -241,8 +310,25 @@ export function getVoicingsForChord(
     return getBestVoicings(root, quality, limit, tuning);
   }
 
-  // Convert all positions to our format (using standard tuning for note names)
-  const voicings = chord.positions.map(pos => convertPosition(pos, root, tuning));
+  // Convert all positions to our format (using standard tuning first)
+  const standardVoicings = chord.positions.map(pos => convertPosition(pos, root, STANDARD_TUNING));
+
+  let voicings: ChordVoicing[];
+
+  if (isStandardTuning(tuning)) {
+    // Standard tuning - use voicings as-is
+    voicings = standardVoicings;
+  } else {
+    // Non-standard tuning - adapt voicings by shifting fret positions
+    voicings = standardVoicings
+      .map(v => adaptVoicingToTuning(v, tuning))
+      .filter((v): v is ChordVoicing => v !== null);
+
+    // If no chords-db voicings work in this tuning, fall back to solver
+    if (voicings.length === 0) {
+      return getBestVoicings(root, quality, limit, tuning);
+    }
+  }
 
   // Sort by fret position (open chords first)
   voicings.sort((a, b) => a.lowestFret - b.lowestFret);
