@@ -58,27 +58,8 @@ export function useAudioEngine() {
     reverbRef.current = reverb;
     limiterRef.current = limiter;
 
-    // iOS PWA fix: Resume audio context when app comes back to foreground
-    // This handles the case where iOS suspends audio when PWA is backgrounded
-    const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible') {
-        try {
-          const ctx = Tone.getContext().rawContext;
-          if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
-            await ctx.resume();
-            console.log('Audio context resumed on visibility change');
-          }
-        } catch (e) {
-          console.warn('Failed to resume audio on visibility change:', e);
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
     // Cleanup on unmount
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
       sampler.dispose();
       reverb.dispose();
       limiter.dispose();
@@ -97,29 +78,10 @@ export function useAudioEngine() {
     // Unlock iOS audio SYNCHRONOUSLY first (must stay in gesture call stack)
     unlockIOSAudio();
 
-    // Always try to start/resume Tone.js audio context
-    // iOS PWA can have context in various states (suspended, interrupted)
-    try {
+    // Then start Tone.js audio context
+    if (Tone.getContext().state !== 'running') {
       await Tone.start();
-
-      // Get the raw audio context
-      const ctx = Tone.getContext().rawContext;
-
-      // iOS PWA fix: Handle interrupted state and retry resume
-      // The 'interrupted' state is specific to iOS when the system takes over audio
-      if (ctx.state !== 'running') {
-        await ctx.resume();
-
-        // If still not running after first resume, try again with a small delay
-        // This helps with iOS PWA first-launch edge case
-        // Cast to string to avoid TypeScript narrowing issues with state
-        if ((ctx.state as string) !== 'running') {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          await ctx.resume();
-        }
-      }
-    } catch (e) {
-      console.warn('Audio context start/resume failed:', e);
+      console.log('Audio context started');
     }
   }, []);
 
