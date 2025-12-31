@@ -361,7 +361,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   setTuning: (newTuning: string[], name: string, mode: TuningChangeMode) => {
-    const { tuning: oldTuning, guitarStringState } = get();
+    const { tuning: oldTuning, guitarStringState, targetRoot, targetFamily, targetQuality, voicingTypeFilter } = get();
 
     // Check if fretboard has any notes
     const hasNotes = Object.values(guitarStringState).some(f => f !== null);
@@ -385,8 +385,72 @@ export const useMusicStore = create<AppState>((set, get) => ({
     }
 
     if (mode === 'keep') {
-      // Keep same fret positions, just update tuning
-      // Re-run detection with new tuning context
+      // Keep same fret positions, pitch changes with new tuning
+      // If a chord was selected, detect what it now represents and promote to selected chord
+
+      if (targetRoot && targetQuality) {
+        // A chord was selected - detect the new chord and set it as selected
+        const noteCount = Object.values(guitarStringState).filter(f => f !== null).length;
+
+        if (noteCount >= 2) {
+          const analysis = analyzeVoicing(guitarStringState, newTuning);
+
+          // Use the top suggestion (highest confidence) as the new chord
+          if (analysis.suggestions.length > 0) {
+            const topSuggestion = analysis.suggestions[0];
+            const newFamily = getFamilyForType(topSuggestion.quality) || '';
+            const voicings = getVoicingsForChord(topSuggestion.root, topSuggestion.quality, 12, voicingTypeFilter, newTuning);
+
+            // Find matching voicing
+            const matchingVoicing = findMatchingVoicing(guitarStringState, voicings);
+            const selectedIndex = matchingVoicing ? voicings.indexOf(matchingVoicing) : -1;
+
+            set({
+              tuning: newTuning,
+              tuningName: name,
+              guitarStringState, // Keep same frets
+              targetRoot: topSuggestion.root,
+              targetFamily: newFamily,
+              targetQuality: topSuggestion.quality,
+              availableVoicings: voicings,
+              currentVoicingIndex: selectedIndex >= 0 ? selectedIndex : 0,
+              isCustomShape: selectedIndex < 0,
+              detectedChord: null,
+              suggestions: [],
+              voicingType: null,
+            });
+            return;
+          }
+        }
+
+        // Fallback: couldn't detect a chord, enter free-form with detection
+        const detectedChord = runChordDetection(guitarStringState, newTuning);
+        set({
+          tuning: newTuning,
+          tuningName: name,
+          isCustomShape: true,
+          targetRoot: '',
+          targetFamily: '',
+          targetQuality: '',
+          availableVoicings: [],
+          detectedChord,
+          suggestions: [],
+          voicingType: null,
+        });
+        return;
+      }
+
+      // No chord was selected - just update tuning and run detection
+      const detectedChord = runChordDetection(guitarStringState, newTuning);
+      const noteCount = Object.values(guitarStringState).filter(f => f !== null).length;
+      let suggestions: ChordSuggestion[] = [];
+      let voicingType: VoicingType | null = null;
+      if (noteCount >= 2) {
+        const analysis = analyzeVoicing(guitarStringState, newTuning);
+        suggestions = analysis.suggestions;
+        voicingType = analysis.voicingType;
+      }
+
       set({
         tuning: newTuning,
         tuningName: name,
@@ -395,6 +459,9 @@ export const useMusicStore = create<AppState>((set, get) => ({
         targetFamily: '',
         targetQuality: '',
         availableVoicings: [],
+        detectedChord,
+        suggestions,
+        voicingType,
       });
       return;
     }
@@ -432,18 +499,146 @@ export const useMusicStore = create<AppState>((set, get) => ({
       }
     }
 
-    set({
-      tuning: newTuning,
-      tuningName: name,
-      guitarStringState: newGuitarState,
-      isCustomShape: true,
-      targetRoot: '',
-      targetFamily: '',
-      targetQuality: '',
-      availableVoicings: [],
-      detectedChord: null,
-      suggestions: [],
-      voicingType: null,
-    });
+    // If a chord was selected, preserve chord identity and re-fetch voicings for new tuning
+    if (targetRoot && targetQuality) {
+      const voicings = getVoicingsForChord(targetRoot, targetQuality, 12, voicingTypeFilter, newTuning);
+
+      // Try to find a voicing that matches the adapted frets
+      const matchingVoicing = findMatchingVoicing(newGuitarState, voicings);
+      const selectedIndex = matchingVoicing ? voicings.indexOf(matchingVoicing) : -1;
+
+      set({
+        tuning: newTuning,
+        tuningName: name,
+        guitarStringState: newGuitarState,
+        targetRoot,
+        targetFamily,
+        targetQuality,
+        availableVoicings: voicings,
+        currentVoicingIndex: selectedIndex >= 0 ? selectedIndex : 0,
+        isCustomShape: selectedIndex < 0, // Custom if adapted frets don't match any voicing
+        detectedChord: null,
+        suggestions: [],
+        voicingType: null,
+      });
+    } else {
+      // Free-form mode - just adapt frets and run detection
+      const detectedChord = runChordDetection(newGuitarState, newTuning);
+
+      // Run suggestion analysis
+      const noteCount = Object.values(newGuitarState).filter(f => f !== null).length;
+      let suggestions: ChordSuggestion[] = [];
+      let voicingType: VoicingType | null = null;
+      if (noteCount >= 2) {
+        const analysis = analyzeVoicing(newGuitarState, newTuning);
+        suggestions = analysis.suggestions;
+        voicingType = analysis.voicingType;
+      }
+
+      set({
+        tuning: newTuning,
+        tuningName: name,
+        guitarStringState: newGuitarState,
+        isCustomShape: true,
+        targetRoot: '',
+        targetFamily: '',
+        targetQuality: '',
+        availableVoicings: [],
+        detectedChord,
+        suggestions,
+        voicingType,
+      });
+    }
+  },
+
+  restoreFromUrl: (params) => {
+    const { guitarState, tuning, tuningName, root, quality, voicingIndex } = params;
+    const effectiveTuning = tuning || STANDARD_TUNING;
+
+    // If chord selection is provided, restore as selected chord
+    if (root && quality) {
+      const family = getFamilyForType(quality) || '';
+      const voicings = getVoicingsForChord(root, quality, 12, 'all', effectiveTuning);
+
+      // If a valid voicingIndex was provided, trust it (URL was generated with this index)
+      if (voicingIndex !== undefined && voicingIndex >= 0 && voicingIndex < voicings.length) {
+        const selectedVoicing = voicings[voicingIndex];
+
+        set({
+          tuning: [...effectiveTuning],
+          tuningName: tuningName || 'Standard',
+          guitarStringState: voicingToGuitarState(selectedVoicing.frets),
+          targetRoot: root,
+          targetFamily: family,
+          targetQuality: quality,
+          availableVoicings: voicings,
+          currentVoicingIndex: voicingIndex,
+          isCustomShape: false, // Trust the provided index
+          detectedChord: null,
+          suggestions: [],
+          voicingType: null,
+        });
+        return;
+      }
+
+      // No valid voicingIndex - try to find matching voicing from guitar state
+      const matchingVoicing = findMatchingVoicing(guitarState, voicings);
+      const selectedIndex = matchingVoicing ? voicings.indexOf(matchingVoicing) : 0;
+
+      // Check if guitar state matches the selected voicing exactly
+      const selectedVoicing = voicings[selectedIndex];
+      let isCustom = false;
+      if (selectedVoicing) {
+        for (let i = 0; i < 6; i++) {
+          if (guitarState[i as StringIndex] !== selectedVoicing.frets[i]) {
+            isCustom = true;
+            break;
+          }
+        }
+      }
+
+      set({
+        tuning: [...effectiveTuning],
+        tuningName: tuningName || 'Standard',
+        guitarStringState: guitarState,
+        targetRoot: root,
+        targetFamily: family,
+        targetQuality: quality,
+        availableVoicings: voicings,
+        currentVoicingIndex: selectedIndex,
+        isCustomShape: isCustom,
+        detectedChord: null,
+        suggestions: [],
+        voicingType: null,
+      });
+    } else {
+      // Free-form mode - run detection
+      const detectedChord = runChordDetection(guitarState, effectiveTuning);
+
+      // Run suggestion analysis
+      const noteCount = Object.values(guitarState).filter(f => f !== null).length;
+      let suggestions: ChordSuggestion[] = [];
+      let voicingType: VoicingType | null = null;
+      if (noteCount >= 2) {
+        const analysis = analyzeVoicing(guitarState, effectiveTuning);
+        suggestions = analysis.suggestions;
+        voicingType = analysis.voicingType;
+      }
+
+      set({
+        tuning: [...effectiveTuning],
+        tuningName: tuningName || 'Standard',
+        guitarStringState: guitarState,
+        targetRoot: '',
+        targetFamily: '',
+        targetQuality: '',
+        availableVoicings: [],
+        currentVoicingIndex: 0,
+        isCustomShape: true,
+        detectedChord,
+        suggestions,
+        voicingType,
+      });
+    }
   },
 }));

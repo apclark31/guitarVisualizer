@@ -1,84 +1,96 @@
-/* ChordHeader - Unified chord identity + picker */
+/* ChordHeader - Unified chord display card + position controls */
 
 .chordHeader {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
-  padding: 0;
-  background-color: #262626;
-  border-radius: 8px;
+  gap: 6px;
+  padding: 8px 16px;
   width: 100%;
   max-width: 600px;
-  overflow: hidden;
 }
 
-/* Identity section - chord name, notes, subtext (header area) */
-.identitySection {
+/* Card row: chord card + (i) button (positioned absolutely) */
+.cardRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Tappable chord card - clean minimal style */
+.chordCard {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  text-align: center;
-  height: 72px; /* Fixed height to prevent DOM shift */
-  padding: 0 20px;
-  width: 100%;
-  background-color: #1f1f1f; /* Slightly darker to distinguish */
+  width: 320px;
+  height: 64px;
+  padding: 10px 40px 10px 20px; /* Extra right padding for caret */
+  background-color: #2a2a2a;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  position: relative;
 }
 
-.mainRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.chordCard:hover {
+  background-color: #333333;
 }
 
-.title {
-  font-size: 18px;
+.chordCard:focus {
+  outline: none;
+}
+
+/* Dropdown chevron indicator - native select arrow style */
+.chordCard::after {
+  content: '';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #a1a1aa;
+  border-bottom: 2px solid #a1a1aa;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.primaryText {
+  font-size: 16px;
   font-weight: 500;
   color: #a1a1aa;
+  text-align: center;
 }
 
-.titleSelected {
-  font-size: 24px;
+.primarySelected {
+  font-size: 20px;
   font-weight: 600;
   color: #3b82f6;
 }
 
-.notes {
-  font-size: 14px;
-  color: #71717a;
-}
-
-.subtext {
+.secondaryText {
   font-size: 13px;
-  color: #52525b;
-}
-
-.subtextEmpty {
-  font-size: 14px;
   color: #71717a;
+  text-align: center;
 }
 
-.voicingBadge {
-  font-size: 11px;
-  font-weight: 500;
-  color: #a1a1aa;
-  background-color: #3f3f46;
-  padding: 2px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
+/* Info bubble button - absolutely positioned to not affect centering */
 .infoBubble {
-  width: 24px;
-  height: 24px;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 1px solid #3b82f6;
   background-color: transparent;
   color: #3b82f6;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   font-style: italic;
   cursor: pointer;
@@ -94,123 +106,109 @@
   color: #fff;
 }
 
-/* Controls row - picker + voicing dropdown (input area) */
-.controlsRow {
+/* Position controls row - minimal arrow style */
+.positionRow {
   display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  width: 100%;
-  padding: 12px 16px 14px;
-  background-color: #262626;
-  border-top: 1px solid #333333;
+  align-items: center;
+  gap: 16px;
 }
 
-.picker {
-  flex: 1;
-  min-width: 0;
-}
-
-.voicingLabel {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 0 0 110px;
-  min-width: 0;
-}
-
-.voicingLabelText {
-  font-size: 11px;
-  color: #71717a;
-}
-
-.voicingSelect {
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #525252;
-  background-color: #333333;
-  color: #fff;
-  font-size: 14px;
+.navButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: none;
+  background-color: transparent;
+  color: #52525b;
+  font-size: 18px;
+  font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.15s ease;
-  width: 100%;
-  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+  padding: 0;
 }
 
-.voicingSelect:hover {
-  border-color: #3b82f6;
+.navButton:hover:not(:disabled) {
+  color: #ffffff;
 }
 
-.voicingSelect:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+.navButton:not(:disabled) {
+  color: #a1a1aa;
+}
+
+.navButton:disabled {
+  color: #3f3f46;
+  cursor: not-allowed;
+}
+
+.positionLabel {
+  font-size: 13px;
+  color: #71717a;
+  min-width: 70px;
+  text-align: center;
 }
 
 /* Mobile Styles */
 @media (max-width: 768px) {
   .chordHeader {
-    border-radius: 8px;
+    padding: 6px 12px;
+    gap: 4px;
     max-width: 100%;
   }
 
-  .identitySection {
-    gap: 2px;
-    height: 60px; /* Fixed height for mobile */
-    padding: 0 16px;
+  .chordCard {
+    width: 280px;
+    height: 56px;
+    padding: 8px 36px 8px 16px;
   }
 
-  .mainRow {
-    gap: 8px;
+  .chordCard::after {
+    right: 14px;
+    width: 6px;
+    height: 6px;
   }
 
-  .title {
-    font-size: 16px;
+  .primaryText {
+    font-size: 15px;
   }
 
-  .titleSelected {
-    font-size: 20px;
+  .primarySelected {
+    font-size: 18px;
   }
 
-  .notes {
-    font-size: 13px;
-  }
-
-  .subtext {
+  .secondaryText {
     font-size: 12px;
   }
 
-  .voicingBadge {
-    font-size: 10px;
-    padding: 2px 6px;
+  .infoBubble {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
 
-  /* Controls row: picker takes ~68%, voicing ~30% */
-  .controlsRow {
-    gap: 8px;
-    padding: 10px 12px 12px;
+  .positionRow {
+    gap: 12px;
   }
 
-  .picker {
-    flex: 0 0 68%;
+  .navButton {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
   }
 
-  .voicingLabel {
-    flex: 0 0 30%;
-  }
-
-  .voicingSelect {
-    font-size: 13px;
-    padding: 8px 6px;
+  .positionLabel {
+    font-size: 12px;
+    min-width: 60px;
   }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .infoBubble {
-    transition: none;
-  }
-
-  .voicingSelect {
+  .chordCard,
+  .infoBubble,
+  .navButton {
     transition: none;
   }
 }

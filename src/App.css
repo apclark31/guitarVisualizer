@@ -31,10 +31,11 @@ body {
   flex: 1;
 }
 
-/* Chord Display Bar */
+/* Chord Display Bar - sits close to fretboard */
 .chordBar {
   display: flex;
   justify-content: center;
+  margin-bottom: -8px; /* Pull closer to fretboard */
 }
 
 /* Controls Bar - horizontal on desktop */

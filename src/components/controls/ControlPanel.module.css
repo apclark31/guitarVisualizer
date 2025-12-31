@@ -1,4 +1,4 @@
-/* Control Panel - Simplified layout (voicing nav, toggles, buttons) */
+/* Control Panel - Simplified layout (voicing filter, tuning, toggles, buttons) */
 .controlPanel {
   background-color: #262626;
   border-radius: 8px;
@@ -25,42 +25,97 @@
   margin: 0;
 }
 
-/* Position navigation */
-.voicingNav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 38px;
+/* Voicing + Tuning row - 50/50 split */
+.voicingTuningRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: end;
 }
 
-.navButton {
-  width: 38px;
+/* Voicing select wrapper - holds custom chevron */
+.selectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Custom chevron for select */
+.selectWrapper::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid #a1a1aa;
+  border-bottom: 2px solid #a1a1aa;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+/* Voicing select dropdown */
+.voicingSelect {
+  padding: 0 28px 0 12px;
   height: 38px;
-  border-radius: 6px;
+  background: #333333;
   border: 1px solid #525252;
-  background-color: #333333;
-  color: #fff;
-  font-size: 14px;
+  border-radius: 6px;
+  color: #e5e5e5;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
+  transition: border-color 0.15s ease;
+  width: 100%;
+  /* Hide native select arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
 }
 
-.navButton:hover:not(:disabled) {
-  background-color: #3b82f6;
+.voicingSelect:hover {
   border-color: #3b82f6;
 }
 
-.navButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.voicingSelect:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
-.voicingLabel {
-  flex: 1;
-  text-align: center;
+/* Tuning button */
+.tuningButton {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  width: 100%;
+  padding: 0 28px 0 12px;
+  height: 38px;
+  background: #333333;
+  border: 1px solid #525252;
+  border-radius: 6px;
+  color: #e5e5e5;
   font-size: 13px;
-  color: #a1a1aa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tuningButton:hover {
+  border-color: #3b82f6;
+}
+
+/* Native select arrow style chevron */
+.tuningButton::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid #a1a1aa;
+  border-bottom: 2px solid #a1a1aa;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
 }
 
 /* iOS-style toggle switch */
@@ -183,44 +238,8 @@
   width: 100%;
 }
 
-/* Voicing + Tuning row */
-.voicingTuningRow {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 16px;
-  align-items: end;
-}
-
-/* Tuning button */
-.tuningButton {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-width: 120px;
-  padding: 0 12px;
-  height: 38px;
-  background: #333333;
-  border: 1px solid #525252;
-  border-radius: 6px;
-  color: #e5e5e5;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.tuningButton:hover {
-  border-color: #3b82f6;
-}
-
-.tuningIcon {
-  margin-left: 8px;
-  font-size: 10px;
-  opacity: 0.6;
-}
-
-/* Toggles row - both toggles side by side, spans full width */
+/* Toggles row - both toggles side by side */
 .togglesRow {
-  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
@@ -228,7 +247,6 @@
 
 /* Buttons row - each button in its own column */
 .buttonsRow {
-  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
@@ -244,11 +262,31 @@
     max-width: 100%;
   }
 
+  .voicingTuningRow {
+    gap: 12px;
+  }
+
   .togglesRow {
     gap: 12px;
   }
 
   .buttonsRow {
     gap: 12px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .voicingSelect,
+  .tuningButton,
+  .toggleSwitch,
+  .playButton,
+  .clearButton,
+  .shareButton {
+    transition: none;
+  }
+
+  .toggleSwitch::after {
+    transition: none;
   }
 }

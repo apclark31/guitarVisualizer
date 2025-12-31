@@ -7,11 +7,11 @@ import { AppHeader } from './components/layout/AppHeader';
 import { useMusicStore } from './store/useMusicStore';
 import { decodeTuningFromUrl } from './config/constants';
 import { unlockIOSAudio } from './lib/ios-audio-unlock';
-import type { StringIndex } from './types';
+import type { StringIndex, GuitarStringState } from './types';
 import './App.css';
 
 function App() {
-  const { setFret, setTuning } = useMusicStore();
+  const { restoreFromUrl } = useMusicStore();
   const audioWarmedRef = useRef(false);
 
   // Parse URL params on mount to restore shared chord
@@ -19,18 +19,16 @@ function App() {
     const params = new URLSearchParams(window.location.search);
     const sharedState = params.get('s');
     const tuningParam = params.get('t');
-
-    // Apply tuning first (before setting frets)
-    if (tuningParam) {
-      const decoded = decodeTuningFromUrl(tuningParam);
-      if (decoded) {
-        // Use 'clear' mode since we're restoring state from URL
-        setTuning(decoded.tuning, decoded.name, 'clear');
-      }
-    }
+    const rootParam = params.get('r');
+    const qualityParam = params.get('q');
+    const voicingParam = params.get('v');
 
     if (sharedState) {
-      // Format: "0-3,1-2,2-0" (string-fret pairs)
+      // Parse guitar state from URL
+      const guitarState: GuitarStringState = {
+        0: null, 1: null, 2: null, 3: null, 4: null, 5: null
+      };
+
       const pairs = sharedState.split(',');
       for (const pair of pairs) {
         const [stringStr, fretStr] = pair.split('-');
@@ -45,14 +43,38 @@ function App() {
           fret >= 0 &&
           fret <= 24
         ) {
-          setFret(stringIndex as StringIndex, fret);
+          guitarState[stringIndex as StringIndex] = fret;
         }
       }
+
+      // Parse tuning if provided
+      let tuning: string[] | undefined;
+      let tuningName: string | undefined;
+      if (tuningParam) {
+        const decoded = decodeTuningFromUrl(tuningParam);
+        if (decoded) {
+          tuning = decoded.tuning;
+          tuningName = decoded.name;
+        }
+      }
+
+      // Parse voicing index if provided
+      const voicingIndex = voicingParam ? parseInt(voicingParam, 10) : undefined;
+
+      // Restore full state in one action
+      restoreFromUrl({
+        guitarState,
+        tuning,
+        tuningName,
+        root: rootParam || undefined,
+        quality: qualityParam || undefined,
+        voicingIndex: isNaN(voicingIndex as number) ? undefined : voicingIndex,
+      });
 
       // Clean up URL without reloading
       window.history.replaceState({}, '', window.location.pathname);
     }
-  }, [setFret, setTuning]);
+  }, [restoreFromUrl]);
 
   // iOS PWA fix: Pre-warm audio context on first touch anywhere
   // This helps iOS PWA mode recognize the user gesture before Play is tapped

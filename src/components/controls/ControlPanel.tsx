@@ -3,8 +3,8 @@ import { useMusicStore } from '../../store/useMusicStore';
 import { useAudioEngine } from '../../hooks/useAudioEngine';
 import { TuningModal } from './TuningModal';
 import { TuningConfirmModal } from './TuningConfirmModal';
-import { encodeTuningForUrl } from '../../config/constants';
-import type { StringIndex, TuningChangeMode } from '../../types';
+import { encodeTuningForUrl, VOICING_FILTER_OPTIONS } from '../../config/constants';
+import type { StringIndex, TuningChangeMode, VoicingFilterType } from '../../types';
 import styles from './ControlPanel.module.css';
 
 export function ControlPanel() {
@@ -15,15 +15,15 @@ export function ControlPanel() {
     setDisplayMode,
     playbackMode,
     setPlaybackMode,
-    availableVoicings,
     currentVoicingIndex,
-    setVoicingIndex,
     isCustomShape,
     clearAllStrings,
     guitarStringState,
     tuning,
     tuningName,
     setTuning,
+    voicingTypeFilter,
+    setVoicingTypeFilter,
   } = useMusicStore();
 
   const { isLoaded, playChord, playNote } = useAudioEngine();
@@ -31,23 +31,21 @@ export function ControlPanel() {
   // Check if there are any notes to play
   const hasNotes = Object.values(guitarStringState).some(fret => fret !== null);
 
-  const isFreeFormMode = !targetRoot || !targetQuality;
-
   // Tuning modal state
   const [showTuningModal, setShowTuningModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingTuning, setPendingTuning] = useState<{ tuning: string[]; name: string } | null>(null);
 
   // Handle tuning selection from TuningModal
-  const handleTuningSelect = (tuning: string[], name: string) => {
+  const handleTuningSelect = (newTuning: string[], name: string) => {
     // If no notes on fretboard, apply directly with 'clear' mode (acts same as empty)
     if (!hasNotes) {
-      setTuning(tuning, name, 'clear');
+      setTuning(newTuning, name, 'clear');
       return;
     }
 
     // Otherwise, show confirm modal for adapt/keep/clear choice
-    setPendingTuning({ tuning, name });
+    setPendingTuning({ tuning: newTuning, name });
     setShowConfirmModal(true);
   };
 
@@ -65,16 +63,8 @@ export function ControlPanel() {
     setShowConfirmModal(false);
   };
 
-  const handlePrevVoicing = () => {
-    if (currentVoicingIndex > 0) {
-      setVoicingIndex(currentVoicingIndex - 1);
-    }
-  };
-
-  const handleNextVoicing = () => {
-    if (currentVoicingIndex < availableVoicings.length - 1) {
-      setVoicingIndex(currentVoicingIndex + 1);
-    }
+  const handleVoicingFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setVoicingTypeFilter(e.target.value as VoicingFilterType);
   };
 
   const toggleDisplayMode = () => {
@@ -107,6 +97,16 @@ export function ControlPanel() {
       params.set('t', tuningSlug);
     }
 
+    // Include chord selection if one is active (not free-form)
+    if (targetRoot && targetQuality) {
+      params.set('r', targetRoot);
+      params.set('q', targetQuality);
+      // Include voicing index if not custom
+      if (!isCustomShape && currentVoicingIndex >= 0) {
+        params.set('v', currentVoicingIndex.toString());
+      }
+    }
+
     const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
 
     try {
@@ -120,39 +120,22 @@ export function ControlPanel() {
 
   return (
     <div className={styles.controlPanel}>
-      {/* Row 1: Voicing Navigation + Tuning */}
+      {/* Row 1: Voicing Filter + Tuning */}
       <div className={styles.voicingTuningRow}>
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Position</h3>
-          <div className={styles.voicingNav}>
-            <button
-              onClick={handlePrevVoicing}
-              disabled={currentVoicingIndex === 0 || availableVoicings.length === 0}
-              className={styles.navButton}
+          <h3 className={styles.sectionTitle}>Voicing</h3>
+          <div className={styles.selectWrapper}>
+            <select
+              value={voicingTypeFilter}
+              onChange={handleVoicingFilterChange}
+              className={styles.voicingSelect}
             >
-              &lt;
-            </button>
-            <span className={styles.voicingLabel}>
-              {isFreeFormMode ? (
-                'Free Play'
-              ) : isCustomShape ? (
-                'Custom'
-              ) : availableVoicings.length > 0 ? (
-                `${currentVoicingIndex + 1} of ${availableVoicings.length}`
-              ) : (
-                'No voicings'
-              )}
-            </span>
-            <button
-              onClick={handleNextVoicing}
-              disabled={
-                currentVoicingIndex >= availableVoicings.length - 1 ||
-                availableVoicings.length === 0
-              }
-              className={styles.navButton}
-            >
-              &gt;
-            </button>
+              {VOICING_FILTER_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -163,7 +146,6 @@ export function ControlPanel() {
             onClick={() => setShowTuningModal(true)}
           >
             {tuningName}
-            <span className={styles.tuningIcon}>▾</span>
           </button>
         </div>
       </div>

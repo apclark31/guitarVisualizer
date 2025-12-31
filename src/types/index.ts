@@ -130,4 +130,14 @@ export interface AppState {
 
   // Tuning Actions
   setTuning: (tuning: string[], name: string, mode: TuningChangeMode) => void;
+
+  // URL Restoration
+  restoreFromUrl: (params: {
+    guitarState: GuitarStringState;
+    tuning?: string[];
+    tuningName?: string;
+    root?: string;
+    quality?: string;
+    voicingIndex?: number;
+  }) => void;
 }

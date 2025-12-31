@@ -1,9 +1,8 @@
 /**
- * ChordPicker - Multi-column chord selector
+ * ChordPicker - Multi-column chord selector modal
  *
  * Three-column picker for Root, Family, and Type selection.
- * Desktop: dropdown with scrollable columns
- * Mobile: modal takeover with swipe-scrollable columns
+ * Controlled externally via isOpen/onClose props.
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -29,13 +28,13 @@ const ROOT_OPTIONS = [
 ] as const;
 
 interface ChordPickerProps {
-  className?: string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function ChordPicker({ className }: ChordPickerProps) {
+export function ChordPicker({ isOpen, onClose }: ChordPickerProps) {
   const { targetRoot, targetFamily, targetQuality, setChord } = useMusicStore();
 
-  const [isOpen, setIsOpen] = useState(false);
   const [pendingRoot, setPendingRoot] = useState(targetRoot || 'A');
   const [pendingFamily, setPendingFamily] = useState<ChordFamily>(targetFamily || 'Major');
   const [pendingType, setPendingType] = useState(targetQuality || 'Major');
@@ -65,24 +64,24 @@ export function ChordPicker({ className }: ChordPickerProps) {
   // Apply selection and close picker
   const handleApply = useCallback(() => {
     setChord(pendingRoot, pendingFamily, pendingType);
-    setIsOpen(false);
-  }, [pendingRoot, pendingFamily, pendingType, setChord]);
+    onClose();
+  }, [pendingRoot, pendingFamily, pendingType, setChord, onClose]);
 
-  // Close on outside click (desktop)
+  // Close on outside click
   useEffect(() => {
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
       if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        onClose();
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
-  // Lock body scroll when modal is open (mobile)
+  // Lock body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -114,101 +113,83 @@ export function ChordPicker({ className }: ChordPickerProps) {
     });
   }, [isOpen, pendingRoot, pendingFamily, pendingType]);
 
-  // Build display text
-  const displayText = targetRoot && targetQuality
-    ? `${targetRoot} · ${targetFamily} · ${targetQuality}`
-    : 'Select a chord...';
+  // Don't render anything if not open
+  if (!isOpen) return null;
 
   return (
-    <div ref={pickerRef} className={`${styles.container} ${className || ''}`}>
-      {/* Trigger button */}
-      <button
-        className={styles.trigger}
-        onClick={() => setIsOpen(!isOpen)}
-        aria-expanded={isOpen}
-        aria-haspopup="listbox"
-      >
-        <span className={styles.triggerText}>{displayText}</span>
-        <span className={styles.triggerIcon}>▾</span>
-      </button>
+    <>
+      <div
+        className={styles.backdrop}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div ref={pickerRef} className={styles.picker}>
+        {/* Close button */}
+        <button
+          className={styles.closeButton}
+          onClick={onClose}
+          aria-label="Close picker"
+        >
+          ✕
+        </button>
 
-      {/* Backdrop + Picker modal */}
-      {isOpen && (
-        <>
-          <div
-            className={styles.backdrop}
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
-          <div className={styles.picker}>
-            {/* Close button */}
-            <button
-              className={styles.closeButton}
-              onClick={() => setIsOpen(false)}
-              aria-label="Close picker"
-            >
-              ✕
-            </button>
+        {/* Column headers */}
+        <div className={styles.headers}>
+          <div className={styles.header}>Root</div>
+          <div className={styles.header}>Family</div>
+          <div className={styles.header}>Type</div>
+        </div>
 
-          {/* Column headers */}
-          <div className={styles.headers}>
-            <div className={styles.header}>Root</div>
-            <div className={styles.header}>Family</div>
-            <div className={styles.header}>Type</div>
+        {/* Columns container */}
+        <div className={styles.columns}>
+          {/* Root column */}
+          <div ref={rootColumnRef} className={styles.column}>
+            {ROOT_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                data-value={option.value}
+                className={`${styles.option} ${pendingRoot === option.value ? styles.active : ''}`}
+                onClick={() => setPendingRoot(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
 
-          {/* Columns container */}
-          <div className={styles.columns}>
-            {/* Root column */}
-            <div ref={rootColumnRef} className={styles.column}>
-              {ROOT_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  data-value={option.value}
-                  className={`${styles.option} ${pendingRoot === option.value ? styles.active : ''}`}
-                  onClick={() => setPendingRoot(option.value)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Family column */}
-            <div ref={familyColumnRef} className={styles.column}>
-              {CHORD_FAMILIES.map((family) => (
-                <button
-                  key={family}
-                  data-value={family}
-                  className={`${styles.option} ${pendingFamily === family ? styles.active : ''}`}
-                  onClick={() => handleFamilyChange(family)}
-                >
-                  {family}
-                </button>
-              ))}
-            </div>
-
-            {/* Type column */}
-            <div ref={typeColumnRef} className={styles.column}>
-              {typeOptions.map((type) => (
-                <button
-                  key={type}
-                  data-value={type}
-                  className={`${styles.option} ${pendingType === type ? styles.active : ''}`}
-                  onClick={() => setPendingType(type)}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
+          {/* Family column */}
+          <div ref={familyColumnRef} className={styles.column}>
+            {CHORD_FAMILIES.map((family) => (
+              <button
+                key={family}
+                data-value={family}
+                className={`${styles.option} ${pendingFamily === family ? styles.active : ''}`}
+                onClick={() => handleFamilyChange(family)}
+              >
+                {family}
+              </button>
+            ))}
           </div>
 
-          {/* Apply button */}
-          <button className={styles.applyButton} onClick={handleApply}>
-            Apply
-          </button>
+          {/* Type column */}
+          <div ref={typeColumnRef} className={styles.column}>
+            {typeOptions.map((type) => (
+              <button
+                key={type}
+                data-value={type}
+                className={`${styles.option} ${pendingType === type ? styles.active : ''}`}
+                onClick={() => setPendingType(type)}
+              >
+                {type}
+              </button>
+            ))}
           </div>
-        </>
-      )}
-    </div>
+        </div>
+
+        {/* Apply button */}
+        <button className={styles.applyButton} onClick={handleApply}>
+          Apply
+        </button>
+      </div>
+    </>
   );
 }
