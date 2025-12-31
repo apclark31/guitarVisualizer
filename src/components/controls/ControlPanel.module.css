@@ -239,26 +239,31 @@
 .clearButton {
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid #525252;
-  background-color: transparent;
-  color: #a3a3a3;
+  border: 1px solid #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
   font-size: 13px;
   cursor: pointer;
   transition: all 0.15s ease;
   width: 100%;
 }
 
-.clearButton:hover {
-  background-color: #ef4444;
-  border-color: #ef4444;
-  color: #fff;
+.clearButton:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.clearButton:disabled {
+  background-color: #404040;
+  border-color: #404040;
+  color: #737373;
+  cursor: not-allowed;
 }
 
 .shareButton {
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid #3b82f6;
-  background-color: transparent;
+  background-color: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
   font-size: 13px;
   cursor: pointer;
@@ -267,13 +272,13 @@
 }
 
 .shareButton:hover:not(:disabled) {
-  background-color: #3b82f6;
-  color: #fff;
+  background-color: rgba(59, 130, 246, 0.2);
 }
 
 .shareButton:disabled {
-  border-color: #525252;
-  color: #525252;
+  background-color: #404040;
+  border-color: #404040;
+  color: #737373;
   cursor: not-allowed;
 }
 

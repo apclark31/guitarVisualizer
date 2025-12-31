@@ -252,7 +252,11 @@ export function ControlPanel() {
           >
             {copied ? 'Copied!' : 'Share'}
           </button>
-          <button onClick={clearAllStrings} className={styles.clearButton}>
+          <button
+            onClick={clearAllStrings}
+            disabled={!hasNotes}
+            className={styles.clearButton}
+          >
             Clear All
           </button>
         </div>
