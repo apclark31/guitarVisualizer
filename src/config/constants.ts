@@ -245,8 +245,10 @@ export const FRETBOARD_DIMENSIONS = {
   NUT_WIDTH: 6,
   /** Width of regular frets */
   FRET_WIDTH: 2,
-  /** Height of each string spacing */
+  /** Height of each string spacing (desktop) */
   STRING_SPACING: 30,
+  /** Height of each string spacing (mobile - larger tap targets) */
+  STRING_SPACING_MOBILE: 36,
   /** Width of each fret spacing */
   FRET_SPACING: 60,
   /** Padding around the fretboard (increased for sharp/flat labels) */

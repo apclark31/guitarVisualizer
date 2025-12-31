@@ -8,7 +8,8 @@
   overflow-x: auto;
   background-color: transparent;
   border-radius: 12px;
-  padding: 8px 0;
+  padding: 8px 0 12px;
+  /* No horizontal padding - string labels align with control panel edge */
 }
 
 .fretboardSvg {
@@ -41,7 +42,7 @@
 /* Mobile styles */
 @media (max-width: 768px) {
   .fretboardContainer {
-    padding: 8px;
+    padding: 8px 0 12px;
     border-radius: 8px;
   }
 

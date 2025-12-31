@@ -35,7 +35,7 @@ body {
 .chordBar {
   display: flex;
   justify-content: center;
-  margin-bottom: -8px; /* Pull closer to fretboard */
+  margin-bottom: -12px; /* Pull closer to fretboard */
 }
 
 /* Controls Bar - horizontal on desktop */

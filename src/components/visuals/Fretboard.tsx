@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { useAudioEngine } from '../../hooks/useAudioEngine';
 import {
@@ -6,7 +6,7 @@ import {
   STRING_COUNT,
   MARKER_FRETS,
   DOUBLE_MARKER_FRETS,
-  FRETBOARD_DIMENSIONS as DIM,
+  FRETBOARD_DIMENSIONS as BASE_DIM,
 } from '../../config/constants';
 import { COLORS } from '../../config/theme';
 import { Note } from '@tonaljs/tonal';
@@ -34,6 +34,24 @@ export function Fretboard() {
   const { guitarStringState, setFret, clearString, displayMode, targetRoot, detectedChord, tuning } = useMusicStore();
   const { playFretNote, isLoaded } = useAudioEngine();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Detect mobile for larger string spacing (better tap targets)
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  // Use mobile string spacing for larger tap targets
+  const DIM = {
+    ...BASE_DIM,
+    STRING_SPACING: isMobile ? BASE_DIM.STRING_SPACING_MOBILE : BASE_DIM.STRING_SPACING,
+  };
 
   // Determine the root note to use for interval coloring
   const colorRoot = targetRoot || (detectedChord?.bassNote) || null;
@@ -77,9 +95,9 @@ export function Fretboard() {
     }
   }, [guitarStringState]);
 
-  // Calculate SVG dimensions
+  // Calculate SVG dimensions (extra 4px bottom padding for fret numbers)
   const width = DIM.PADDING * 2 + DIM.NUT_WIDTH + FRET_COUNT * DIM.FRET_SPACING;
-  const height = DIM.PADDING * 2 + (STRING_COUNT - 1) * DIM.STRING_SPACING;
+  const height = DIM.PADDING * 2 + (STRING_COUNT - 1) * DIM.STRING_SPACING + 4;
 
   // X position for a given fret
   const getFretX = (fret: number): number => {
@@ -214,11 +232,11 @@ export function Fretboard() {
       return (
         <text
           key={`label-${i}`}
-          x={DIM.PADDING - 10}
-          y={getStringY(i) + 4}
-          textAnchor="end"
+          x={4}
+          y={getStringY(i) + 5}
+          textAnchor="start"
           fill={COLORS.ui.textMuted}
-          fontSize={12}
+          fontSize={16}
           fontFamily="monospace"
         >
           {noteName}
@@ -227,19 +245,19 @@ export function Fretboard() {
     });
   };
 
-  // Render fret numbers
+  // Render fret numbers (skip 0 - users learn to tap the nut)
   const renderFretNumbers = () => {
     const numbers = [];
-    for (let fret = 0; fret <= FRET_COUNT; fret++) {
+    for (let fret = 1; fret <= FRET_COUNT; fret++) {
       const x = getFretX(fret);
       numbers.push(
         <text
           key={`fretnum-${fret}`}
           x={x}
-          y={height - 5}
+          y={height - 2}
           textAnchor="middle"
           fill={COLORS.ui.textMuted}
-          fontSize={10}
+          fontSize={16}
           fontFamily="monospace"
         >
           {fret}

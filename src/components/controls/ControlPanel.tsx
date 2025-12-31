@@ -16,6 +16,8 @@ export function ControlPanel() {
     playbackMode,
     setPlaybackMode,
     currentVoicingIndex,
+    availableVoicings,
+    setVoicingIndex,
     isCustomShape,
     clearAllStrings,
     guitarStringState,
@@ -25,6 +27,21 @@ export function ControlPanel() {
     voicingTypeFilter,
     setVoicingTypeFilter,
   } = useMusicStore();
+
+  // Position navigation
+  const isFreeFormMode = !targetRoot || !targetQuality;
+
+  const handlePrevVoicing = () => {
+    if (currentVoicingIndex > 0) {
+      setVoicingIndex(currentVoicingIndex - 1);
+    }
+  };
+
+  const handleNextVoicing = () => {
+    if (currentVoicingIndex < availableVoicings.length - 1) {
+      setVoicingIndex(currentVoicingIndex + 1);
+    }
+  };
 
   const { isLoaded, playChord, playNote } = useAudioEngine();
 
@@ -120,7 +137,42 @@ export function ControlPanel() {
 
   return (
     <div className={styles.controlPanel}>
-      {/* Row 1: Voicing Filter + Tuning */}
+      {/* Row 1: Position Navigation */}
+      <div className={styles.positionRow}>
+        <button
+          onClick={handlePrevVoicing}
+          disabled={isFreeFormMode || currentVoicingIndex === 0 || availableVoicings.length === 0}
+          className={styles.navButton}
+          aria-label="Previous voicing"
+        >
+          &lt;
+        </button>
+        <span className={`${styles.positionLabel} ${isFreeFormMode ? styles.positionLabelInactive : ''}`}>
+          {isFreeFormMode ? (
+            'Position'
+          ) : isCustomShape ? (
+            'Custom'
+          ) : availableVoicings.length > 0 ? (
+            `${currentVoicingIndex + 1} of ${availableVoicings.length}`
+          ) : (
+            'Position'
+          )}
+        </span>
+        <button
+          onClick={handleNextVoicing}
+          disabled={
+            isFreeFormMode ||
+            currentVoicingIndex >= availableVoicings.length - 1 ||
+            availableVoicings.length === 0
+          }
+          className={styles.navButton}
+          aria-label="Next voicing"
+        >
+          &gt;
+        </button>
+      </div>
+
+      {/* Row 2: Voicing Filter + Tuning */}
       <div className={styles.voicingTuningRow}>
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>Voicing</h3>

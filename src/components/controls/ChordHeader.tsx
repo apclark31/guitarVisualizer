@@ -62,13 +62,11 @@ export function ChordHeader() {
     targetRoot,
     targetQuality,
     guitarStringState,
-    availableVoicings,
-    currentVoicingIndex,
-    setVoicingIndex,
-    isCustomShape,
     suggestions,
     voicingType,
     tuning,
+    availableVoicings,
+    currentVoicingIndex,
   } = useMusicStore();
 
   const hasSuggestions = suggestions.length > 0;
@@ -81,22 +79,6 @@ export function ChordHeader() {
 
   // Get top suggestion for voicing type
   const topSuggestion = suggestions[0] || null;
-
-  // Determine if we're in free-form mode (no chord selected)
-  const isFreeFormMode = !targetRoot || !targetQuality;
-
-  // Position navigation handlers
-  const handlePrevVoicing = () => {
-    if (currentVoicingIndex > 0) {
-      setVoicingIndex(currentVoicingIndex - 1);
-    }
-  };
-
-  const handleNextVoicing = () => {
-    if (currentVoicingIndex < availableVoicings.length - 1) {
-      setVoicingIndex(currentVoicingIndex + 1);
-    }
-  };
 
   // Determine what to display based on state
   const getDisplayContent = () => {
@@ -143,7 +125,7 @@ export function ChordHeader() {
     // State 1: Blank - no notes, no selection
     return {
       state: 'blank' as const,
-      primaryText: 'Select a chord or tap fretboard',
+      primaryText: 'Select a chord or tap the fretboard to begin',
       secondaryText: null,
       showSuggestions: false,
     };
@@ -178,41 +160,6 @@ export function ChordHeader() {
             i
           </button>
         )}
-      </div>
-
-      {/* Position controls */}
-      <div className={styles.positionRow}>
-        <button
-          onClick={handlePrevVoicing}
-          disabled={isFreeFormMode || currentVoicingIndex === 0 || availableVoicings.length === 0}
-          className={styles.navButton}
-          aria-label="Previous voicing"
-        >
-          &lt;
-        </button>
-        <span className={styles.positionLabel}>
-          {isFreeFormMode ? (
-            '—'
-          ) : isCustomShape ? (
-            'Custom'
-          ) : availableVoicings.length > 0 ? (
-            `${currentVoicingIndex + 1} of ${availableVoicings.length}`
-          ) : (
-            '—'
-          )}
-        </span>
-        <button
-          onClick={handleNextVoicing}
-          disabled={
-            isFreeFormMode ||
-            currentVoicingIndex >= availableVoicings.length - 1 ||
-            availableVoicings.length === 0
-          }
-          className={styles.navButton}
-          aria-label="Next voicing"
-        >
-          &gt;
-        </button>
       </div>
 
       {/* Chord Picker Modal */}
