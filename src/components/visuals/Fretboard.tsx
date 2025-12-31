@@ -68,26 +68,38 @@ export function Fretboard() {
 
     if (activeFrets.length === 0) return;
 
-    // Find the center of the voicing
+    // Find the bounds of the voicing
     const minFret = Math.min(...activeFrets);
     const maxFret = Math.max(...activeFrets);
     const centerFret = (minFret + maxFret) / 2;
 
-    // Calculate the x position of the center fret in SVG coordinates
-    const centerX = DIM.PADDING + DIM.NUT_WIDTH + (centerFret - 0.5) * DIM.FRET_SPACING;
-
     // Get the scale factor (SVG width vs actual container scroll width)
     const svgWidth = DIM.PADDING * 2 + DIM.NUT_WIDTH + FRET_COUNT * DIM.FRET_SPACING;
     const scrollWidth = container.scrollWidth;
+    const containerWidth = container.clientWidth;
+
+    // Only proceed if there's actual overflow (mobile)
+    if (scrollWidth <= containerWidth) return;
+
     const scale = scrollWidth / svgWidth;
 
-    // Calculate target scroll position to center the voicing
-    const scaledCenterX = centerX * scale;
-    const containerWidth = container.clientWidth;
-    const targetScroll = scaledCenterX - containerWidth / 2;
+    // Calculate x positions for min/max frets
+    const minFretX = (DIM.PADDING + DIM.NUT_WIDTH + (minFret - 0.5) * DIM.FRET_SPACING) * scale;
+    const maxFretX = (DIM.PADDING + DIM.NUT_WIDTH + (maxFret - 0.5) * DIM.FRET_SPACING) * scale;
 
-    // Only scroll on mobile (when there's actual overflow)
-    if (scrollWidth > containerWidth) {
+    // Current visible bounds with margin (don't scroll if voicing is comfortably visible)
+    const margin = 60; // px margin before triggering scroll
+    const visibleLeft = container.scrollLeft + margin;
+    const visibleRight = container.scrollLeft + containerWidth - margin;
+
+    // Check if voicing is already within visible bounds
+    const isVisible = minFretX >= visibleLeft && maxFretX <= visibleRight;
+
+    if (!isVisible) {
+      // Calculate target scroll position to center the voicing
+      const centerX = (DIM.PADDING + DIM.NUT_WIDTH + (centerFret - 0.5) * DIM.FRET_SPACING) * scale;
+      const targetScroll = centerX - containerWidth / 2;
+
       container.scrollTo({
         left: Math.max(0, targetScroll),
         behavior: 'smooth',
