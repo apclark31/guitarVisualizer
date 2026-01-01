@@ -1,10 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import type { ChordSuggestion, VoicingType, VoicingFilterType } from '../../types';
+import type { ChordSuggestion, VoicingType, VoicingFilterType, KeySuggestion } from '../../types';
 import styles from './SuggestionModal.module.css';
+
+type TabType = 'chords' | 'keys';
 
 interface SuggestionModalProps {
   suggestions: ChordSuggestion[];
+  keySuggestions: KeySuggestion[];
   voicingType: VoicingType | null;
   playedNotes: string;
   onClose: () => void;
@@ -61,8 +64,9 @@ function getQualityDisplayName(quality: string): string {
   return map[quality] || quality;
 }
 
-export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose }: SuggestionModalProps) {
-  const { applySuggestion } = useMusicStore();
+export function SuggestionModal({ suggestions, keySuggestions, voicingType, playedNotes, onClose }: SuggestionModalProps) {
+  const { applySuggestion, setKeyContext } = useMusicStore();
+  const [activeTab, setActiveTab] = useState<TabType>('chords');
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -77,6 +81,11 @@ export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose
     onClose();
   };
 
+  const handleSetKey = (keySuggestion: KeySuggestion) => {
+    setKeyContext({ root: keySuggestion.root, type: keySuggestion.type });
+    onClose();
+  };
+
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -87,8 +96,8 @@ export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose
   const topSuggestion = suggestions[0];
   const isShell = isShellVoicing(voicingType);
 
-  // Build guidance text
-  const getGuidanceText = () => {
+  // Build guidance text for chords tab
+  const getChordGuidanceText = () => {
     if (isShell && topSuggestion) {
       const missingText = topSuggestion.missingIntervals.length > 0
         ? topSuggestion.missingIntervals.join(', ')
@@ -111,12 +120,26 @@ export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose
     );
   };
 
+  // Build guidance text for keys tab
+  const getKeyGuidanceText = () => {
+    return (
+      <>
+        The notes <strong>{playedNotes.replace(/ · /g, ', ')}</strong> fit these keys.
+        Set a key to filter the chord picker to diatonic chords.
+      </>
+    );
+  };
+
+  const hasKeys = keySuggestions.length > 0;
+
   return (
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h3 className={styles.title}>Chord Matches</h3>
-          {voicingType && voicingType !== 'unknown' && voicingType !== 'partial' && (
+          <h3 className={styles.title}>
+            {activeTab === 'chords' ? 'Chord Matches' : 'Key Matches'}
+          </h3>
+          {activeTab === 'chords' && voicingType && voicingType !== 'unknown' && voicingType !== 'partial' && (
             <span className={styles.voicingBadge}>
               {formatVoicingType(voicingType)}
             </span>
@@ -126,45 +149,99 @@ export function SuggestionModal({ suggestions, voicingType, playedNotes, onClose
           </button>
         </div>
 
-        <p className={styles.guidance}>{getGuidanceText()}</p>
+        {/* Tab bar - only show if there are key suggestions */}
+        {hasKeys && (
+          <div className={styles.tabBar}>
+            <button
+              className={`${styles.tab} ${activeTab === 'chords' ? styles.tabActive : ''}`}
+              onClick={() => setActiveTab('chords')}
+            >
+              Chords ({suggestions.length})
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === 'keys' ? styles.tabActive : ''}`}
+              onClick={() => setActiveTab('keys')}
+            >
+              Keys ({keySuggestions.length})
+            </button>
+          </div>
+        )}
 
-        <div className={styles.suggestionList}>
-          {suggestions.map((suggestion, index) => {
-            const typeTag = getTypeTag(suggestion.voicingType);
-            const filter = getFilterForVoicingType(suggestion.voicingType);
+        {activeTab === 'chords' && (
+          <>
+            <p className={styles.guidance}>{getChordGuidanceText()}</p>
 
-            return (
-              <div key={`${suggestion.root}-${suggestion.quality}-${index}`} className={styles.suggestionItem}>
-                <div className={styles.suggestionInfo}>
-                  <span className={styles.chordName}>
-                    {suggestion.root} {suggestion.quality}
-                    {typeTag && (
-                      <span className={styles.typeTag}>[{typeTag}]</span>
-                    )}
-                  </span>
-                  <span className={styles.intervals}>
-                    {suggestion.presentIntervals.join(' · ')}
-                    {suggestion.missingIntervals.length > 0 && (
-                      <span className={styles.missing}>
-                        {' '}(missing: {suggestion.missingIntervals.join(', ')})
+            <div className={styles.suggestionList}>
+              {suggestions.map((suggestion, index) => {
+                const typeTag = getTypeTag(suggestion.voicingType);
+                const filter = getFilterForVoicingType(suggestion.voicingType);
+
+                return (
+                  <div key={`${suggestion.root}-${suggestion.quality}-${index}`} className={styles.suggestionItem}>
+                    <div className={styles.suggestionInfo}>
+                      <span className={styles.chordName}>
+                        {suggestion.root} {suggestion.quality}
+                        {typeTag && (
+                          <span className={styles.typeTag}>[{typeTag}]</span>
+                        )}
                       </span>
-                    )}
-                  </span>
-                </div>
-                <button
-                  className={styles.applyButton}
-                  onClick={() => handleApplyChord(suggestion, filter)}
-                  title={`Load ${typeTag || 'voicing'} from library`}
-                >
-                  Apply
-                </button>
-              </div>
-            );
-          })}
-        </div>
+                      <span className={styles.intervals}>
+                        {suggestion.presentIntervals.join(' · ')}
+                        {suggestion.missingIntervals.length > 0 && (
+                          <span className={styles.missing}>
+                            {' '}(missing: {suggestion.missingIntervals.join(', ')})
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    <button
+                      className={styles.applyButton}
+                      onClick={() => handleApplyChord(suggestion, filter)}
+                      title={`Load ${typeTag || 'voicing'} from library`}
+                    >
+                      Apply
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
 
-        {suggestions.length === 0 && (
-          <p className={styles.emptyMessage}>No chord suggestions available</p>
+            {suggestions.length === 0 && (
+              <p className={styles.emptyMessage}>No chord suggestions available</p>
+            )}
+          </>
+        )}
+
+        {activeTab === 'keys' && (
+          <>
+            <p className={styles.guidance}>{getKeyGuidanceText()}</p>
+
+            <div className={styles.suggestionList}>
+              {keySuggestions.map((keySuggestion, index) => (
+                <div key={`${keySuggestion.root}-${keySuggestion.type}-${index}`} className={styles.suggestionItem}>
+                  <div className={styles.suggestionInfo}>
+                    <span className={styles.chordName}>
+                      {keySuggestion.display}
+                    </span>
+                    <span className={styles.intervals}>
+                      {keySuggestion.reason}
+                    </span>
+                  </div>
+                  <button
+                    className={styles.setButton}
+                    onClick={() => handleSetKey(keySuggestion)}
+                    title={`Set ${keySuggestion.display} as key context`}
+                  >
+                    Set
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {keySuggestions.length === 0 && (
+              <p className={styles.emptyMessage}>No key suggestions available</p>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -1,6 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import { useAudioEngine } from '../../hooks/useAudioEngine';
 import {
   FRET_COUNT,
   STRING_COUNT,
@@ -30,9 +29,12 @@ function getNoteName(fullNote: string): string {
 /** String thickness by index (0=low E, 5=high E) */
 const STRING_THICKNESS = [2.5, 2.0, 1.6, 1.3, 1.0, 0.8];
 
-export function Fretboard() {
+interface FretboardProps {
+  playFretNote: (stringIndex: StringIndex, fret: number) => Promise<void>;
+}
+
+export function Fretboard({ playFretNote }: FretboardProps) {
   const { guitarStringState, setFret, clearString, displayMode, targetRoot, detectedChord, tuning } = useMusicStore();
-  const { playFretNote, isLoaded } = useAudioEngine();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Detect mobile for larger string spacing (better tap targets)
@@ -129,9 +131,8 @@ export function Fretboard() {
       clearString(stringIndex);
     } else {
       setFret(stringIndex, fret);
-      if (isLoaded) {
-        playFretNote(stringIndex, fret);
-      }
+      // playFretNote handles the audio loaded check internally
+      playFretNote(stringIndex, fret);
     }
   };
 

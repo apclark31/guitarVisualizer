@@ -1,4 +1,4 @@
-/* ChordPicker - Multi-column chord selector modal */
+/* KeyPicker - Two-column key selector modal */
 
 /* Picker modal - fixed position centered */
 .picker {
@@ -7,7 +7,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
-  width: 480px;
+  width: 280px;
   max-width: 95vw;
   background: var(--color-surface, #262626);
   border: 1px solid var(--color-border, #404040);
@@ -44,7 +44,7 @@
 /* Column headers */
 .headers {
   display: grid;
-  grid-template-columns: 80px 100px 1fr;
+  grid-template-columns: 1fr 1fr;
   border-bottom: 1px solid var(--color-border, #404040);
   background: var(--color-surface-dark, #1f1f1f);
   border-radius: 12px 12px 0 0;
@@ -64,7 +64,7 @@
 /* Columns container */
 .columns {
   display: grid;
-  grid-template-columns: 80px 100px 1fr;
+  grid-template-columns: 1fr 1fr;
   height: 280px;
   flex: 1;
 }
@@ -126,35 +126,38 @@
   font-weight: 600;
 }
 
-/* Action buttons container */
-.actionButtons {
-  display: flex;
-  gap: 0;
-  flex-shrink: 0;
-}
-
-/* Preview button */
-.previewButton {
-  flex: 1;
-  padding: 0.875rem;
-  background: var(--color-surface-hover, #333333);
-  border: none;
+/* Action buttons row */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   border-top: 1px solid var(--color-border, #404040);
-  border-radius: 0 0 0 12px;
-  color: var(--color-text, #e5e5e5);
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
 }
 
-.previewButton:hover {
-  background: var(--color-border, #404040);
+/* Clear button */
+.clearButton {
+  display: block;
+  width: 100%;
+  padding: 0.875rem;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--color-border, #404040);
+  border-radius: 0 0 0 12px;
+  color: var(--color-text-muted, #a3a3a3);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.clearButton:hover {
+  background: var(--color-surface-hover, #333333);
+  color: var(--color-text, #e5e5e5);
 }
 
 /* Apply button */
 .applyButton {
-  flex: 1;
+  display: block;
+  width: 100%;
   padding: 0.875rem;
   background: var(--color-accent, #3b82f6);
   border: none;
@@ -190,13 +193,13 @@
 @media (max-width: 768px) {
   .picker {
     position: fixed;
-    top: 10%;
-    left: 4%;
-    right: 4%;
+    top: 20%;
+    left: 10%;
+    right: 10%;
     bottom: auto;
-    width: 92%;
-    max-width: 92%;
-    max-height: 80%;
+    width: 80%;
+    max-width: 80%;
+    max-height: 60%;
     transform: none;
     border-radius: 12px;
     display: flex;
@@ -210,7 +213,6 @@
   }
 
   .headers {
-    grid-template-columns: 80px 110px 1fr;
     padding-top: 0.5rem;
     border-radius: 12px 12px 0 0;
   }
@@ -225,10 +227,10 @@
   }
 
   .columns {
-    grid-template-columns: 80px 110px 1fr;
     flex: 1;
     min-height: 0; /* Allow flex shrinking */
     overflow: hidden;
+    height: auto;
   }
 
   .column {
@@ -243,24 +245,11 @@
     font-size: 0.9375rem;
   }
 
-  .actionButtons {
-    flex-shrink: 0;
-  }
-
-  .previewButton {
-    padding: 1rem;
-    font-size: 1rem;
-  }
-
+  .clearButton,
   .applyButton {
     padding: 1rem;
     font-size: 1rem;
   }
-}
-
-/* Animation for type column when family changes */
-.column:last-child {
-  transition: opacity 0.15s ease;
 }
 
 /* Reduced motion preference */
@@ -269,12 +258,8 @@
     scroll-behavior: auto;
   }
 
-  .column:last-child {
-    transition: none;
-  }
-
   .option,
-  .previewButton,
+  .clearButton,
   .applyButton {
     transition: none;
   }

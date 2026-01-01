@@ -5,7 +5,8 @@ import { ControlPanel } from './components/controls/ControlPanel';
 import { ChordHeader } from './components/controls/ChordHeader';
 import { AppHeader } from './components/layout/AppHeader';
 import { useMusicStore } from './store/useMusicStore';
-import { decodeTuningFromUrl } from './config/constants';
+import { useAudioEngine } from './hooks/useAudioEngine';
+import { decodeTuningFromUrl, decodeKeyFromUrl } from './config/constants';
 import { unlockIOSAudio } from './lib/ios-audio-unlock';
 import type { StringIndex, GuitarStringState } from './types';
 import './App.css';
@@ -13,6 +14,7 @@ import './App.css';
 function App() {
   const { restoreFromUrl } = useMusicStore();
   const audioWarmedRef = useRef(false);
+  const { isLoaded, playChord, playFretNote, playNote, playNotes } = useAudioEngine();
 
   // Parse URL params on mount to restore shared chord
   useEffect(() => {
@@ -22,6 +24,7 @@ function App() {
     const rootParam = params.get('r');
     const qualityParam = params.get('q');
     const voicingParam = params.get('v');
+    const keyParam = params.get('k');
 
     if (sharedState) {
       // Parse guitar state from URL
@@ -61,6 +64,9 @@ function App() {
       // Parse voicing index if provided
       const voicingIndex = voicingParam ? parseInt(voicingParam, 10) : undefined;
 
+      // Parse key context if provided
+      const keyContext = keyParam ? decodeKeyFromUrl(keyParam) : undefined;
+
       // Restore full state in one action
       restoreFromUrl({
         guitarState,
@@ -69,6 +75,7 @@ function App() {
         root: rootParam || undefined,
         quality: qualityParam || undefined,
         voicingIndex: isNaN(voicingIndex as number) ? undefined : voicingIndex,
+        keyContext: keyContext || undefined,
       });
 
       // Clean up URL without reloading
@@ -113,17 +120,21 @@ function App() {
 
       <div className="content">
         <div className="chordBar">
-          <ChordHeader />
+          <ChordHeader playNotes={playNotes} />
         </div>
 
         <main className="main">
           <section className="visualizer">
-            <Fretboard />
+            <Fretboard playFretNote={playFretNote} />
           </section>
         </main>
 
         <div className="controlsBar">
-          <ControlPanel />
+          <ControlPanel
+            isAudioLoaded={isLoaded}
+            playChord={playChord}
+            playNote={playNote}
+          />
         </div>
 
         <footer className="footer">

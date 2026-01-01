@@ -13,10 +13,13 @@ import type {
   ChordVoicing,
   ChordFamily,
   TuningChangeMode,
+  KeyContext,
+  KeySuggestion,
 } from '../types';
 import { getVoicingsForChord } from '../lib/chord-data';
 import { detectChord } from '../lib/chord-detector';
 import { analyzeVoicing } from '../lib/voicing-analyzer';
+import { detectKeys, getNotesFromGuitarState } from '../lib/key-detector';
 import { getFamilyForType, STANDARD_TUNING, FRET_COUNT } from '../config/constants';
 import { Note } from '@tonaljs/tonal';
 
@@ -101,12 +104,16 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   // Suggestions (from voicing analyzer)
   suggestions: [],
+  keySuggestions: [],
   voicingType: null,
   voicingTypeFilter: 'all',
 
   // Tuning State
   tuning: [...STANDARD_TUNING],
   tuningName: 'Standard',
+
+  // Key Context
+  keyContext: null,
 
   // UI State
   displayMode: 'notes',
@@ -202,11 +209,17 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
     // Run suggestion analysis if 2+ notes
     let suggestions: ChordSuggestion[] = [];
+    let keySuggestions: KeySuggestion[] = [];
     let voicingType: VoicingType | null = null;
     if (noteCount >= 2) {
       const analysis = analyzeVoicing(newGuitarState, tuning);
       suggestions = analysis.suggestions;
       voicingType = analysis.voicingType;
+
+      // Run key detection
+      const { notes, bassNote } = getNotesFromGuitarState(newGuitarState, tuning);
+      const chordRoot = suggestions[0]?.root;
+      keySuggestions = detectKeys(notes, bassNote, chordRoot);
     }
 
     set({
@@ -214,6 +227,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
       isCustomShape: true,
       detectedChord,
       suggestions,
+      keySuggestions,
       voicingType,
       // Clear target chord when manually editing
       targetRoot: '',
@@ -235,11 +249,17 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
     // Run suggestion analysis if 2+ notes
     let suggestions: ChordSuggestion[] = [];
+    let keySuggestions: KeySuggestion[] = [];
     let voicingType: VoicingType | null = null;
     if (noteCount >= 2) {
       const analysis = analyzeVoicing(newGuitarState, tuning);
       suggestions = analysis.suggestions;
       voicingType = analysis.voicingType;
+
+      // Run key detection
+      const { notes, bassNote } = getNotesFromGuitarState(newGuitarState, tuning);
+      const chordRoot = suggestions[0]?.root;
+      keySuggestions = detectKeys(notes, bassNote, chordRoot);
     }
 
     set({
@@ -247,6 +267,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
       isCustomShape: true,
       detectedChord: runChordDetection(newGuitarState, tuning),
       suggestions,
+      keySuggestions,
       voicingType,
     });
   },
@@ -257,12 +278,14 @@ export const useMusicStore = create<AppState>((set, get) => ({
       isCustomShape: true,
       detectedChord: null,
       suggestions: [],
+      keySuggestions: [],
       voicingType: null,
       voicingTypeFilter: 'all', // Reset filter to default
       targetRoot: '',
       targetFamily: '',
       targetQuality: '',
       availableVoicings: [],
+      keyContext: null, // Also clear key context
     });
   },
 
@@ -444,11 +467,17 @@ export const useMusicStore = create<AppState>((set, get) => ({
       const detectedChord = runChordDetection(guitarStringState, newTuning);
       const noteCount = Object.values(guitarStringState).filter(f => f !== null).length;
       let suggestions: ChordSuggestion[] = [];
+      let keySuggestions: KeySuggestion[] = [];
       let voicingType: VoicingType | null = null;
       if (noteCount >= 2) {
         const analysis = analyzeVoicing(guitarStringState, newTuning);
         suggestions = analysis.suggestions;
         voicingType = analysis.voicingType;
+
+        // Run key detection
+        const { notes, bassNote } = getNotesFromGuitarState(guitarStringState, newTuning);
+        const chordRoot = suggestions[0]?.root;
+        keySuggestions = detectKeys(notes, bassNote, chordRoot);
       }
 
       set({
@@ -461,6 +490,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
         availableVoicings: [],
         detectedChord,
         suggestions,
+        keySuggestions,
         voicingType,
       });
       return;
@@ -528,11 +558,17 @@ export const useMusicStore = create<AppState>((set, get) => ({
       // Run suggestion analysis
       const noteCount = Object.values(newGuitarState).filter(f => f !== null).length;
       let suggestions: ChordSuggestion[] = [];
+      let keySuggestions: KeySuggestion[] = [];
       let voicingType: VoicingType | null = null;
       if (noteCount >= 2) {
         const analysis = analyzeVoicing(newGuitarState, newTuning);
         suggestions = analysis.suggestions;
         voicingType = analysis.voicingType;
+
+        // Run key detection
+        const { notes, bassNote } = getNotesFromGuitarState(newGuitarState, newTuning);
+        const chordRoot = suggestions[0]?.root;
+        keySuggestions = detectKeys(notes, bassNote, chordRoot);
       }
 
       set({
@@ -546,13 +582,18 @@ export const useMusicStore = create<AppState>((set, get) => ({
         availableVoicings: [],
         detectedChord,
         suggestions,
+        keySuggestions,
         voicingType,
       });
     }
   },
 
+  setKeyContext: (keyContext: KeyContext | null) => {
+    set({ keyContext });
+  },
+
   restoreFromUrl: (params) => {
-    const { guitarState, tuning, tuningName, root, quality, voicingIndex } = params;
+    const { guitarState, tuning, tuningName, root, quality, voicingIndex, keyContext } = params;
     const effectiveTuning = tuning || STANDARD_TUNING;
 
     // If chord selection is provided, restore as selected chord
@@ -567,6 +608,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
         set({
           tuning: [...effectiveTuning],
           tuningName: tuningName || 'Standard',
+          keyContext: keyContext ?? null,
           guitarStringState: voicingToGuitarState(selectedVoicing.frets),
           targetRoot: root,
           targetFamily: family,
@@ -600,6 +642,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
       set({
         tuning: [...effectiveTuning],
         tuningName: tuningName || 'Standard',
+        keyContext: keyContext ?? null,
         guitarStringState: guitarState,
         targetRoot: root,
         targetFamily: family,
@@ -618,16 +661,23 @@ export const useMusicStore = create<AppState>((set, get) => ({
       // Run suggestion analysis
       const noteCount = Object.values(guitarState).filter(f => f !== null).length;
       let suggestions: ChordSuggestion[] = [];
+      let keySuggestions: KeySuggestion[] = [];
       let voicingType: VoicingType | null = null;
       if (noteCount >= 2) {
         const analysis = analyzeVoicing(guitarState, effectiveTuning);
         suggestions = analysis.suggestions;
         voicingType = analysis.voicingType;
+
+        // Run key detection
+        const { notes, bassNote } = getNotesFromGuitarState(guitarState, effectiveTuning);
+        const chordRoot = suggestions[0]?.root;
+        keySuggestions = detectKeys(notes, bassNote, chordRoot);
       }
 
       set({
         tuning: [...effectiveTuning],
         tuningName: tuningName || 'Standard',
+        keyContext: keyContext ?? null,
         guitarStringState: guitarState,
         targetRoot: '',
         targetFamily: '',
@@ -637,6 +687,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
         isCustomShape: true,
         detectedChord,
         suggestions,
+        keySuggestions,
         voicingType,
       });
     }

@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import { useAudioEngine } from '../../hooks/useAudioEngine';
 import { TuningModal } from './TuningModal';
 import { TuningConfirmModal } from './TuningConfirmModal';
-import { encodeTuningForUrl, VOICING_FILTER_OPTIONS } from '../../config/constants';
-import type { StringIndex, TuningChangeMode, VoicingFilterType } from '../../types';
+import { KeyPicker } from './KeyPicker';
+import { encodeTuningForUrl, encodeKeyForUrl, VOICING_FILTER_OPTIONS } from '../../config/constants';
+import type { StringIndex, TuningChangeMode, VoicingFilterType, PlaybackMode } from '../../types';
 import styles from './ControlPanel.module.css';
 
-export function ControlPanel() {
+interface ControlPanelProps {
+  isAudioLoaded: boolean;
+  playChord: (mode?: PlaybackMode) => Promise<void>;
+  playNote: (note: string, duration?: number) => Promise<void>;
+}
+
+export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPanelProps) {
   const {
     targetRoot,
     targetQuality,
@@ -26,6 +32,7 @@ export function ControlPanel() {
     setTuning,
     voicingTypeFilter,
     setVoicingTypeFilter,
+    keyContext,
   } = useMusicStore();
 
   // Position navigation
@@ -42,8 +49,6 @@ export function ControlPanel() {
       setVoicingIndex(currentVoicingIndex + 1);
     }
   };
-
-  const { isLoaded, playChord, playNote } = useAudioEngine();
 
   // Check if there are any notes to play
   const hasNotes = Object.values(guitarStringState).some(fret => fret !== null);
@@ -84,6 +89,14 @@ export function ControlPanel() {
     setVoicingTypeFilter(e.target.value as VoicingFilterType);
   };
 
+  // Key picker modal state
+  const [showKeyModal, setShowKeyModal] = useState(false);
+
+  // Get display text for key button
+  const keyDisplayText = keyContext
+    ? `${keyContext.root} ${keyContext.type === 'major' ? 'Major' : 'Minor'}`
+    : '--';
+
   const toggleDisplayMode = () => {
     setDisplayMode(displayMode === 'notes' ? 'intervals' : 'notes');
   };
@@ -122,6 +135,11 @@ export function ControlPanel() {
       if (!isCustomShape && currentVoicingIndex >= 0) {
         params.set('v', currentVoicingIndex.toString());
       }
+    }
+
+    // Include key context if one is set
+    if (keyContext) {
+      params.set('k', encodeKeyForUrl(keyContext.root, keyContext.type));
     }
 
     const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
@@ -172,8 +190,18 @@ export function ControlPanel() {
         </button>
       </div>
 
-      {/* Row 2: Voicing Filter + Tuning */}
-      <div className={styles.voicingTuningRow}>
+      {/* Row 2: Key + Voicing Filter + Tuning */}
+      <div className={styles.keyVoicingTuningRow}>
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Key</h3>
+          <button
+            className={styles.keyButton}
+            onClick={() => setShowKeyModal(true)}
+          >
+            {keyDisplayText}
+          </button>
+        </div>
+
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>Voicing</h3>
           <div className={styles.selectWrapper}>
@@ -239,10 +267,10 @@ export function ControlPanel() {
       <div className={styles.buttonsRow}>
         <button
           onClick={() => playChord()}
-          disabled={!isLoaded || !hasNotes}
+          disabled={!isAudioLoaded || !hasNotes}
           className={styles.playButton}
         >
-          {!isLoaded ? 'Loading...' : 'Play Chord'}
+          {!isAudioLoaded ? 'Loading...' : 'Play Chord'}
         </button>
         <div className={styles.secondaryButtons}>
           <button
@@ -268,7 +296,7 @@ export function ControlPanel() {
         onClose={() => setShowTuningModal(false)}
         onSelectTuning={handleTuningSelect}
         playNote={playNote}
-        isAudioLoaded={isLoaded}
+        isAudioLoaded={isAudioLoaded}
       />
 
       <TuningConfirmModal
@@ -276,6 +304,11 @@ export function ControlPanel() {
         tuningName={pendingTuning?.name || ''}
         onSelect={handleConfirmSelect}
         onCancel={handleConfirmCancel}
+      />
+
+      <KeyPicker
+        isOpen={showKeyModal}
+        onClose={() => setShowKeyModal(false)}
       />
     </div>
   );

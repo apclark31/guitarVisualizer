@@ -5,10 +5,12 @@
  * Controlled externally via isOpen/onClose props.
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import { CHORD_FAMILIES, FAMILY_TO_TYPES } from '../../config/constants';
-import type { ChordFamily } from '../../types';
+import { CHORD_FAMILIES, FAMILY_TO_TYPES, getDiatonicChords } from '../../config/constants';
+import { getVoicingsForChord } from '../../lib/chord-data';
+import { Note } from '@tonaljs/tonal';
+import type { ChordFamily, PlaybackMode } from '../../types';
 import styles from './ChordPicker.module.css';
 
 /** Root notes with combined enharmonic labels */
@@ -30,10 +32,11 @@ const ROOT_OPTIONS = [
 interface ChordPickerProps {
   isOpen: boolean;
   onClose: () => void;
+  playNotes: (notes: string[], mode?: PlaybackMode) => Promise<void>;
 }
 
-export function ChordPicker({ isOpen, onClose }: ChordPickerProps) {
-  const { targetRoot, targetFamily, targetQuality, setChord } = useMusicStore();
+export function ChordPicker({ isOpen, onClose, playNotes }: ChordPickerProps) {
+  const { targetRoot, targetFamily, targetQuality, setChord, keyContext, tuning } = useMusicStore();
 
   const [pendingRoot, setPendingRoot] = useState(targetRoot || 'A');
   const [pendingFamily, setPendingFamily] = useState<ChordFamily>(targetFamily || 'Major');
@@ -44,6 +47,49 @@ export function ChordPicker({ isOpen, onClose }: ChordPickerProps) {
   const familyColumnRef = useRef<HTMLDivElement>(null);
   const typeColumnRef = useRef<HTMLDivElement>(null);
 
+  // Get diatonic chords when key context is active
+  const diatonicChords = useMemo(() => {
+    if (!keyContext) return null;
+    return getDiatonicChords(keyContext.root, keyContext.type);
+  }, [keyContext]);
+
+  // Get root options - filtered to diatonic when key is active
+  const rootOptions = useMemo(() => {
+    if (!diatonicChords) return ROOT_OPTIONS;
+
+    return diatonicChords.map(chord => ({
+      value: chord.root,
+      label: `${chord.root} - ${chord.numeral}`,
+      family: chord.family,
+      hasDominantOption: chord.hasDominantOption,
+    }));
+  }, [diatonicChords]);
+
+  // Get diatonic info for the currently selected root
+  const currentDiatonicInfo = useMemo(() => {
+    if (!diatonicChords) return null;
+    return diatonicChords.find(c => c.root === pendingRoot) || null;
+  }, [diatonicChords, pendingRoot]);
+
+  // Get available families - normally all, but filtered when key is active
+  const availableFamilies = useMemo(() => {
+    if (!currentDiatonicInfo) return CHORD_FAMILIES;
+
+    // V chord gets both Major and Dominant
+    if (currentDiatonicInfo.hasDominantOption) {
+      if (currentDiatonicInfo.family === 'Major') {
+        return ['Major', 'Dominant'] as const;
+      }
+      // Minor v chord in minor key can go to Dominant (borrowed)
+      if (currentDiatonicInfo.family === 'Minor') {
+        return ['Minor', 'Dominant'] as const;
+      }
+    }
+
+    // Other degrees get just their diatonic family
+    return [currentDiatonicInfo.family] as const;
+  }, [currentDiatonicInfo]);
+
   // Sync pending state when store changes
   useEffect(() => {
     if (targetRoot) setPendingRoot(targetRoot);
@@ -53,6 +99,21 @@ export function ChordPicker({ isOpen, onClose }: ChordPickerProps) {
 
   // Get types for selected family
   const typeOptions = FAMILY_TO_TYPES[pendingFamily] || FAMILY_TO_TYPES['Major'];
+
+  // When root changes, auto-select diatonic family if key is active
+  const handleRootChange = useCallback((root: string) => {
+    setPendingRoot(root);
+
+    // Auto-select diatonic family when key is active
+    if (diatonicChords) {
+      const diatonicInfo = diatonicChords.find(c => c.root === root);
+      if (diatonicInfo) {
+        setPendingFamily(diatonicInfo.family);
+        const firstType = FAMILY_TO_TYPES[diatonicInfo.family][0];
+        setPendingType(firstType);
+      }
+    }
+  }, [diatonicChords]);
 
   // When family changes, reset type to first in new family
   const handleFamilyChange = useCallback((family: ChordFamily) => {
@@ -66,6 +127,32 @@ export function ChordPicker({ isOpen, onClose }: ChordPickerProps) {
     setChord(pendingRoot, pendingFamily, pendingType);
     onClose();
   }, [pendingRoot, pendingFamily, pendingType, setChord, onClose]);
+
+  // Preview the pending chord selection
+  const handlePreview = useCallback(() => {
+    // Get the first voicing for the pending chord
+    const voicings = getVoicingsForChord(pendingRoot, pendingType, 1, 'all', tuning);
+    if (voicings.length === 0) return;
+
+    const voicing = voicings[0];
+    const notes: string[] = [];
+
+    // Convert fret positions to note names
+    for (let i = 0; i < 6; i++) {
+      const fret = voicing.frets[i];
+      if (fret !== null) {
+        const openMidi = Note.midi(tuning[i]);
+        if (openMidi !== null) {
+          const note = Note.fromMidi(openMidi + fret);
+          notes.push(note);
+        }
+      }
+    }
+
+    if (notes.length > 0) {
+      playNotes(notes);
+    }
+  }, [pendingRoot, pendingType, tuning, playNotes]);
 
   // Close on outside click
   useEffect(() => {
@@ -144,12 +231,12 @@ export function ChordPicker({ isOpen, onClose }: ChordPickerProps) {
         <div className={styles.columns}>
           {/* Root column */}
           <div ref={rootColumnRef} className={styles.column}>
-            {ROOT_OPTIONS.map((option) => (
+            {rootOptions.map((option) => (
               <button
                 key={option.value}
                 data-value={option.value}
                 className={`${styles.option} ${pendingRoot === option.value ? styles.active : ''}`}
-                onClick={() => setPendingRoot(option.value)}
+                onClick={() => handleRootChange(option.value)}
               >
                 {option.label}
               </button>
@@ -158,7 +245,7 @@ export function ChordPicker({ isOpen, onClose }: ChordPickerProps) {
 
           {/* Family column */}
           <div ref={familyColumnRef} className={styles.column}>
-            {CHORD_FAMILIES.map((family) => (
+            {availableFamilies.map((family) => (
               <button
                 key={family}
                 data-value={family}
@@ -185,10 +272,15 @@ export function ChordPicker({ isOpen, onClose }: ChordPickerProps) {
           </div>
         </div>
 
-        {/* Apply button */}
-        <button className={styles.applyButton} onClick={handleApply}>
-          Apply
-        </button>
+        {/* Action buttons */}
+        <div className={styles.actionButtons}>
+          <button className={styles.previewButton} onClick={handlePreview}>
+            Preview
+          </button>
+          <button className={styles.applyButton} onClick={handleApply}>
+            Apply
+          </button>
+        </div>
       </div>
     </>
   );

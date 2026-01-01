@@ -1,9 +1,15 @@
 // Core music types for the chord visualizer
 
-import type { ChordFamily } from '../config/constants';
+import type { ChordFamily, KeyType } from '../config/constants';
 
 /** Re-export types for convenience */
-export type { ChordFamily, TuningCategory } from '../config/constants';
+export type { ChordFamily, TuningCategory, KeyType } from '../config/constants';
+
+/** Key context state */
+export interface KeyContext {
+  root: string;
+  type: KeyType;
+}
 
 /** Tuning change mode - how to handle existing voicing when tuning changes */
 export type TuningChangeMode = 'adapt' | 'keep' | 'clear';
@@ -33,6 +39,15 @@ export interface ChordSuggestion {
   voicingType: VoicingType;
   missingIntervals: string[];
   presentIntervals: string[];
+}
+
+/** A key suggestion from key detection */
+export interface KeySuggestion {
+  root: string;
+  type: KeyType;
+  display: string;
+  score: number;
+  reason: string;
 }
 
 /** Fret number: 0 = open, 1-22 = fretted, null = muted */
@@ -96,12 +111,16 @@ export interface AppState {
 
   // Suggestions (from voicing analyzer)
   suggestions: ChordSuggestion[];
+  keySuggestions: KeySuggestion[];
   voicingType: VoicingType | null;
   voicingTypeFilter: VoicingFilterType;
 
   // Tuning State
   tuning: string[];
   tuningName: string;
+
+  // Key Context
+  keyContext: KeyContext | null;
 
   // UI State
   displayMode: DisplayMode;
@@ -131,6 +150,9 @@ export interface AppState {
   // Tuning Actions
   setTuning: (tuning: string[], name: string, mode: TuningChangeMode) => void;
 
+  // Key Context Actions
+  setKeyContext: (keyContext: KeyContext | null) => void;
+
   // URL Restoration
   restoreFromUrl: (params: {
     guitarState: GuitarStringState;
@@ -139,5 +161,6 @@ export interface AppState {
     root?: string;
     quality?: string;
     voicingIndex?: number;
+    keyContext?: KeyContext | null;
   }) => void;
 }

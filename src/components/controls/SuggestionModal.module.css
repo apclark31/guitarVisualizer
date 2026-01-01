@@ -71,6 +71,44 @@
   color: #fff;
 }
 
+/* Tab bar */
+.tabBar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.tab {
+  flex: 1;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: #a3a3a3;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab:hover {
+  color: #d4d4d4;
+  background-color: #262626;
+}
+
+.tabActive {
+  background-color: #333333;
+  color: #fafafa;
+}
+
+.tabActive:hover {
+  background-color: #333333;
+  color: #fafafa;
+}
+
 .guidance {
   font-size: 14px;
   color: #a3a3a3;
@@ -151,6 +189,23 @@
 
 .applyButton:hover {
   background-color: #2563eb;
+}
+
+.setButton {
+  padding: 8px 14px;
+  background-color: #22c55e;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.setButton:hover {
+  background-color: #16a34a;
 }
 
 .emptyMessage {

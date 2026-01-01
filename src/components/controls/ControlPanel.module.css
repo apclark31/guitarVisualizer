@@ -70,12 +70,48 @@
   color: #3f3f46;
 }
 
-/* Voicing + Tuning row - 50/50 split */
-.voicingTuningRow {
+/* Key + Voicing + Tuning row - 3-column split */
+.keyVoicingTuningRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 16px;
   align-items: end;
+}
+
+/* Key button - opens modal picker */
+.keyButton {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  width: 100%;
+  padding: 0 28px 0 12px;
+  height: 38px;
+  background: #333333;
+  border: 1px solid #525252;
+  border-radius: 6px;
+  color: #e5e5e5;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.keyButton:hover {
+  border-color: #3b82f6;
+}
+
+/* Native select arrow style chevron */
+.keyButton::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid #a1a1aa;
+  border-bottom: 2px solid #a1a1aa;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
 }
 
 /* Voicing select wrapper - holds custom chevron */
@@ -327,8 +363,13 @@
     min-width: 70px;
   }
 
-  .voicingTuningRow {
-    gap: 12px;
+  .keyVoicingTuningRow {
+    gap: 8px;
+  }
+
+  .keyButton {
+    font-size: 12px;
+    padding: 0 24px 0 8px;
   }
 
   .togglesRow {
@@ -342,6 +383,7 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
+  .keyButton,
   .voicingSelect,
   .tuningButton,
   .toggleSwitch,

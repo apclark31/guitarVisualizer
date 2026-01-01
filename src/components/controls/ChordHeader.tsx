@@ -14,10 +14,15 @@
 import { useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { Note } from '@tonaljs/tonal';
-import type { StringIndex } from '../../types';
+import type { StringIndex, PlaybackMode } from '../../types';
 import { ChordPicker } from './ChordPicker';
 import { SuggestionModal } from './SuggestionModal';
+import { getRomanNumeral } from '../../config/constants';
 import styles from './ChordHeader.module.css';
+
+interface ChordHeaderProps {
+  playNotes: (notes: string[], mode?: PlaybackMode) => Promise<void>;
+}
 
 /** Get played notes as a formatted string */
 function getPlayedNotesDisplay(
@@ -54,7 +59,7 @@ function formatVoicingType(type: string | null): string | null {
   return labels[type] || null;
 }
 
-export function ChordHeader() {
+export function ChordHeader({ playNotes }: ChordHeaderProps) {
   const [showPickerModal, setShowPickerModal] = useState(false);
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
 
@@ -63,10 +68,12 @@ export function ChordHeader() {
     targetQuality,
     guitarStringState,
     suggestions,
+    keySuggestions,
     voicingType,
     tuning,
     availableVoicings,
     currentVoicingIndex,
+    keyContext,
   } = useMusicStore();
 
   const hasSuggestions = suggestions.length > 0;
@@ -89,16 +96,36 @@ export function ChordHeader() {
         ? `${targetRoot} ${targetQuality}/${currentVoicing.bassNote}`
         : `${targetRoot} ${targetQuality}`;
 
+      // Get Roman numeral if key context is active
+      let keySubtitle: string | null = null;
+      if (keyContext) {
+        const numeral = getRomanNumeral(targetRoot, keyContext.root, keyContext.type);
+        if (numeral) {
+          const keyName = `${keyContext.root} ${keyContext.type === 'major' ? 'Major' : 'Minor'}`;
+          keySubtitle = `${numeral} in ${keyName}`;
+        }
+      }
+
+      // Show notes, and key subtitle if present (both together)
+      let secondaryText: string | null = null;
+      if (keySubtitle && playedNotes) {
+        secondaryText = `${playedNotes} · ${keySubtitle}`;
+      } else if (keySubtitle) {
+        secondaryText = keySubtitle;
+      } else if (playedNotes) {
+        secondaryText = playedNotes;
+      }
+
       return {
         state: 'selected' as const,
         primaryText: chordName,
-        secondaryText: playedNotes || null,
+        secondaryText,
         showSuggestions: false, // No (i) when chord is selected
       };
     }
 
-    // State 3: Notes with matches (3+ notes and has suggestions)
-    if (hasNotes && noteCount >= 3 && hasSuggestions) {
+    // State 3: Notes with matches (2+ notes and has suggestions)
+    if (hasNotes && noteCount >= 2 && hasSuggestions) {
       const voicingLabel = formatVoicingType(topSuggestion?.voicingType || voicingType);
       // Show voicing type inline with helper text
       const helperText = voicingLabel
@@ -166,12 +193,14 @@ export function ChordHeader() {
       <ChordPicker
         isOpen={showPickerModal}
         onClose={() => setShowPickerModal(false)}
+        playNotes={playNotes}
       />
 
       {/* Suggestion Modal */}
       {showSuggestionModal && (
         <SuggestionModal
           suggestions={suggestions}
+          keySuggestions={keySuggestions}
           voicingType={voicingType}
           playedNotes={playedNotes}
           onClose={() => setShowSuggestionModal(false)}

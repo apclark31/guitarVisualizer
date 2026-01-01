@@ -166,6 +166,49 @@ export function useAudioEngine() {
     }
   }, [guitarStringState, playbackMode, isAudioLoaded, startAudio]);
 
+  // Play arbitrary array of notes (for preview functionality)
+  const playNotes = useCallback(async (notes: string[], mode?: PlaybackMode) => {
+    await startAudio();
+
+    if (!samplerRef.current || !isAudioLoaded || notes.length === 0) return;
+
+    const now = Tone.now();
+    const currentMode = mode || playbackMode;
+
+    // Stop any currently playing notes
+    samplerRef.current.releaseAll();
+
+    switch (currentMode) {
+      case 'block':
+        samplerRef.current.triggerAttackRelease(
+          notes,
+          PLAYBACK_TIMING.NOTE_DURATION,
+          now
+        );
+        break;
+
+      case 'strum':
+        notes.forEach((note, index) => {
+          samplerRef.current?.triggerAttackRelease(
+            note,
+            PLAYBACK_TIMING.NOTE_DURATION,
+            now + index * PLAYBACK_TIMING.STRUM_DELAY
+          );
+        });
+        break;
+
+      case 'arpeggio':
+        notes.forEach((note, index) => {
+          samplerRef.current?.triggerAttackRelease(
+            note,
+            PLAYBACK_TIMING.NOTE_DURATION * 0.5,
+            now + index * PLAYBACK_TIMING.ARPEGGIO_DELAY
+          );
+        });
+        break;
+    }
+  }, [playbackMode, isAudioLoaded, startAudio]);
+
   // Stop all currently playing notes
   const stopAll = useCallback(() => {
     if (samplerRef.current) {
@@ -178,6 +221,7 @@ export function useAudioEngine() {
     playNote,
     playFretNote,
     playChord,
+    playNotes,
     stopAll,
     startAudio,
   };

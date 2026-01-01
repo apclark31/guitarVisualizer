@@ -282,6 +282,159 @@ export const TRIAD_PATTERNS: Record<string, readonly number[]> = {
   'aug': [0, 4, 8],     // R-3-#5
 } as const;
 
+// ============================================
+// Key Context Constants
+// ============================================
+
+/** Key types */
+export const KEY_TYPES = ['major', 'minor'] as const;
+export type KeyType = typeof KEY_TYPES[number];
+
+/** Key option for selector */
+export interface KeyOption {
+  root: string;
+  type: KeyType;
+  display: string;
+}
+
+/** All available key options (24 keys: 12 major + 12 minor) */
+export const KEY_OPTIONS: KeyOption[] = [
+  // Major keys
+  { root: 'C', type: 'major', display: 'C Major' },
+  { root: 'C#', type: 'major', display: 'C# Major' },
+  { root: 'D', type: 'major', display: 'D Major' },
+  { root: 'Eb', type: 'major', display: 'Eb Major' },
+  { root: 'E', type: 'major', display: 'E Major' },
+  { root: 'F', type: 'major', display: 'F Major' },
+  { root: 'F#', type: 'major', display: 'F# Major' },
+  { root: 'G', type: 'major', display: 'G Major' },
+  { root: 'Ab', type: 'major', display: 'Ab Major' },
+  { root: 'A', type: 'major', display: 'A Major' },
+  { root: 'Bb', type: 'major', display: 'Bb Major' },
+  { root: 'B', type: 'major', display: 'B Major' },
+  // Minor keys
+  { root: 'C', type: 'minor', display: 'C Minor' },
+  { root: 'C#', type: 'minor', display: 'C# Minor' },
+  { root: 'D', type: 'minor', display: 'D Minor' },
+  { root: 'Eb', type: 'minor', display: 'Eb Minor' },
+  { root: 'E', type: 'minor', display: 'E Minor' },
+  { root: 'F', type: 'minor', display: 'F Minor' },
+  { root: 'F#', type: 'minor', display: 'F# Minor' },
+  { root: 'G', type: 'minor', display: 'G Minor' },
+  { root: 'G#', type: 'minor', display: 'G# Minor' },
+  { root: 'A', type: 'minor', display: 'A Minor' },
+  { root: 'Bb', type: 'minor', display: 'Bb Minor' },
+  { root: 'B', type: 'minor', display: 'B Minor' },
+];
+
+/** Roman numerals for scale degrees */
+export const ROMAN_NUMERALS = {
+  major: ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°'],
+  minor: ['i', 'ii°', 'III', 'iv', 'v', 'VI', 'VII'],
+} as const;
+
+/** Diatonic chord families by scale degree */
+export const DIATONIC_FAMILIES = {
+  major: ['Major', 'Minor', 'Minor', 'Major', 'Major', 'Minor', 'Diminished'] as ChordFamily[],
+  minor: ['Minor', 'Diminished', 'Major', 'Minor', 'Minor', 'Major', 'Major'] as ChordFamily[],
+} as const;
+
+/** Scale intervals in semitones for major and minor */
+export const SCALE_INTERVALS = {
+  major: [0, 2, 4, 5, 7, 9, 11],
+  minor: [0, 2, 3, 5, 7, 8, 10],
+} as const;
+
+/** Get diatonic chord info for a key */
+export interface DiatonicChord {
+  root: string;
+  numeral: string;
+  family: ChordFamily;
+  degree: number;
+  hasDominantOption?: boolean; // V chord in major, v chord in minor
+}
+
+/** Get all diatonic chords for a given key */
+export function getDiatonicChords(keyRoot: string, keyType: KeyType): DiatonicChord[] {
+  const intervals = SCALE_INTERVALS[keyType];
+  const numerals = ROMAN_NUMERALS[keyType];
+  const families = DIATONIC_FAMILIES[keyType];
+
+  // Normalize the key root - convert flats to sharps for lookup
+  const isFlat = keyRoot.includes('b');
+  let normalizedRoot = keyRoot.replace('b', '').replace('#', '');
+
+  // Find base index in chromatic notes
+  let baseIndex = CHROMATIC_NOTES.findIndex(n => n === normalizedRoot || n.charAt(0) === normalizedRoot);
+  if (baseIndex === -1) return [];
+
+  // Adjust for accidentals
+  if (isFlat) {
+    baseIndex = (baseIndex - 1 + 12) % 12;
+  } else if (keyRoot.includes('#')) {
+    baseIndex = (baseIndex + 1) % 12;
+  }
+
+  return intervals.map((interval, degree) => {
+    const noteIndex = (baseIndex + interval) % 12;
+    const noteName = CHROMATIC_NOTES[noteIndex];
+
+    // Use flats for flat keys, sharps otherwise
+    let displayNote = noteName;
+    if (isFlat && noteName.includes('#')) {
+      // Convert sharp to flat equivalent
+      const nextIndex = (noteIndex + 1) % 12;
+      displayNote = CHROMATIC_NOTES[nextIndex] + 'b';
+    }
+
+    return {
+      root: displayNote,
+      numeral: numerals[degree],
+      family: families[degree],
+      degree: degree + 1,
+      hasDominantOption: (keyType === 'major' && degree === 4) || (keyType === 'minor' && degree === 4),
+    };
+  });
+}
+
+/** Encode key for URL (e.g., "C major" -> "Cmaj", "A minor" -> "Amin") */
+export function encodeKeyForUrl(root: string, type: KeyType): string {
+  const typeAbbrev = type === 'major' ? 'maj' : 'min';
+  return `${root}${typeAbbrev}`;
+}
+
+/** Decode key from URL (e.g., "Cmaj" -> { root: "C", type: "major" }) */
+export function decodeKeyFromUrl(value: string): { root: string; type: KeyType } | null {
+  if (!value) return null;
+
+  const match = value.match(/^([A-G][#b]?)(maj|min)$/);
+  if (!match) return null;
+
+  const [, root, typeAbbrev] = match;
+  const type: KeyType = typeAbbrev === 'maj' ? 'major' : 'minor';
+
+  // Validate the key exists in our options
+  const keyOption = KEY_OPTIONS.find(k => k.root === root && k.type === type);
+  if (!keyOption) return null;
+
+  return { root, type };
+}
+
+/** Get Roman numeral for a chord in a key context */
+export function getRomanNumeral(
+  chordRoot: string,
+  keyRoot: string,
+  keyType: KeyType
+): string | null {
+  const diatonicChords = getDiatonicChords(keyRoot, keyType);
+  const match = diatonicChords.find(d => d.root === chordRoot);
+  return match?.numeral ?? null;
+}
+
+// ============================================
+// Chord Quality Complexity
+// ============================================
+
 /** Chord quality complexity for ranking (lower = simpler) */
 export const QUALITY_COMPLEXITY: Record<string, number> = {
   // Basic (1-10)
