@@ -73,7 +73,7 @@ const welcomeSteps: TourStep[] = [
     id: 'cc-overview-controls',
     element: '[data-tour="position-nav"]',
     position: 'bottom',
-    mobilePosition: 'bottom',
+    mobilePosition: 'top',
     content: `The <strong>Control Panel</strong> — navigate voicings, change settings, and more. We'll explore each one.`,
   },
 ];
@@ -214,7 +214,7 @@ const keyContextSteps: TourStep[] = [
     id: 'cc-key-picker',
     element: '[data-tour="key-picker"]',
     position: 'left',
-    mobilePosition: 'bottom',
+    mobilePosition: 'top',
     content: `Pick a key — like <strong>C Major</strong> or <strong>A Minor</strong>. This filters the chord picker to diatonic chords only.`,
     action: 'Apply a key',
     interactive: true,
