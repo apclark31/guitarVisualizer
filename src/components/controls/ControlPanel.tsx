@@ -154,7 +154,7 @@ export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPane
   };
 
   return (
-    <div className={styles.controlPanel}>
+    <div className={styles.controlPanel} data-tour="control-panel">
       {/* Row 1: Position Navigation */}
       <div className={styles.positionRow} data-tour="position-nav">
         <button

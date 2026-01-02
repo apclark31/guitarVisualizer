@@ -18,7 +18,7 @@
 
 export interface TourButton {
   text: string;
-  action: 'next' | 'back' | 'complete' | 'skip' | 'close-picker' | 'close-and-next' | 'force-close-picker-next';
+  action: 'next' | 'back' | 'complete' | 'skip' | 'close-picker' | 'close-and-next' | 'force-close-picker-next' | 'apply-key-and-next';
   style: 'primary' | 'secondary' | 'skip';
 }
 
@@ -71,7 +71,7 @@ const welcomeSteps: TourStep[] = [
   },
   {
     id: 'cc-overview-controls',
-    element: '[data-tour="position-nav"]',
+    element: '[data-tour="control-panel"]',
     position: 'bottom',
     mobilePosition: 'top',
     content: `The <strong>Control Panel</strong> — navigate voicings, change settings, and more. We'll explore each one.`,
@@ -212,13 +212,10 @@ const keyContextSteps: TourStep[] = [
   },
   {
     id: 'cc-key-picker',
-    element: '[data-tour="key-picker"]',
-    position: 'left',
-    mobilePosition: 'top',
     content: `Pick a key — like <strong>C Major</strong> or <strong>A Minor</strong>. This filters the chord picker to diatonic chords only.`,
-    action: 'Apply a key',
-    interactive: true,
-    interactiveSelector: '[data-tour="key-apply"]',
+    buttons: [
+      { text: 'Apply C Major', action: 'apply-key-and-next', style: 'primary' },
+    ],
   },
   {
     id: 'cc-key-filtered',

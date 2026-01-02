@@ -168,6 +168,22 @@ function mapButtonAction(action: TourButton['action'], tour: Tour): () => void {
           tour.next();
         });
       };
+    case 'apply-key-and-next':
+      return () => {
+        // Click C root, Major type, then Apply button on the KeyPicker
+        const cButton = document.querySelector('[data-tour="key-picker"] [data-value="C"]') as HTMLElement;
+        const majorButton = document.querySelector('[data-tour="key-picker"] [data-value="major"]') as HTMLElement;
+        const applyButton = document.querySelector('[data-tour="key-apply"]') as HTMLElement;
+
+        if (cButton) cButton.click();
+        if (majorButton) majorButton.click();
+        if (applyButton) applyButton.click();
+
+        // Advance after modal closes
+        requestAnimationFrame(() => {
+          tour.next();
+        });
+      };
     default:
       return () => tour.next();
   }
