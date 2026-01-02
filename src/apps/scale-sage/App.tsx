@@ -40,6 +40,14 @@ function ScaleSageApp() {
   // Audio engine
   const { isLoaded, playScale, playNote, startAudio } = useScaleAudioEngine();
 
+  // Update document title for Scale Sage
+  useEffect(() => {
+    document.title = 'Scale Sage | Fret Atlas';
+    return () => {
+      document.title = 'Chord Compass | Fret Atlas';
+    };
+  }, []);
+
   // Parse URL params on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
