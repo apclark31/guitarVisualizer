@@ -170,6 +170,12 @@ function mapButtonAction(action: TourButton['action'], tour: Tour): () => void {
       };
     case 'apply-key-and-next':
       return () => {
+        // Debug: log all data-tour elements currently in DOM
+        const allTourElements = document.querySelectorAll('[data-tour]');
+        console.log('[Tour] apply-key-and-next: All data-tour elements:',
+          Array.from(allTourElements).map(el => el.getAttribute('data-tour'))
+        );
+
         // C Major is the default selection, just click Apply
         const applyButton = document.querySelector('[data-tour="key-apply"]') as HTMLElement;
         console.log('[Tour] apply-key-and-next: Apply button found?', !!applyButton);
@@ -177,6 +183,19 @@ function mapButtonAction(action: TourButton['action'], tour: Tour): () => void {
         if (applyButton) {
           applyButton.click();
           console.log('[Tour] apply-key-and-next: Clicked Apply');
+        } else {
+          // Fallback: try finding by button text if data-tour failed
+          const keyPicker = document.querySelector('[data-tour="key-picker"]');
+          console.log('[Tour] apply-key-and-next: KeyPicker found?', !!keyPicker);
+          if (keyPicker) {
+            const buttons = keyPicker.querySelectorAll('button');
+            console.log('[Tour] apply-key-and-next: Buttons in KeyPicker:', buttons.length);
+            const applyByText = Array.from(buttons).find(btn => btn.textContent === 'Apply');
+            if (applyByText) {
+              console.log('[Tour] apply-key-and-next: Found Apply by text, clicking');
+              (applyByText as HTMLElement).click();
+            }
+          }
         }
 
         // Advance after modal closes

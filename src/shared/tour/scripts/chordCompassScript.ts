@@ -212,6 +212,7 @@ const keyContextSteps: TourStep[] = [
   },
   {
     id: 'cc-key-picker',
+    waitFor: '[data-tour="key-apply"]',  // Wait for KeyPicker to render
     content: `Pick a key — like <strong>C Major</strong> or <strong>A Minor</strong>. This filters the chord picker to diatonic chords only.`,
     buttons: [
       { text: 'Apply C Major', action: 'apply-key-and-next', style: 'primary' },

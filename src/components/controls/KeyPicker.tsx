@@ -8,6 +8,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
+import { useTour } from '../../shared/tour';
 import type { KeyType } from '../../config/constants';
 import styles from './KeyPicker.module.css';
 
@@ -42,6 +43,7 @@ interface KeyPickerProps {
 
 export function KeyPicker({ isOpen, onClose }: KeyPickerProps) {
   const { keyContext, setKeyContext } = useMusicStore();
+  const { isActive: isTourActive } = useTour();
 
   const [pendingRoot, setPendingRoot] = useState(keyContext?.root || 'C');
   const [pendingType, setPendingType] = useState<KeyType>(keyContext?.type || 'major');
@@ -75,7 +77,14 @@ export function KeyPicker({ isOpen, onClose }: KeyPickerProps) {
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+      const target = event.target as HTMLElement;
+
+      // Don't close if clicking inside any Shepherd tour element
+      if (target.closest('.shepherd-element, .shepherd-button, .shepherd-modal-overlay-container')) {
+        return;
+      }
+
+      if (pickerRef.current && !pickerRef.current.contains(target)) {
         onClose();
       }
     };
@@ -120,11 +129,14 @@ export function KeyPicker({ isOpen, onClose }: KeyPickerProps) {
 
   return (
     <>
-      <div
-        className={styles.backdrop}
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      {/* Hide backdrop during tour to prevent click interference */}
+      {!isTourActive && (
+        <div
+          className={styles.backdrop}
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
       <div ref={pickerRef} className={styles.picker} data-tour="key-picker">
         {/* Close button */}
         <button
