@@ -34,6 +34,22 @@
   transition: transform 0.1s ease;
 }
 
+/* Tour highlight pulsing ring */
+.tourHighlightRing {
+  animation: tourPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes tourPulse {
+  0%, 100% {
+    opacity: 1;
+    r: 22;
+  }
+  50% {
+    opacity: 0.5;
+    r: 28;
+  }
+}
+
 /* Scroll hint gradient overlay */
 .scrollHint {
   display: none;

@@ -11,6 +11,12 @@ import { Note } from '@tonaljs/tonal';
 import type { StringIndex, GuitarStringState, DisplayMode, HighlightedNote } from '../../types';
 import styles from './Fretboard.module.css';
 
+/** Type for tour-highlighted frets */
+interface TourHighlightFret {
+  string: number;
+  fret: number;
+}
+
 /** Calculate the note at a given string and fret */
 function getNoteAtPosition(stringIndex: number, fret: number, tuning: readonly string[]): string {
   const openNote = tuning[stringIndex];
@@ -45,6 +51,8 @@ export interface FretboardProps {
   onFretPlay?: (stringIndex: StringIndex, fret: number) => void;
   /** Pre-computed highlighted notes (for scale display) */
   highlightedNotes?: HighlightedNote[];
+  /** Data attribute for tour targeting */
+  'data-tour'?: string;
 }
 
 export function Fretboard({
@@ -56,6 +64,7 @@ export function Fretboard({
   onFretClick,
   onFretPlay,
   highlightedNotes,
+  'data-tour': dataTour,
 }: FretboardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -69,6 +78,21 @@ export function Fretboard({
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mediaQuery.addEventListener('change', handler);
     return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  // Tour-highlighted frets (for guided placement)
+  const [tourHighlights, setTourHighlights] = useState<TourHighlightFret[] | null>(null);
+
+  // Listen for tour highlight events
+  useEffect(() => {
+    const handleTourHighlight = (event: CustomEvent<TourHighlightFret[] | null>) => {
+      setTourHighlights(event.detail);
+    };
+
+    window.addEventListener('tour-highlight-frets', handleTourHighlight as EventListener);
+    return () => {
+      window.removeEventListener('tour-highlight-frets', handleTourHighlight as EventListener);
+    };
   }, []);
 
   // Use mobile string spacing for larger tap targets
@@ -460,8 +484,54 @@ export function Fretboard({
     });
   };
 
+  // Render tour highlight indicators (pulsing rings)
+  const renderTourHighlights = () => {
+    if (!tourHighlights || tourHighlights.length === 0) return null;
+
+    return tourHighlights.map((highlight, index) => {
+      const x = getFretX(highlight.fret);
+      const y = getStringY(highlight.string);
+
+      return (
+        <g key={`tour-highlight-${highlight.string}-${highlight.fret}-${index}`} style={{ pointerEvents: 'none' }}>
+          {/* Outer pulsing ring */}
+          <circle
+            cx={x}
+            cy={y}
+            r={DIM.DOT_RADIUS + 8}
+            fill="none"
+            stroke={COLORS.ui.primary}
+            strokeWidth={2}
+            className={styles.tourHighlightRing}
+          />
+          {/* Inner filled circle */}
+          <circle
+            cx={x}
+            cy={y}
+            r={DIM.DOT_RADIUS}
+            fill={`${COLORS.ui.primary}40`}
+            stroke={COLORS.ui.primary}
+            strokeWidth={2}
+          />
+          {/* "Tap here" indicator */}
+          <text
+            x={x}
+            y={y + 4}
+            textAnchor="middle"
+            fill={COLORS.ui.primary}
+            fontSize={8}
+            fontWeight="bold"
+            fontFamily="sans-serif"
+          >
+            TAP
+          </text>
+        </g>
+      );
+    });
+  };
+
   return (
-    <div className={styles.fretboardWrapper}>
+    <div className={styles.fretboardWrapper} data-tour={dataTour}>
       <div className={styles.fretboardContainer} ref={containerRef}>
         <svg
           viewBox={`0 0 ${width} ${height}`}
@@ -495,6 +565,9 @@ export function Fretboard({
 
           {/* Highlighted notes (scales) */}
           {renderHighlightedNotes()}
+
+          {/* Tour highlights (pulsing indicators for guided placement) */}
+          {renderTourHighlights()}
 
           {/* Active notes (clicked notes, render on top) */}
           {renderActiveNotes()}

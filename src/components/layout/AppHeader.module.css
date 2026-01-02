@@ -149,6 +149,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   padding: 14px 20px;
   color: #a3a3a3;
   text-decoration: none;
@@ -156,7 +157,11 @@
   font-size: 0.9375rem;
   font-weight: 500;
   transition: all 0.15s ease;
+  border: none;
   border-left: 3px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
 }
 
 .navLink:hover {

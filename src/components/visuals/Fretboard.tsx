@@ -46,6 +46,7 @@ export function Fretboard({ playFretNote }: FretboardProps) {
       interactive={true}
       onFretClick={handleFretClick}
       onFretPlay={playFretNote}
+      data-tour="fretboard"
     />
   );
 }

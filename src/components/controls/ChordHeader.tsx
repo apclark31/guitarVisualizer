@@ -11,7 +11,7 @@
  * Position controls are included below the card.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { Note } from '@tonaljs/tonal';
 import type { StringIndex, PlaybackMode } from '../../types';
@@ -75,6 +75,13 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
     currentVoicingIndex,
     keyContext,
   } = useMusicStore();
+
+  // Listen for tour event to force-close the picker
+  useEffect(() => {
+    const handleTourClosePicker = () => setShowPickerModal(false);
+    window.addEventListener('tour-close-picker', handleTourClosePicker);
+    return () => window.removeEventListener('tour-close-picker', handleTourClosePicker);
+  }, []);
 
   const hasSuggestions = suggestions.length > 0;
   const playedNotes = getPlayedNotesDisplay(guitarStringState, tuning);
@@ -168,6 +175,7 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
           className={styles.chordCard}
           onClick={() => setShowPickerModal(true)}
           aria-label="Open chord picker"
+          data-tour="chord-card"
         >
           <span className={`${styles.primaryText} ${display.state === 'selected' ? styles.primarySelected : ''}`}>
             {display.primaryText}
@@ -183,6 +191,7 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
             className={styles.infoBubble}
             onClick={() => setShowSuggestionModal(true)}
             aria-label="View chord suggestions"
+            data-tour="info-button"
           >
             i
           </button>

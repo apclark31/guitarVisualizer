@@ -134,7 +134,7 @@ export function SuggestionModal({ suggestions, keySuggestions, voicingType, play
 
   return (
     <div className={styles.overlay} onClick={handleOverlayClick}>
-      <div className={styles.modal}>
+      <div className={styles.modal} data-tour="suggestion-modal">
         <div className={styles.header}>
           <h3 className={styles.title}>
             {activeTab === 'chords' ? 'Chord Matches' : 'Key Matches'}
@@ -198,6 +198,7 @@ export function SuggestionModal({ suggestions, keySuggestions, voicingType, play
                       className={styles.applyButton}
                       onClick={() => handleApplyChord(suggestion, filter)}
                       title={`Load ${typeTag || 'voicing'} from library`}
+                      data-tour="suggestion-apply"
                     >
                       Apply
                     </button>

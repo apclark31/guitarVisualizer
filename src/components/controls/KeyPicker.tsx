@@ -125,12 +125,13 @@ export function KeyPicker({ isOpen, onClose }: KeyPickerProps) {
         onClick={onClose}
         aria-hidden="true"
       />
-      <div ref={pickerRef} className={styles.picker}>
+      <div ref={pickerRef} className={styles.picker} data-tour="key-picker">
         {/* Close button */}
         <button
           className={styles.closeButton}
           onClick={onClose}
           aria-label="Close picker"
+          data-tour="key-close"
         >
           ✕
         </button>
@@ -177,7 +178,7 @@ export function KeyPicker({ isOpen, onClose }: KeyPickerProps) {
           <button className={styles.clearButton} onClick={handleClear}>
             Clear
           </button>
-          <button className={styles.applyButton} onClick={handleApply}>
+          <button className={styles.applyButton} onClick={handleApply} data-tour="key-apply">
             Apply
           </button>
         </div>

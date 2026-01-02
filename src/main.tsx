@@ -1,6 +1,7 @@
 import { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { TourProvider } from './shared/tour';
 import './index.css';
 
 // Lazy load apps for code splitting
@@ -32,14 +33,16 @@ function AppLoading() {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <Suspense fallback={<AppLoading />}>
-        <Routes>
-          <Route path="/chordcompass/*" element={<ChordCompassApp />} />
-          <Route path="/scalesage/*" element={<ScaleSageApp />} />
-          <Route path="/" element={<Navigate to="/chordcompass/" replace />} />
-          <Route path="*" element={<Navigate to="/chordcompass/" replace />} />
-        </Routes>
-      </Suspense>
+      <TourProvider>
+        <Suspense fallback={<AppLoading />}>
+          <Routes>
+            <Route path="/chordcompass/*" element={<ChordCompassApp />} />
+            <Route path="/scalesage/*" element={<ScaleSageApp />} />
+            <Route path="/" element={<Navigate to="/chordcompass/" replace />} />
+            <Route path="*" element={<Navigate to="/chordcompass/" replace />} />
+          </Routes>
+        </Suspense>
+      </TourProvider>
     </BrowserRouter>
   </StrictMode>,
 );

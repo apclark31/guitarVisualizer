@@ -9,6 +9,7 @@
 
 import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import { useTour } from '../../shared/tour';
 import styles from './AppHeader.module.css';
 
 interface NavItem {
@@ -16,12 +17,13 @@ interface NavItem {
   href: string;
   icon?: 'github' | 'compass' | 'scaleSage';
   comingSoon?: boolean;
+  action?: 'tour'; // Special action instead of navigation
 }
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Chord Compass', href: '/chordcompass/', icon: 'compass' },
   { label: 'Scale Sage', href: '/scalesage/', icon: 'scaleSage' },
-  { label: 'Tutorial', href: '#', comingSoon: true },
+  { label: 'Take the Tour', href: '#', action: 'tour' },
   { label: 'Feedback', href: '#', comingSoon: true },
   { label: 'GitHub', href: 'https://github.com/apclark31/guitarVisualizer', icon: 'github' },
 ];
@@ -33,6 +35,7 @@ const fretAtlasIconUrl = `${import.meta.env.BASE_URL}fret-atlas-icon.png`;
 export function AppHeader() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const location = useLocation();
+  const { startChordCompassTour } = useTour();
 
   // Determine current app based on path
   const isScaleSage = location.pathname.startsWith('/scalesage');
@@ -41,6 +44,14 @@ export function AppHeader() {
 
   const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
   const closeDrawer = () => setIsDrawerOpen(false);
+
+  const handleTourClick = () => {
+    closeDrawer();
+    // Currently only Chord Compass tour is implemented
+    if (!isScaleSage) {
+      startChordCompassTour();
+    }
+  };
 
   return (
     <>
@@ -91,7 +102,26 @@ export function AppHeader() {
           {NAV_ITEMS.map((item) => {
             const isActive = location.pathname.startsWith(item.href.replace(/\/$/, ''));
             const isExternal = item.href.startsWith('http');
-            const isDisabled = item.comingSoon || item.href === '#';
+            const isTourAction = item.action === 'tour';
+            const isDisabled = item.comingSoon || (item.href === '#' && !isTourAction);
+
+            // Tour action button (only enabled for current app)
+            if (isTourAction) {
+              // Disable tour on Scale Sage until implemented
+              const tourDisabled = isScaleSage;
+              return (
+                <li key={item.label}>
+                  <button
+                    className={`${styles.navLink} ${tourDisabled ? styles.navLinkDisabled : ''}`}
+                    onClick={tourDisabled ? undefined : handleTourClick}
+                    disabled={tourDisabled}
+                  >
+                    <span>{item.label}</span>
+                    {tourDisabled && <span className={styles.comingSoon}>Coming Soon</span>}
+                  </button>
+                </li>
+              );
+            }
 
             // External links use <a>
             if (isExternal) {

@@ -156,7 +156,7 @@ export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPane
   return (
     <div className={styles.controlPanel}>
       {/* Row 1: Position Navigation */}
-      <div className={styles.positionRow}>
+      <div className={styles.positionRow} data-tour="position-nav">
         <button
           onClick={handlePrevVoicing}
           disabled={isFreeFormMode || currentVoicingIndex === 0 || availableVoicings.length === 0}
@@ -197,6 +197,7 @@ export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPane
           <button
             className={styles.keyButton}
             onClick={() => setShowKeyModal(true)}
+            data-tour="key-button"
           >
             {keyDisplayText}
           </button>
@@ -224,6 +225,7 @@ export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPane
           <button
             className={styles.tuningButton}
             onClick={() => setShowTuningModal(true)}
+            data-tour="tuning-button"
           >
             {tuningName}
           </button>
@@ -232,7 +234,7 @@ export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPane
 
       {/* Row 2: Toggles (Display + Playback side by side) */}
       <div className={styles.togglesRow}>
-        <div className={styles.section}>
+        <div className={styles.section} data-tour="display-toggle">
           <h3 className={styles.sectionTitle}>Display</h3>
           <div className={styles.toggleRow}>
             <span className={styles.toggleLabel}>Intervals</span>
@@ -269,6 +271,7 @@ export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPane
           onClick={() => playChord()}
           disabled={!isAudioLoaded || !hasNotes}
           className={styles.playButton}
+          data-tour="play-button"
         >
           {!isAudioLoaded ? 'Loading...' : 'Play Chord'}
         </button>
@@ -277,6 +280,7 @@ export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPane
             onClick={handleShare}
             disabled={!hasNotes}
             className={styles.shareButton}
+            data-tour="share-button"
           >
             {copied ? 'Copied!' : 'Share'}
           </button>
@@ -284,6 +288,7 @@ export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPane
             onClick={clearAllStrings}
             disabled={!hasNotes}
             className={styles.clearButton}
+            data-tour="clear-button"
           >
             Clear All
           </button>

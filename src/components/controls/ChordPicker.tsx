@@ -9,6 +9,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { CHORD_FAMILIES, FAMILY_TO_TYPES, getDiatonicChords } from '../../config/constants';
 import { getVoicingsForChord } from '../../lib/chord-data';
+import { useTour } from '../../shared/tour/TourContext';
 import { Note } from '@tonaljs/tonal';
 import type { ChordFamily, PlaybackMode } from '../../types';
 import styles from './ChordPicker.module.css';
@@ -37,6 +38,7 @@ interface ChordPickerProps {
 
 export function ChordPicker({ isOpen, onClose, playNotes }: ChordPickerProps) {
   const { targetRoot, targetFamily, targetQuality, setChord, keyContext, tuning } = useMusicStore();
+  const { isActive: isTourActive } = useTour();
 
   const [pendingRoot, setPendingRoot] = useState(targetRoot || 'A');
   const [pendingFamily, setPendingFamily] = useState<ChordFamily>(targetFamily || 'Major');
@@ -159,9 +161,19 @@ export function ChordPicker({ isOpen, onClose, playNotes }: ChordPickerProps) {
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
-        onClose();
+      const target = event.target as Element;
+
+      // Don't close if clicking inside the picker
+      if (pickerRef.current && pickerRef.current.contains(target)) {
+        return;
       }
+
+      // Don't close if clicking inside any Shepherd tour element
+      if (target.closest('.shepherd-element, .shepherd-button, .shepherd-modal-overlay-container')) {
+        return;
+      }
+
+      onClose();
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -205,17 +217,21 @@ export function ChordPicker({ isOpen, onClose, playNotes }: ChordPickerProps) {
 
   return (
     <>
-      <div
-        className={styles.backdrop}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <div ref={pickerRef} className={styles.picker}>
+      {/* Hide backdrop during tour to prevent click interference */}
+      {!isTourActive && (
+        <div
+          className={styles.backdrop}
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+      <div ref={pickerRef} className={styles.picker} data-tour="chord-picker">
         {/* Close button */}
         <button
           className={styles.closeButton}
           onClick={onClose}
           aria-label="Close picker"
+          data-tour="picker-close"
         >
           ✕
         </button>
@@ -277,7 +293,7 @@ export function ChordPicker({ isOpen, onClose, playNotes }: ChordPickerProps) {
           <button className={styles.previewButton} onClick={handlePreview}>
             Preview
           </button>
-          <button className={styles.applyButton} onClick={handleApply}>
+          <button className={styles.applyButton} onClick={handleApply} data-tour="picker-apply">
             Apply
           </button>
         </div>

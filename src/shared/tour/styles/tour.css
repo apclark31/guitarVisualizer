@@ -1,0 +1,298 @@
+/**
+ * Custom Shepherd JS styling for Fret Atlas
+ * Matches the dark theme and accent colors
+ */
+
+/* Import Shepherd's base styles */
+@import 'shepherd.js/dist/css/shepherd.css';
+
+/* Modal overlay - darker for better focus */
+.shepherd-modal-overlay-container {
+  fill: rgba(0, 0, 0, 0.8);
+}
+
+/* Main tooltip container */
+.shepherd-element.fret-atlas-tour {
+  background: #262626;
+  border: 1px solid #404040;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  max-width: 340px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Content area */
+.shepherd-element.fret-atlas-tour .shepherd-content {
+  padding: 0;
+}
+
+/* Text content */
+.shepherd-element.fret-atlas-tour .shepherd-text {
+  color: #e5e5e5;
+  font-size: 15px;
+  line-height: 1.6;
+  padding: 16px 20px;
+}
+
+/* Header (if used) */
+.shepherd-element.fret-atlas-tour .shepherd-header {
+  background: transparent;
+  padding: 16px 20px 0;
+}
+
+.shepherd-element.fret-atlas-tour .shepherd-title {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Cancel button (X) */
+.shepherd-element.fret-atlas-tour .shepherd-cancel-icon {
+  color: #a3a3a3;
+  font-size: 24px;
+  font-weight: 400;
+  opacity: 1;
+  transition: color 0.15s ease;
+}
+
+.shepherd-element.fret-atlas-tour .shepherd-cancel-icon:hover {
+  color: #ffffff;
+}
+
+/* Footer with buttons */
+.shepherd-element.fret-atlas-tour .shepherd-footer {
+  padding: 12px 20px 16px;
+  border-top: 1px solid #333333;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Button base styles */
+.shepherd-element.fret-atlas-tour .shepherd-button {
+  background: #404040;
+  border: none;
+  border-radius: 8px;
+  color: #e5e5e5;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  transition: all 0.15s ease;
+}
+
+.shepherd-element.fret-atlas-tour .shepherd-button:hover {
+  background: #525252;
+}
+
+/* Primary button - green accent (Scale Sage) */
+.shepherd-element.fret-atlas-tour .shepherd-button.tour-btn-primary {
+  background: #22c55e;
+  color: #0a0a0a;
+  font-weight: 600;
+}
+
+.shepherd-element.fret-atlas-tour .shepherd-button.tour-btn-primary:hover {
+  background: #16a34a;
+}
+
+/* Secondary button */
+.shepherd-element.fret-atlas-tour .shepherd-button.tour-btn-secondary {
+  background: transparent;
+  color: #a3a3a3;
+}
+
+.shepherd-element.fret-atlas-tour .shepherd-button.tour-btn-secondary:hover {
+  background: #333333;
+  color: #e5e5e5;
+}
+
+/* Skip button - subtle, doesn't compete with primary */
+.shepherd-element.fret-atlas-tour .shepherd-button.tour-btn-skip {
+  background: transparent;
+  color: #737373;
+  font-size: 13px;
+  padding: 6px 12px;
+}
+
+.shepherd-element.fret-atlas-tour .shepherd-button.tour-btn-skip:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #a3a3a3;
+}
+
+/* Arrow styling */
+.shepherd-element.fret-atlas-tour .shepherd-arrow,
+.shepherd-element.fret-atlas-tour .shepherd-arrow::before {
+  background: #262626;
+}
+
+.shepherd-element.fret-atlas-tour .shepherd-arrow::before {
+  border: 1px solid #404040;
+}
+
+/* ===== Scale Sage Guide Avatar ===== */
+
+.sage-guide {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.sage-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #22c55e;
+  flex-shrink: 0;
+  background: #1a1a1a;
+}
+
+.sage-message {
+  flex: 1;
+  padding-top: 2px;
+}
+
+.sage-message strong {
+  color: #22c55e;
+}
+
+.sage-message em {
+  color: #a3a3a3;
+  font-style: normal;
+}
+
+/* Action callout - for interactive steps */
+.sage-action {
+  display: inline-block;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+/* ===== Welcome/Centered Steps ===== */
+
+.shepherd-element.fret-atlas-tour.tour-centered {
+  max-width: 400px;
+}
+
+.tour-welcome-content {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.tour-welcome-content .sage-avatar {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  display: block;
+}
+
+.tour-welcome-content h2 {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.tour-welcome-content p {
+  color: #a3a3a3;
+  margin: 0;
+}
+
+/* ===== Completion Step ===== */
+
+.tour-complete-content {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.tour-complete-content .sage-avatar {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  display: block;
+}
+
+.tour-complete-content h2 {
+  color: #22c55e;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.tour-complete-content p {
+  color: #a3a3a3;
+  margin: 0 0 8px;
+}
+
+/* ===== Progress Indicator ===== */
+
+.tour-progress {
+  text-align: center;
+  color: #737373;
+  font-size: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #333333;
+  margin-top: 12px;
+}
+
+/* ===== Modal Z-Index Override ===== */
+/* Ensure Shepherd appears above app modals */
+
+.shepherd-modal-overlay-container {
+  z-index: 10000 !important;
+}
+
+.shepherd-element {
+  z-index: 10001 !important;
+}
+
+/* ===== Mobile Adjustments ===== */
+
+@media (max-width: 768px) {
+  /* Constrain tooltip width on mobile - use specific Shepherd selectors */
+  .shepherd-element.shepherd-enabled.fret-atlas-tour {
+    max-width: calc(100vw - 32px);
+  }
+
+  .shepherd-element.fret-atlas-tour .shepherd-text {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  .shepherd-element.fret-atlas-tour .shepherd-footer {
+    padding: 10px 16px 14px;
+  }
+
+  .shepherd-element.fret-atlas-tour .sage-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .shepherd-element.fret-atlas-tour .sage-guide {
+    gap: 12px;
+  }
+
+  /* Welcome/complete screens */
+  .shepherd-element.fret-atlas-tour .tour-welcome-content .sage-avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .shepherd-element.fret-atlas-tour .tour-welcome-content h2 {
+    font-size: 18px;
+  }
+}
+
+/* ===== Reduced Motion ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .shepherd-element.fret-atlas-tour,
+  .shepherd-element.fret-atlas-tour .shepherd-button {
+    transition: none;
+  }
+}
