@@ -64,7 +64,7 @@ const defaultStepOptions: StepOptions = {
   classes: 'fret-atlas-tour',
   scrollTo: { behavior: 'smooth', block: 'center' },
   cancelIcon: { enabled: true },
-  modalOverlayOpeningPadding: 12,
+  modalOverlayOpeningPadding: 16,
   modalOverlayOpeningRadius: 12,
 };
 
@@ -170,19 +170,19 @@ function mapButtonAction(action: TourButton['action'], tour: Tour): () => void {
       };
     case 'apply-key-and-next':
       return () => {
-        // Click C root, Major type, then Apply button on the KeyPicker
-        const cButton = document.querySelector('[data-tour="key-picker"] [data-value="C"]') as HTMLElement;
-        const majorButton = document.querySelector('[data-tour="key-picker"] [data-value="major"]') as HTMLElement;
+        // C Major is the default selection, just click Apply
         const applyButton = document.querySelector('[data-tour="key-apply"]') as HTMLElement;
+        console.log('[Tour] apply-key-and-next: Apply button found?', !!applyButton);
 
-        if (cButton) cButton.click();
-        if (majorButton) majorButton.click();
-        if (applyButton) applyButton.click();
+        if (applyButton) {
+          applyButton.click();
+          console.log('[Tour] apply-key-and-next: Clicked Apply');
+        }
 
         // Advance after modal closes
-        requestAnimationFrame(() => {
+        setTimeout(() => {
           tour.next();
-        });
+        }, 100);
       };
     default:
       return () => tour.next();

@@ -240,6 +240,25 @@
   margin-top: 12px;
 }
 
+/* ===== Tooltip Spacing ===== */
+/* Add extra distance between tooltip and highlighted element */
+
+.shepherd-element.fret-atlas-tour[data-popper-placement^="top"] {
+  margin-bottom: 8px;
+}
+
+.shepherd-element.fret-atlas-tour[data-popper-placement^="bottom"] {
+  margin-top: 8px;
+}
+
+.shepherd-element.fret-atlas-tour[data-popper-placement^="left"] {
+  margin-right: 8px;
+}
+
+.shepherd-element.fret-atlas-tour[data-popper-placement^="right"] {
+  margin-left: 8px;
+}
+
 /* ===== Modal Z-Index Override ===== */
 /* Ensure Shepherd appears above app modals */
 
