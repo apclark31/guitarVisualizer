@@ -1,9 +1,43 @@
 // Core music types for the chord visualizer
 
-import type { ChordFamily, KeyType } from '../config/constants';
+// Import shared types for local use
+import type {
+  StringIndex as SharedStringIndex,
+  FretNumber as SharedFretNumber,
+  GuitarStringState as SharedGuitarStringState,
+  PlaybackMode as SharedPlaybackMode,
+  DisplayMode as SharedDisplayMode,
+  Instrument as SharedInstrument,
+} from '../shared/types';
 
-/** Re-export types for convenience */
+// Re-export shared types
+export type {
+  StringIndex,
+  FretNumber,
+  GuitarStringState,
+  PlaybackMode,
+  DisplayMode,
+  IntervalType,
+  HighlightedNote,
+  FretboardConfig,
+  Instrument,
+} from '../shared/types';
+
+// Import constants types for local use
+import type { ChordFamily as SharedChordFamily, KeyType as SharedKeyType } from '../config/constants';
+
+// Re-export constants types
 export type { ChordFamily, TuningCategory, KeyType } from '../config/constants';
+
+// Local type aliases for use within this file
+type StringIndex = SharedStringIndex;
+type FretNumber = SharedFretNumber;
+type GuitarStringState = SharedGuitarStringState;
+type PlaybackMode = SharedPlaybackMode;
+type DisplayMode = SharedDisplayMode;
+type Instrument = SharedInstrument;
+type ChordFamily = SharedChordFamily;
+type KeyType = SharedKeyType;
 
 /** Key context state */
 export interface KeyContext {
@@ -13,9 +47,6 @@ export interface KeyContext {
 
 /** Tuning change mode - how to handle existing voicing when tuning changes */
 export type TuningChangeMode = 'adapt' | 'keep' | 'clear';
-
-/** String index: 0 = Low E, 5 = High E */
-export type StringIndex = 0 | 1 | 2 | 3 | 4 | 5;
 
 /** Voicing type classification */
 export type VoicingType =
@@ -50,12 +81,6 @@ export interface KeySuggestion {
   reason: string;
 }
 
-/** Fret number: 0 = open, 1-22 = fretted, null = muted */
-export type FretNumber = number | null;
-
-/** Physical state of each guitar string */
-export type GuitarStringState = Record<StringIndex, FretNumber>;
-
 /** A calculated chord voicing from the solver */
 export interface ChordVoicing {
   /** Fret positions for each string [LowE, A, D, G, B, HighE] */
@@ -71,18 +96,6 @@ export interface ChordVoicing {
   /** True if bass note differs from root (slash chord) */
   isInversion?: boolean;
 }
-
-/** Playback modes for audio */
-export type PlaybackMode = 'block' | 'strum' | 'arpeggio';
-
-/** Current instrument selection */
-export type Instrument = 'guitar' | 'piano';
-
-/** Note display mode */
-export type DisplayMode = 'notes' | 'intervals';
-
-/** Interval type for color coding */
-export type IntervalType = 'root' | 'third' | 'fifth' | 'seventh' | 'extension';
 
 /** Detected chord information */
 export interface DetectedChordInfo {

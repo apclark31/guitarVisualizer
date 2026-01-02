@@ -1,0 +1,119 @@
+/* ScaleHeader - Tappable scale display card */
+/* Mirrors ChordHeader styles from Chord Compass */
+
+.scaleHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 16px;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Card row: scale card centered */
+.cardRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Tappable scale card - clean minimal style */
+.scaleCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 320px;
+  height: 64px;
+  padding: 10px 40px 10px 20px; /* Extra right padding for caret */
+  background-color: #2a2a2a;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  position: relative;
+}
+
+.scaleCard:hover {
+  background-color: #333333;
+}
+
+.scaleCard:focus {
+  outline: none;
+}
+
+/* Dropdown chevron indicator - native select arrow style */
+.scaleCard::after {
+  content: '';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #a1a1aa;
+  border-bottom: 2px solid #a1a1aa;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.primaryText {
+  font-size: 16px;
+  font-weight: 500;
+  color: #a1a1aa;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.primarySelected {
+  font-size: 20px;
+  font-weight: 600;
+  color: #3b82f6; /* Blue for consistency with Chord Compass */
+}
+
+.secondaryText {
+  font-size: 13px;
+  color: #71717a;
+  text-align: center;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .scaleHeader {
+    padding: 2px 12px;
+    max-width: 100%;
+  }
+
+  .scaleCard {
+    width: 280px;
+    height: 56px;
+    padding: 8px 36px 8px 16px;
+  }
+
+  .scaleCard::after {
+    right: 14px;
+    width: 6px;
+    height: 6px;
+  }
+
+  .primaryText {
+    font-size: 15px;
+  }
+
+  .primarySelected {
+    font-size: 18px;
+  }
+
+  .secondaryText {
+    font-size: 12px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .scaleCard {
+    transition: none;
+  }
+}

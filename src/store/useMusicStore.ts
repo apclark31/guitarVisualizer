@@ -20,7 +20,8 @@ import { getVoicingsForChord } from '../lib/chord-data';
 import { detectChord } from '../lib/chord-detector';
 import { analyzeVoicing } from '../lib/voicing-analyzer';
 import { detectKeys, getNotesFromGuitarState } from '../lib/key-detector';
-import { getFamilyForType, STANDARD_TUNING, FRET_COUNT } from '../config/constants';
+import { getFamilyForType, FRET_COUNT } from '../config/constants';
+import { useSharedStore } from '../shared/store';
 import { Note } from '@tonaljs/tonal';
 
 /** Initial guitar state - all strings muted */
@@ -86,6 +87,9 @@ function findMatchingVoicing(
   return bestMatch;
 }
 
+// Helper to get current shared state
+const getSharedState = () => useSharedStore.getState();
+
 export const useMusicStore = create<AppState>((set, get) => ({
   // User Selection (Target) - empty by default (free-form mode)
   targetRoot: '',
@@ -108,9 +112,9 @@ export const useMusicStore = create<AppState>((set, get) => ({
   voicingType: null,
   voicingTypeFilter: 'all',
 
-  // Tuning State
-  tuning: [...STANDARD_TUNING],
-  tuningName: 'Standard',
+  // Tuning State - synced with shared store
+  tuning: [...getSharedState().tuning],
+  tuningName: getSharedState().tuningName,
 
   // Key Context
   keyContext: null,
@@ -119,11 +123,11 @@ export const useMusicStore = create<AppState>((set, get) => ({
   displayMode: 'notes',
   isCustomShape: false,
 
-  // Audio State
-  isAudioLoaded: false,
-  volume: -12, // dB
-  playbackMode: 'strum',
-  currentInstrument: 'guitar',
+  // Audio State - synced with shared store
+  isAudioLoaded: getSharedState().isAudioLoaded,
+  volume: getSharedState().volume,
+  playbackMode: getSharedState().playbackMode,
+  currentInstrument: getSharedState().currentInstrument,
 
   // Actions
   setTargetChord: (root: string, quality: string) => {
@@ -294,14 +298,21 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   setPlaybackMode: (mode: PlaybackMode) => {
+    // Update both local and shared store
+    getSharedState().setPlaybackMode(mode);
     set({ playbackMode: mode });
   },
 
   setVolume: (volume: number) => {
-    set({ volume: Math.max(-60, Math.min(0, volume)) });
+    // Update both local and shared store
+    const clampedVolume = Math.max(-60, Math.min(0, volume));
+    getSharedState().setVolume(clampedVolume);
+    set({ volume: clampedVolume });
   },
 
   setAudioLoaded: (loaded: boolean) => {
+    // Update both local and shared store
+    getSharedState().setAudioLoaded(loaded);
     set({ isAudioLoaded: loaded });
   },
 
@@ -385,6 +396,9 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   setTuning: (newTuning: string[], name: string, mode: TuningChangeMode) => {
     const { tuning: oldTuning, guitarStringState, targetRoot, targetFamily, targetQuality, voicingTypeFilter } = get();
+
+    // Update shared store first (simple tuning change)
+    getSharedState().setTuning(newTuning, name);
 
     // Check if fretboard has any notes
     const hasNotes = Object.values(guitarStringState).some(f => f !== null);
@@ -594,7 +608,12 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   restoreFromUrl: (params) => {
     const { guitarState, tuning, tuningName, root, quality, voicingIndex, keyContext } = params;
-    const effectiveTuning = tuning || STANDARD_TUNING;
+    const sharedState = getSharedState();
+    const effectiveTuning = tuning || sharedState.tuning;
+    const effectiveTuningName = tuningName || sharedState.tuningName;
+
+    // Update shared store with restored tuning
+    sharedState.setTuning([...effectiveTuning], effectiveTuningName);
 
     // If chord selection is provided, restore as selected chord
     if (root && quality) {

@@ -1,0 +1,88 @@
+/* Scale Sage App Styles */
+/* Mirrors Chord Compass layout exactly for consistency */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Content wrapper - 14px below header for separation */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px 24px 16px;
+  flex: 1;
+}
+
+/* Scale Header Card - sits close to fretboard */
+.scaleBar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: -12px; /* Pull closer to fretboard */
+}
+
+/* Main Content - fretboard */
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+.visualizer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Controls Bar - horizontal on desktop */
+.controlsBar {
+  display: flex;
+  justify-content: center;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 12px;
+  color: #52525b;
+  font-size: 13px;
+  margin-top: auto; /* Push to bottom */
+}
+
+.footer p {
+  margin: 0;
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+  .content {
+    padding: 14px 12px 12px;
+    gap: 8px;
+  }
+
+  .scaleBar {
+    padding: 0;
+  }
+
+  .main {
+    flex: none;
+    padding: 0;
+  }
+
+  .controlsBar {
+    padding: 0;
+  }
+
+  .footer {
+    padding: 12px;
+  }
+
+  /* Reorder: scale header, fretboard, controls, footer */
+  .scaleBar { order: 1; }
+  .main { order: 2; }
+  .controlsBar { order: 3; }
+  .footer { order: 4; }
+}

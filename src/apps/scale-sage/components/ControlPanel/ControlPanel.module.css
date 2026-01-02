@@ -1,4 +1,6 @@
-/* Control Panel - Simplified layout (voicing filter, tuning, toggles, buttons) */
+/* Scale Sage Control Panel */
+/* Mirrors Chord Compass ControlPanel styles */
+
 .controlPanel {
   background-color: #262626;
   border-radius: 8px;
@@ -70,97 +72,15 @@
   color: #3f3f46;
 }
 
-/* Key + Voicing + Tuning row - 3-column split */
-.keyVoicingTuningRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-  align-items: end;
-}
-
-/* Key button - opens modal picker */
-.keyButton {
+/* Tuning row */
+.tuningRow {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
+  justify-content: center;
+}
+
+.tuningRow .section {
   width: 100%;
-  padding: 0 28px 0 12px;
-  height: 38px;
-  background: #333333;
-  border: 1px solid #525252;
-  border-radius: 6px;
-  color: #e5e5e5;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.keyButton:hover {
-  border-color: #3b82f6;
-}
-
-/* Native select arrow style chevron */
-.keyButton::after {
-  content: '';
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  border-right: 2px solid #a1a1aa;
-  border-bottom: 2px solid #a1a1aa;
-  transform: translateY(-70%) rotate(45deg);
-  pointer-events: none;
-}
-
-/* Voicing select wrapper - holds custom chevron */
-.selectWrapper {
-  position: relative;
-  width: 100%;
-}
-
-/* Custom chevron for select */
-.selectWrapper::after {
-  content: '';
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  border-right: 2px solid #a1a1aa;
-  border-bottom: 2px solid #a1a1aa;
-  transform: translateY(-70%) rotate(45deg);
-  pointer-events: none;
-}
-
-/* Voicing select dropdown */
-.voicingSelect {
-  padding: 0 28px 0 12px;
-  height: 38px;
-  background: #333333;
-  border: 1px solid #525252;
-  border-radius: 6px;
-  color: #e5e5e5;
-  font-size: 13px;
-  cursor: pointer;
-  transition: border-color 0.15s ease;
-  width: 100%;
-  /* Hide native select arrow */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: none;
-}
-
-.voicingSelect:hover {
-  border-color: #3b82f6;
-}
-
-.voicingSelect:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  max-width: 200px;
 }
 
 /* Tuning button */
@@ -244,12 +164,19 @@
   transform: translateX(20px);
 }
 
+/* Toggles row - both toggles side by side */
+.togglesRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
 /* Action buttons */
 .playButton {
   padding: 8px 16px;
   border-radius: 6px;
   border: none;
-  background-color: #22c55e;
+  background-color: #22c55e; /* Green for Scale Sage */
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -324,13 +251,6 @@
   width: 100%;
 }
 
-/* Toggles row - both toggles side by side */
-.togglesRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
 /* Buttons row - each button in its own column */
 .buttonsRow {
   display: grid;
@@ -363,15 +283,6 @@
     min-width: 70px;
   }
 
-  .keyVoicingTuningRow {
-    gap: 8px;
-  }
-
-  .keyButton {
-    font-size: 12px;
-    padding: 0 24px 0 8px;
-  }
-
   .togglesRow {
     gap: 12px;
   }
@@ -383,8 +294,6 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .keyButton,
-  .voicingSelect,
   .tuningButton,
   .toggleSwitch,
   .navButton,

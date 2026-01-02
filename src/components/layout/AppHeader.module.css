@@ -194,8 +194,19 @@
   height: 18px;
 }
 
-.navIcon {
+.compassIcon {
   height: 18px;
+  width: auto;
+}
+
+.scaleSageIcon {
+  height: 28px;
+  width: auto;
+}
+
+/* Larger brand icon for Scale Sage */
+.brandIconLarge {
+  height: 32px;
   width: auto;
 }
 

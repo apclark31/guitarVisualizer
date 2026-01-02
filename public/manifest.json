@@ -1,8 +1,8 @@
 {
-  "name": "Chord Compass | Fret Atlas",
-  "short_name": "Chord Compass",
+  "name": "Fret Atlas",
+  "short_name": "Fret Atlas",
   "description": "Demystifying the guitar fretboard and music theory in an intuitive and approachable way.",
-  "start_url": "/chordcompass/",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",
   "theme_color": "#3b82f6",
@@ -17,6 +17,22 @@
       "src": "/chordcompass/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Chord Compass",
+      "short_name": "Chords",
+      "description": "Explore chord voicings on the fretboard",
+      "url": "/chordcompass/",
+      "icons": [{ "src": "/chordcompass/compass-icon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Scale Sage",
+      "short_name": "Scales",
+      "description": "Visualize scale patterns and positions",
+      "url": "/scalesage/",
+      "icons": [{ "src": "/chordcompass/scale-sage-icon.png", "sizes": "96x96" }]
     }
   ]
 }

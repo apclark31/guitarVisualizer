@@ -1,0 +1,69 @@
+.fretboardWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.fretboardContainer {
+  width: 100%;
+  overflow-x: auto;
+  background-color: transparent;
+  border-radius: 12px;
+  padding: 8px 0 12px;
+  /* No horizontal padding - string labels align with control panel edge */
+}
+
+.fretboardSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 700px; /* Minimum for readability, triggers scroll on small screens */
+}
+
+.clickArea {
+  cursor: pointer;
+  transition: fill 0.1s ease;
+  fill: transparent;
+}
+
+.clickArea:hover {
+  fill: rgba(255, 255, 255, 0.15);
+}
+
+/* Note dots */
+.noteDot {
+  transition: transform 0.1s ease;
+}
+
+/* Scroll hint gradient overlay */
+.scrollHint {
+  display: none;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .fretboardContainer {
+    padding: 8px 0 12px;
+    border-radius: 8px;
+  }
+
+  /* Show scroll hint on mobile */
+  .scrollHint {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 40px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(9, 9, 11, 0.9)
+    );
+    pointer-events: none;
+    border-radius: 0 12px 12px 0;
+  }
+
+  .scrollHintScrolled {
+    display: none;
+  }
+}
