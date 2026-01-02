@@ -5,8 +5,16 @@
       "destination": "/index.html"
     },
     {
+      "source": "/scalesage",
+      "destination": "/scalesage.html"
+    },
+    {
+      "source": "/scalesage/",
+      "destination": "/scalesage.html"
+    },
+    {
       "source": "/scalesage/(.*)",
-      "destination": "/index.html"
+      "destination": "/scalesage.html"
     },
     {
       "source": "/(.*)",

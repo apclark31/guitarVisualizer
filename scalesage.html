@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#09090b" />
+
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Scale Sage" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="scale-sage-icon.png" />
+    <link rel="apple-touch-icon" href="scale-sage-icon.png" />
+
+    <!-- SEO & Open Graph -->
+    <meta name="description" content="Scale visualization tool for guitarists. Learn scale positions and patterns on the fretboard." />
+    <meta property="og:title" content="Scale Sage | Fret Atlas" />
+    <meta property="og:description" content="Scale visualization tool for guitarists. Learn scale positions and patterns on the fretboard." />
+    <meta property="og:image" content="https://fretatlas.com/scale-sage-og.png" />
+    <meta property="og:url" content="https://fretatlas.com/scalesage/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Analytics -->
+    <script src="https://cdn.amplitude.com/script/c1af5ec28f8767f8118ae23c527312d1.js"></script>
+    <script>window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 })); window.amplitude.init('c1af5ec28f8767f8118ae23c527312d1', { "fetchRemoteConfig": true, "autocapture": { "attribution": true, "fileDownloads": true, "formInteractions": true, "pageViews": true, "sessions": true, "elementInteractions": true, "networkTracking": true, "webVitals": true, "frustrationInteractions": true } });</script>
+
+    <title>Scale Sage | Fret Atlas</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
