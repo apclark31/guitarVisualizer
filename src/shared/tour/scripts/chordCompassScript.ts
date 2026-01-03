@@ -164,8 +164,8 @@ const chordCardSteps: TourStep[] = [
   {
     id: 'cc-picker-explore',
     element: '[data-tour="picker-columns"]',  // Highlight the selection columns
-    position: 'bottom',
-    mobilePosition: 'bottom',
+    position: 'top',
+    mobilePosition: 'top',  // Above columns so Preview/Apply buttons visible below
     waitFor: '[data-tour="picker-columns"]',
     content: `Here you can pick any <strong>root</strong>, <strong>family</strong>, and <strong>type</strong>. There's a Preview button to hear it first. Let's apply the current selection.`,
     buttons: [
@@ -215,7 +215,7 @@ const keyContextSteps: TourStep[] = [
   {
     id: 'cc-key-picker',
     waitFor: '[data-tour="key-apply"]',  // Wait for KeyPicker to render
-    content: `Pick a key — like <strong>C Major</strong> or <strong>A Minor</strong>. This filters the chord picker to diatonic chords only.`,
+    content: `You can pick any key here, but let's start with <strong>C Major</strong>. This filters the chord picker to only diatonic chords.`,
     buttons: [
       { text: 'Apply C Major', action: 'apply-key-and-next', style: 'primary' },
     ],
@@ -223,8 +223,8 @@ const keyContextSteps: TourStep[] = [
   {
     id: 'cc-key-filtered',
     element: '[data-tour="chord-picker"]',
-    position: 'left',
-    mobilePosition: 'bottom',
+    position: 'bottom',
+    mobilePosition: 'bottom',  // Always below the picker
     openPicker: true,
     waitFor: '[data-tour="chord-picker"]',
     content: `See? Now you only see chords <strong>in that key</strong>. Super helpful when writing songs or trying to impress Griselda the witch with a fancy new chord.`,
