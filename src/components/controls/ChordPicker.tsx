@@ -244,7 +244,7 @@ export function ChordPicker({ isOpen, onClose, playNotes }: ChordPickerProps) {
         </div>
 
         {/* Columns container */}
-        <div className={styles.columns}>
+        <div className={styles.columns} data-tour="picker-columns">
           {/* Root column */}
           <div ref={rootColumnRef} className={styles.column}>
             {rootOptions.map((option) => (

@@ -205,6 +205,38 @@ function mapButtonAction(action: TourButton['action'], tour: Tour): () => void {
           tour.next();
         }, 100);
       };
+    case 'apply-suggestion-and-next':
+      return () => {
+        // Click the first suggestion's Apply button
+        const applyButton = document.querySelector('[data-tour="suggestion-apply"]') as HTMLElement;
+        console.log('[Tour] apply-suggestion-and-next: Apply button found?', !!applyButton);
+
+        if (applyButton) {
+          applyButton.click();
+          console.log('[Tour] apply-suggestion-and-next: Clicked first suggestion Apply');
+        }
+
+        // Advance after chord is applied and modal closes
+        setTimeout(() => {
+          tour.next();
+        }, 150);
+      };
+    case 'apply-chord-and-next':
+      return () => {
+        // Click the Apply button in ChordPicker
+        const applyButton = document.querySelector('[data-tour="picker-apply"]') as HTMLElement;
+        console.log('[Tour] apply-chord-and-next: Apply button found?', !!applyButton);
+
+        if (applyButton) {
+          applyButton.click();
+          console.log('[Tour] apply-chord-and-next: Clicked ChordPicker Apply');
+        }
+
+        // Advance after chord is applied and picker closes
+        setTimeout(() => {
+          tour.next();
+        }, 150);
+      };
     default:
       return () => tour.next();
   }

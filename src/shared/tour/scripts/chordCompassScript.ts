@@ -18,7 +18,7 @@
 
 export interface TourButton {
   text: string;
-  action: 'next' | 'back' | 'complete' | 'skip' | 'close-picker' | 'close-and-next' | 'force-close-picker-next' | 'apply-key-and-next';
+  action: 'next' | 'back' | 'complete' | 'skip' | 'close-picker' | 'close-and-next' | 'force-close-picker-next' | 'apply-key-and-next' | 'apply-suggestion-and-next' | 'apply-chord-and-next';
   style: 'primary' | 'secondary' | 'skip';
 }
 
@@ -113,13 +113,14 @@ const freePlaySteps: TourStep[] = [
   },
   {
     id: 'cc-detection-modal',
-    element: '[data-tour="suggestion-modal"]',
-    position: 'left',
+    element: '[data-tour="suggestion-first"]',  // Highlight first suggestion item
+    position: 'bottom',
     mobilePosition: 'bottom',
-    content: `These are chords that match the notes you've placed. Tap <strong>Apply</strong> on any chord to load it onto the fretboard.`,
-    action: 'Apply a chord',
-    interactive: true,
-    interactiveSelector: '[data-tour="suggestion-apply"]',
+    waitFor: '[data-tour="suggestion-first"]',
+    content: `These chords match your notes. Let's apply the top match.`,
+    buttons: [
+      { text: 'Apply Top Match', action: 'apply-suggestion-and-next', style: 'primary' },
+    ],
   },
 ];
 
@@ -162,13 +163,14 @@ const chordCardSteps: TourStep[] = [
   },
   {
     id: 'cc-picker-explore',
-    element: '[data-tour="chord-picker"]',
-    position: 'left',
+    element: '[data-tour="picker-columns"]',  // Highlight the selection columns
+    position: 'bottom',
     mobilePosition: 'bottom',
-    content: `Pick any <strong>root</strong>, <strong>family</strong>, and <strong>type</strong>. Use <strong>Preview</strong> to hear it first, then tap <strong>Apply</strong>.`,
-    action: 'Select a different chord',
-    interactive: true,
-    interactiveSelector: '[data-tour="picker-apply"]',
+    waitFor: '[data-tour="picker-columns"]',
+    content: `Here you can pick any <strong>root</strong>, <strong>family</strong>, and <strong>type</strong>. There's a Preview button to hear it first. Let's apply the current selection.`,
+    buttons: [
+      { text: 'Apply Chord', action: 'apply-chord-and-next', style: 'primary' },
+    ],
   },
 ];
 
@@ -181,14 +183,14 @@ const controlPanelSteps: TourStep[] = [
     id: 'cc-position-nav',
     element: '[data-tour="position-nav"]',
     position: 'bottom',
-    mobilePosition: 'bottom',
+    mobilePosition: 'bottom',  // Below control panel, fretboard visible above
     content: `Most chords have multiple <strong>voicings</strong> — different positions on the neck. Use the arrows to explore them all.`,
   },
   {
     id: 'cc-display-toggle',
     element: '[data-tour="display-toggle"]',
-    position: 'top',
-    mobilePosition: 'top',
+    position: 'bottom',
+    mobilePosition: 'bottom',  // Below toggle, fretboard visible above
     content: `Toggle between <strong>note names</strong> and <strong>intervals</strong> to see the relationships between notes.`,
     action: 'Try toggling it',
     interactive: true,

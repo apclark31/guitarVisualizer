@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
+import { useTour } from '../../shared/tour';
 import type { ChordSuggestion, VoicingType, VoicingFilterType, KeySuggestion } from '../../types';
 import styles from './SuggestionModal.module.css';
 
@@ -66,6 +67,7 @@ function getQualityDisplayName(quality: string): string {
 
 export function SuggestionModal({ suggestions, keySuggestions, voicingType, playedNotes, onClose }: SuggestionModalProps) {
   const { applySuggestion, setKeyContext } = useMusicStore();
+  const { isActive: isTourActive } = useTour();
   const [activeTab, setActiveTab] = useState<TabType>('chords');
 
   // Lock body scroll when modal is open
@@ -87,6 +89,9 @@ export function SuggestionModal({ suggestions, keySuggestions, voicingType, play
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
+    // Don't close if tour is active (Shepherd controls dismissal)
+    if (isTourActive) return;
+
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -177,7 +182,11 @@ export function SuggestionModal({ suggestions, keySuggestions, voicingType, play
                 const filter = getFilterForVoicingType(suggestion.voicingType);
 
                 return (
-                  <div key={`${suggestion.root}-${suggestion.quality}-${index}`} className={styles.suggestionItem}>
+                  <div
+                    key={`${suggestion.root}-${suggestion.quality}-${index}`}
+                    className={styles.suggestionItem}
+                    data-tour={index === 0 ? 'suggestion-first' : undefined}
+                  >
                     <div className={styles.suggestionInfo}>
                       <span className={styles.chordName}>
                         {suggestion.root} {suggestion.quality}
