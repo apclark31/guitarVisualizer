@@ -206,8 +206,8 @@ const keyContextSteps: TourStep[] = [
   {
     id: 'cc-key-intro',
     element: '[data-tour="key-button"]',
-    position: 'top',
-    mobilePosition: 'top',
+    position: 'bottom',
+    mobilePosition: 'bottom',  // Below key button, fretboard visible above
     content: `Set a <strong>key</strong> to filter chords to only those that fit. Tap to try it.`,
     action: 'Select a key',
     interactive: true,
