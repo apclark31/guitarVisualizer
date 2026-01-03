@@ -19,7 +19,7 @@ function isMobile(): boolean {
 }
 
 /**
- * Create progress indicator HTML
+ * Create progress indicator HTML (now at top)
  */
 function progressIndicator(current: number, total: number): string {
   return `<div class="tour-progress">${current} of ${total}</div>`;
@@ -27,10 +27,12 @@ function progressIndicator(current: number, total: number): string {
 
 /**
  * Create tour step text with Scale Sage avatar
+ * Progress indicator at top, content below
  */
 function sageMessage(content: string, action?: string, stepNum?: number, totalSteps?: number): string {
   const progress = stepNum && totalSteps ? progressIndicator(stepNum, totalSteps) : '';
   return `
+    ${progress}
     <div class="sage-guide">
       <img src="${sageAvatarUrl}" alt="Scale Sage" class="sage-avatar" />
       <div class="sage-message">
@@ -38,22 +40,22 @@ function sageMessage(content: string, action?: string, stepNum?: number, totalSt
         ${action ? `<div class="sage-action">${action}</div>` : ''}
       </div>
     </div>
-    ${progress}
   `;
 }
 
 /**
  * Create welcome/completion centered content
+ * Progress indicator at top for consistency
  */
 function centeredContent(title: string, content: string, stepNum?: number, totalSteps?: number): string {
   const progress = stepNum && totalSteps ? progressIndicator(stepNum, totalSteps) : '';
   return `
+    ${progress}
     <div class="tour-welcome-content">
       <img src="${sageAvatarUrl}" alt="Scale Sage" class="sage-avatar" />
       <h2>${title}</h2>
       <p>${content}</p>
     </div>
-    ${progress}
   `;
 }
 
@@ -64,8 +66,8 @@ const defaultStepOptions: StepOptions = {
   classes: 'fret-atlas-tour',
   scrollTo: { behavior: 'smooth', block: 'center' },
   cancelIcon: { enabled: true },
-  modalOverlayOpeningPadding: 16,
-  modalOverlayOpeningRadius: 12,
+  modalOverlayOpeningPadding: 8,  // Reduced for tighter targeting
+  modalOverlayOpeningRadius: 8,
 };
 
 /**
