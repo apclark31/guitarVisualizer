@@ -73,67 +73,6 @@ function findBestStartingDegree(
 }
 
 /**
- * Find the most practical root location for pentatonic scales
- *
- * For pentatonic/blues scales, Position 1 should always start from the ROOT.
- * This function finds where the root falls in a practical location,
- * checking both low E and A strings.
- *
- * Examples:
- * - A Minor Pent: A at fret 5 on low E (practical)
- * - D Major Pent: D at fret 5 on A string (E string fret 10 is too high)
- * - E Minor Pent: E at fret 0 on low E (open position)
- *
- * @param rootChroma Chroma value of the root note
- * @param tuning Current guitar tuning
- * @returns Object with stringIndex and fret for the root position
- */
-function findPracticalRootLocation(
-  rootChroma: number,
-  tuning: readonly string[]
-): { stringIndex: number; fret: number } {
-  const candidates: Array<{ stringIndex: number; fret: number; score: number }> = [];
-
-  // Check low E (string 0) and A (string 1) for root locations
-  for (let stringIndex = 0; stringIndex <= 1; stringIndex++) {
-    const openMidi = Note.midi(tuning[stringIndex]);
-    if (openMidi === null) continue;
-
-    for (let fret = 0; fret <= 12; fret++) {
-      if ((openMidi + fret) % 12 === rootChroma) {
-        let score = 0;
-
-        // Ideal range: frets 3-7 (common pentatonic positions)
-        if (fret >= 3 && fret <= 7) {
-          score = 100 + (7 - fret); // Prefer lower frets in range
-        } else if (fret >= 0 && fret <= 2) {
-          // Open/low position: good but slightly less preferred
-          score = 80 + fret;
-        } else if (fret <= 10) {
-          // Higher but acceptable
-          score = 50 - (fret - 7);
-        } else {
-          // Too high
-          score = 20 - (fret - 10);
-        }
-
-        // Slight preference for low E string when scores are close
-        if (stringIndex === 0) score += 5;
-
-        candidates.push({ stringIndex, fret, score });
-        break; // Only first occurrence per string
-      }
-    }
-  }
-
-  candidates.sort((a, b) => b.score - a.score);
-
-  return candidates.length > 0
-    ? { stringIndex: candidates[0].stringIndex, fret: candidates[0].fret }
-    : { stringIndex: 0, fret: 0 };
-}
-
-/**
  * Find a practical starting fret for a given scale degree
  *
  * @param targetChroma Chroma value of the target note
