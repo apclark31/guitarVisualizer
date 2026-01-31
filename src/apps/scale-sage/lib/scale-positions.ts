@@ -218,26 +218,28 @@ export function getScaleNotes(
 /**
  * Find box positions for pentatonic scales
  *
- * Pentatonic boxes are the classic 5 positions covering the fretboard.
- * Each position spans 3-4 frets with 2 notes per string.
+ * Uses the "2 closest to anchor" approach:
+ * 1. For each position, find where a scale degree falls on the anchor string (anchor fret)
+ * 2. For each string, find ALL scale notes on the fretboard
+ * 3. Select the 2 notes at or above the anchor fret
  *
- * Current behavior: Position 1 is the LOWEST PRACTICAL position on the fretboard.
- * This may not start from the root note (e.g., D Major Pent Position 1 starts from F#).
+ * This creates traditional box patterns that match how guitarists learn pentatonic scales.
  *
- * Future enhancement: Add toggle for "Theory mode" where Position 1 always starts
- * from the root, even if it's at a higher fret position.
+ * For blues scales, use getBluesPositions() which builds on pentatonic + adds the blue note.
  *
- * @param scaleInfo Scale information
+ * @param scaleInfo Scale information (should be 5-note pentatonic)
  * @param tuning Current tuning
- * @returns Array of 5 ScalePosition objects
+ * @param anchorString Which string to use as anchor (0 = low E, 1 = A string). Default: 0
+ * @returns Array of ScalePosition objects
  */
 export function getPentatonicPositions(
   scaleInfo: ScaleInfo,
-  tuning: readonly string[]
+  tuning: readonly string[],
+  anchorString: number = 0
 ): ScalePosition[] {
   const positions: ScalePosition[] = [];
   const numDegrees = scaleInfo.noteCount;
-  const numPositions = Math.min(numDegrees, 6); // 5 for pentatonic, 6 for blues
+  const numPositions = numDegrees; // One position per scale degree
 
   const rootChroma = Note.chroma(Note.pitchClass(scaleInfo.root));
   if (rootChroma === undefined) return positions;
@@ -256,7 +258,30 @@ export function getPentatonicPositions(
   }
 
   // Find which scale degree creates the best Position 1 (lowest practical position)
-  const startingDegreeOffset = findBestStartingDegree(degreeData, tuning);
+  const startingDegreeOffset = findBestStartingDegree(degreeData, tuning, [2, 5]);
+
+  // Get anchor string open note MIDI
+  const anchorOpenMidi = Note.midi(tuning[anchorString]) ?? 40;
+
+  // Pre-compute all scale notes on each string (frets 0-15 to have headroom)
+  const scaleNotesPerString: Array<Array<{ fret: number; degreeIndex: number }>> = [];
+  for (let stringIndex = 0; stringIndex < tuning.length; stringIndex++) {
+    const openMidi = Note.midi(tuning[stringIndex]);
+    if (openMidi === null) {
+      scaleNotesPerString.push([]);
+      continue;
+    }
+
+    const stringNotes: Array<{ fret: number; degreeIndex: number }> = [];
+    for (let fret = 0; fret <= Math.max(FRET_COUNT, 15); fret++) {
+      const noteChroma = (openMidi + fret) % 12;
+      const degreeIndex = degreeData.findIndex(d => d.chroma === noteChroma);
+      if (degreeIndex !== -1) {
+        stringNotes.push({ fret, degreeIndex });
+      }
+    }
+    scaleNotesPerString.push(stringNotes);
+  }
 
   // Generate each position
   for (let pos = 0; pos < numPositions; pos++) {
@@ -264,59 +289,47 @@ export function getPentatonicPositions(
 
     // This position starts from scale degree (startingDegreeOffset + pos) % numDegrees
     const startDegree = (startingDegreeOffset + pos) % numDegrees;
-    let currentDegreeIndex = startDegree;
 
-    // Find where this starting degree falls on the low E string
-    const firstDegreeChroma = degreeData[currentDegreeIndex].chroma;
-    const referenceFret = findStartingFretForDegree(firstDegreeChroma, tuning);
-
-    // Process each string from low E (0) to high E (5)
-    for (let stringIndex = 0; stringIndex < tuning.length; stringIndex++) {
-      let searchMinFret: number;
-
-      if (stringIndex === 0) {
-        searchMinFret = Math.max(0, referenceFret);
-      } else {
-        const prevStringLastNote = positionNotes
-          .filter(n => n.stringIndex === stringIndex - 1)
-          .sort((a, b) => b.fret - a.fret)[0];
-
-        if (prevStringLastNote) {
-          const prevDegreeIndex = (currentDegreeIndex - 1 + numDegrees) % numDegrees;
-          const prevChroma = degreeData[prevDegreeIndex].chroma;
-          const nextChroma = degreeData[currentDegreeIndex % numDegrees].chroma;
-          const semitonesUp = (nextChroma - prevChroma + 12) % 12;
-          const stringGap = stringIndex === 4 ? 4 : 5;
-
-          searchMinFret = Math.max(0, prevStringLastNote.fret + semitonesUp - stringGap);
-        } else {
-          searchMinFret = Math.max(0, referenceFret - 2);
-        }
+    // Find where this starting degree falls on the anchor string (anchor fret)
+    const startChroma = degreeData[startDegree].chroma;
+    let anchorFret = 0;
+    for (let fret = 0; fret <= 12; fret++) {
+      if ((anchorOpenMidi + fret) % 12 === startChroma) {
+        anchorFret = fret;
+        break;
       }
+    }
 
-      // Find the 2 consecutive scale degrees on this string (pentatonic = 2 per string)
-      for (let noteNum = 0; noteNum < 2; noteNum++) {
-        const degreeIndex = currentDegreeIndex % numDegrees;
-        const degree = degreeData[degreeIndex];
+    // For each string, select 2 notes starting from anchor fret going UP
+    // Traditional boxes span upward from the anchor position
+    for (let stringIndex = 0; stringIndex < tuning.length; stringIndex++) {
+      const stringNotes = scaleNotesPerString[stringIndex];
+      if (stringNotes.length === 0) continue;
 
-        const fret = findNoteOnString(degree.chroma, stringIndex, tuning, searchMinFret);
+      // Find the first scale note at or above (anchor - 1) to allow slight flexibility
+      // Then take that note and the next one
+      const minFret = Math.max(0, anchorFret - 1);
+      const notesAtOrAbove = stringNotes.filter(n => n.fret >= minFret);
 
-        if (fret !== null && fret <= FRET_COUNT) {
+      // Always take 2 notes per string for pentatonic/blues box patterns
+      // Blues is pentatonic-based: the b5 (blue note) appears naturally as one of the 2 notes
+      const selected = notesAtOrAbove.slice(0, 2);
+
+      // Only include notes within reasonable range (FRET_COUNT)
+      for (const note of selected) {
+        if (note.fret <= FRET_COUNT) {
+          const degree = degreeData[note.degreeIndex];
           const isRoot = degree.chroma === rootChroma;
 
           positionNotes.push({
             stringIndex: stringIndex as StringIndex,
-            fret,
+            fret: note.fret,
             note: degree.note,
             interval: getIntervalLabel(degree.interval),
             isRoot,
             color: getIntervalColor(degree.interval),
           });
-
-          searchMinFret = fret + 1;
         }
-
-        currentDegreeIndex++;
       }
     }
 
@@ -494,6 +507,99 @@ export function get3NPSPositions(
 }
 
 /**
+ * Find box positions for blues scale
+ *
+ * Blues = Minor Pentatonic + b5 (the "blue note")
+ *
+ * Algorithm:
+ * 1. Generate minor pentatonic positions for the same root
+ * 2. For each position, find where the b5 falls within the fret range
+ * 3. Add the b5 to the position on strings where it fits
+ *
+ * @param scaleInfo Blues scale information
+ * @param tuning Current tuning
+ * @returns Array of ScalePosition objects
+ */
+export function getBluesPositions(
+  scaleInfo: ScaleInfo,
+  tuning: readonly string[]
+): ScalePosition[] {
+  // Create a "fake" minor pentatonic scale info to generate base positions
+  const minorPentInfo: ScaleInfo = {
+    ...scaleInfo,
+    type: 'minor-pentatonic' as ScaleInfo['type'],
+    // Minor pentatonic: 1, b3, 4, 5, b7 (remove the b5 from blues)
+    notes: scaleInfo.notes.filter((_, i) => scaleInfo.intervals[i] !== '5d'),
+    intervals: scaleInfo.intervals.filter(i => i !== '5d'),
+    noteCount: 5,
+  };
+
+  // Generate pentatonic positions
+  const positions = getPentatonicPositions(minorPentInfo, tuning);
+
+  // Find the blue note (b5) chroma
+  const blueNoteIndex = scaleInfo.intervals.findIndex(i => i === '5d');
+  if (blueNoteIndex === -1) return positions; // No blue note found
+
+  const blueNote = scaleInfo.notes[blueNoteIndex];
+  const blueNoteChroma = Note.chroma(Note.pitchClass(blueNote));
+  if (blueNoteChroma === undefined) return positions;
+
+  const rootChroma = Note.chroma(Note.pitchClass(scaleInfo.root));
+
+  // Add blue note to each position where it fits WITHIN the pentatonic box
+  // The blue note should not extend the box boundaries - it's a passing tone
+  // Track which MIDI pitches of the blue note we've added to avoid unisons across strings
+  for (const position of positions) {
+    const positionMinFret = position.startFret;
+    const positionMaxFret = position.endFret;
+
+    // Track blue note pitches (MIDI values) already added to this position
+    const addedBlueNoteMidis = new Set<number>();
+
+    // For each string, check if blue note falls WITHIN the pentatonic box range
+    for (let stringIndex = 0; stringIndex < tuning.length; stringIndex++) {
+      const openMidi = Note.midi(tuning[stringIndex]);
+      if (openMidi === null) continue;
+
+      // Find where blue note is on this string - only search WITHIN the box
+      for (let fret = positionMinFret; fret <= positionMaxFret; fret++) {
+        if ((openMidi + fret) % 12 === blueNoteChroma && fret <= FRET_COUNT) {
+          const noteMidi = openMidi + fret;
+
+          // Don't add if this exact string/fret position exists
+          const exactExists = position.notes.some(
+            n => n.stringIndex === stringIndex && n.fret === fret
+          );
+
+          // Don't add if this PITCH (MIDI) was already added on another string
+          // This prevents unison notes like Gb@9 on A and Gb@4 on D
+          const pitchExists = addedBlueNoteMidis.has(noteMidi);
+
+          if (!exactExists && !pitchExists) {
+            position.notes.push({
+              stringIndex: stringIndex as StringIndex,
+              fret,
+              note: blueNote,
+              interval: 'b5',
+              isRoot: blueNoteChroma === rootChroma,
+              color: getIntervalColor('5d'),
+            });
+            addedBlueNoteMidis.add(noteMidi);
+          }
+          break; // Only check one instance per string
+        }
+      }
+    }
+
+    // Re-sort notes (fret range stays the same since blue note is within bounds)
+    position.notes.sort((a, b) => a.stringIndex - b.stringIndex || a.fret - b.fret);
+  }
+
+  return positions;
+}
+
+/**
  * Get positions based on scale type and position type preference
  *
  * @param scaleInfo Scale information
@@ -519,14 +625,17 @@ export function getScalePositions(
     ];
   }
 
-  // Choose position type based on scale note count
-  // 5-note scales (pentatonic) and blues use box patterns (2 notes per string)
-  // 7-note scales (diatonic) use 3NPS patterns (3 notes per string)
-  if (scaleInfo.noteCount === 5 || scaleInfo.type === 'blues') {
+  // Blues scale: pentatonic + blue note
+  if (scaleInfo.type === 'blues') {
+    return getBluesPositions(scaleInfo, tuning);
+  }
+
+  // 5-note scales (pentatonic) use box patterns (2 notes per string)
+  if (scaleInfo.noteCount === 5) {
     return getPentatonicPositions(scaleInfo, tuning);
   }
 
-  // 7-note scales always use 3NPS for proper fingering patterns
+  // 7-note scales use 3NPS patterns (3 notes per string)
   return get3NPSPositions(scaleInfo, tuning);
 }
 

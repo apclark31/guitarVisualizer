@@ -25,6 +25,27 @@ const INTERVAL_LABELS: Record<number, string> = {
   11: '7',
 };
 
+/**
+ * Essential intervals that define a chord quality.
+ * Missing these should heavily penalize the suggestion.
+ * Key insight: A dim7 without b5 doesn't sound like dim7,
+ * but a 6th chord without 3 or 5 still functions as a 6th chord.
+ */
+const ESSENTIAL_INTERVALS: Record<string, string[]> = {
+  // Diminished chords MUST have the b5 (tritone) - it defines the sound
+  'Diminished': ['b5'],
+  'Diminished 7': ['b5'],
+  'Minor 7♭5': ['b5'],
+  // Augmented chords MUST have the #5
+  'Augmented': ['#5'],
+  'Augmented 7': ['#5'],
+  'Augmented 9': ['#5'],
+  // Suspended chords need their defining interval
+  'Sus2': ['2'],
+  'Sus4': ['4'],
+  '7sus4': ['4'],
+};
+
 /** Analysis result from voicing-analyzer */
 export interface VoicingAnalysis {
   pitchClasses: string[];
@@ -273,6 +294,15 @@ function calculateConfidence(root: string, bassNote: string, quality: string, pr
   return Math.max(0, Math.min(100, score));
 }
 
+/** Check if a suggestion is missing essential intervals for its chord quality */
+function isMissingEssentialIntervals(suggestion: ChordSuggestion): boolean {
+  const essentials = ESSENTIAL_INTERVALS[suggestion.quality];
+  if (!essentials) return false;
+
+  // Check if any essential interval is in the missing list
+  return essentials.some(essential => suggestion.missingIntervals.includes(essential));
+}
+
 /** Rank suggestions by priority */
 function rankSuggestions(suggestions: ChordSuggestion[], bassNote: string): ChordSuggestion[] {
   return suggestions.sort((a, b) => {
@@ -284,7 +314,13 @@ function rankSuggestions(suggestions: ChordSuggestion[], bassNote: string): Chor
     // 2. Alphabetical by root
     if (a.root !== b.root) return a.root.localeCompare(b.root);
 
-    // 3. Simpler chord types first
+    // 3. Penalize chords missing essential intervals
+    // A dim7 without b5 shouldn't rank above a 6th chord
+    const aMissingEssential = isMissingEssentialIntervals(a) ? 1 : 0;
+    const bMissingEssential = isMissingEssentialIntervals(b) ? 1 : 0;
+    if (aMissingEssential !== bMissingEssential) return aMissingEssential - bMissingEssential;
+
+    // 4. Simpler chord types first
     const aComplexity = QUALITY_COMPLEXITY[a.quality] || 99;
     const bComplexity = QUALITY_COMPLEXITY[b.quality] || 99;
     return aComplexity - bComplexity;

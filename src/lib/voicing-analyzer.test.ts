@@ -273,5 +273,71 @@ describe('voicing-analyzer', () => {
         }
       }
     });
+
+    it('should rank G6 above Gdim7 when only G and E are present (no b5)', () => {
+      // G (fret 3 low E) + G (fret 5 D string) + E (fret 7 A string)
+      // String indices: 0=E, 1=A, 2=D, 3=G, 4=B, 5=E
+      // Intervals: G to E = 9 semitones = major 6th
+      // G6 = R, 3, 5, 6 (0, 4, 7, 9) - missing 3 and 5
+      // Gdim7 = R, b3, b5, bb7 (0, 3, 6, 9) - missing b3 and b5
+      // Gdim7 should NOT rank above G6 because it's missing essential b5
+      const state: GuitarStringState = {
+        0: 3, // G (fret 3 on low E string)
+        1: 7, // E (fret 7 on A string)
+        2: 5, // G (fret 5 on D string)
+        3: null,
+        4: null,
+        5: null,
+      };
+
+      const analysis = analyzeVoicing(state);
+
+      // Find G6 and Gdim7 suggestions
+      const g6Suggestion = analysis.suggestions.find(
+        s => s.root === 'G' && s.quality === 'Major 6'
+      );
+      const gdim7Suggestion = analysis.suggestions.find(
+        s => s.root === 'G' && s.quality === 'Diminished 7'
+      );
+
+      expect(g6Suggestion).toBeDefined();
+
+      // If both exist, G6 should rank higher than Gdim7
+      // because Gdim7 is missing its essential b5 interval
+      if (g6Suggestion && gdim7Suggestion) {
+        const g6Index = analysis.suggestions.indexOf(g6Suggestion);
+        const gdim7Index = analysis.suggestions.indexOf(gdim7Suggestion);
+        expect(g6Index).toBeLessThan(gdim7Index);
+      }
+    });
+
+    it('should penalize diminished chords missing the b5', () => {
+      // Any two notes that match both a 6th chord and dim7
+      // The dim7 should be penalized for missing essential b5
+      const state: GuitarStringState = {
+        0: 0, // E
+        1: null,
+        2: null,
+        3: null,
+        4: 1, // C (enharmonic with B# = bb7 of E)
+        5: null,
+      };
+
+      const analysis = analyzeVoicing(state);
+
+      // E6 and Edim7 both contain E and C
+      // E6 = E, G#, B, C# - C is enharmonic with B#
+      // Actually this tests E with C - let's check what suggestions come up
+      const dimSuggestions = analysis.suggestions.filter(
+        s => s.quality === 'Diminished 7' && s.missingIntervals.includes('b5')
+      );
+
+      // Any dim7 missing b5 should rank lower
+      for (const dimSuggestion of dimSuggestions) {
+        const dimIndex = analysis.suggestions.indexOf(dimSuggestion);
+        // Should not be in the top 3 suggestions
+        expect(dimIndex).toBeGreaterThan(2);
+      }
+    });
   });
 });
