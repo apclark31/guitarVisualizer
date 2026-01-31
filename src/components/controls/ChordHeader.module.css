@@ -72,6 +72,13 @@
   color: #3b82f6;
 }
 
+/* Detected chord name (not yet applied) - white to indicate suggestion */
+.primaryDetected {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e4e4e7;
+}
+
 .secondaryText {
   font-size: 13px;
   color: #71717a;
@@ -131,6 +138,10 @@
 
   .primarySelected {
     font-size: 18px;
+  }
+
+  .primaryDetected {
+    font-size: 16px;
   }
 
   .secondaryText {

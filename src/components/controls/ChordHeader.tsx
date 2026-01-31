@@ -59,6 +59,12 @@ function formatVoicingType(type: string | null): string | null {
   return labels[type] || null;
 }
 
+/** Format missing intervals for display (e.g., ["5", "R"] -> "no 5, R") */
+function formatMissingIntervals(missing: string[]): string | null {
+  if (!missing || missing.length === 0) return null;
+  return `no ${missing.join(', ')}`;
+}
+
 export function ChordHeader({ playNotes }: ChordHeaderProps) {
   const [showPickerModal, setShowPickerModal] = useState(false);
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
@@ -132,16 +138,32 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
     }
 
     // State 3: Notes with matches (2+ notes and has suggestions)
-    if (hasNotes && noteCount >= 2 && hasSuggestions) {
-      const voicingLabel = formatVoicingType(topSuggestion?.voicingType || voicingType);
-      // Show voicing type inline with helper text
-      const helperText = voicingLabel
-        ? `${voicingLabel} · Tap (i) for matches`
-        : 'Tap (i) to see chord matches';
+    if (hasNotes && noteCount >= 2 && hasSuggestions && topSuggestion) {
+      // Show the detected chord name as primary text
+      const chordName = topSuggestion.displayName;
+      const missingText = formatMissingIntervals(topSuggestion.missingIntervals);
+      const voicingLabel = formatVoicingType(topSuggestion.voicingType);
+
+      // Build secondary text: notes + missing intervals + voicing type
+      const parts: string[] = [];
+      parts.push(playedNotes);
+      if (missingText) {
+        parts.push(missingText);
+      } else if (voicingLabel && voicingLabel !== 'Partial') {
+        // Only show voicing type if it's meaningful (not just "Partial")
+        parts.push(voicingLabel);
+      }
+
+      // Add indicator for more matches
+      const matchCount = suggestions.length;
+      if (matchCount > 1) {
+        parts.push(`+${matchCount - 1} more`);
+      }
+
       return {
         state: 'notes-with-match' as const,
-        primaryText: playedNotes,
-        secondaryText: helperText,
+        primaryText: chordName,
+        secondaryText: parts.join(' · '),
         showSuggestions: true,
       };
     }
@@ -177,7 +199,10 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
           aria-label="Open chord picker"
           data-tour="chord-card"
         >
-          <span className={`${styles.primaryText} ${display.state === 'selected' ? styles.primarySelected : ''}`}>
+          <span className={`${styles.primaryText} ${
+            display.state === 'selected' ? styles.primarySelected :
+            display.state === 'notes-with-match' ? styles.primaryDetected : ''
+          }`}>
             {display.primaryText}
           </span>
           {display.secondaryText && (
