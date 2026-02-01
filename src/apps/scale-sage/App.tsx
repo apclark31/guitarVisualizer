@@ -189,7 +189,7 @@ function ScaleSageApp() {
         </div>
 
         <footer className={styles.footer}>
-          <p>Made with coffee and guitars by Alex in PDX</p>
+          <p>Made with ☕ and 🎸 by Alex in PDX</p>
         </footer>
       </div>
     </div>
