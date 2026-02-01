@@ -58,7 +58,11 @@ export function ControlPanel({ isAudioLoaded, playScale, playNote }: ControlPane
   const positionCount = getPositionCount(scaleType);
 
   // Check if we have notes on the fretboard (free-play mode)
-  const noteCount = Object.values(guitarStringState).filter(f => f !== null).length;
+  // Multi-note state: count total frets across all strings
+  const noteCount = Object.values(guitarStringState).reduce(
+    (sum, frets) => sum + frets.length,
+    0
+  );
   const isFreePlayMode = !hasScale && noteCount > 0;
 
   // Position navigation

@@ -15,7 +15,7 @@ import { useScaleStore, useSharedStore } from '../../store/useScaleStore';
 import { ScalePicker } from '../ScalePicker/ScalePicker';
 import { ScaleSuggestionModal } from '../ScaleSuggestionModal';
 import { SCALE_TYPE_DISPLAY, getScale } from '../../lib/scale-data';
-import { getNotesFromGuitarState } from '../../../../shared/lib';
+import { getNotesFromMultiNoteState } from '../../../../shared/lib';
 import styles from './ScaleHeader.module.css';
 
 export function ScaleHeader() {
@@ -35,13 +35,17 @@ export function ScaleHeader() {
   const hasScale = scaleRoot && scaleType;
 
   // Check if we have notes on the fretboard (free-play mode)
-  const noteCount = Object.values(guitarStringState).filter(f => f !== null).length;
+  // Multi-note state: count total frets across all strings
+  const noteCount = Object.values(guitarStringState).reduce(
+    (sum, frets) => sum + frets.length,
+    0
+  );
   const isFreePlayMode = !hasScale && noteCount > 0;
 
   // Get played notes for display
   const playedNotesDisplay = useMemo(() => {
     if (!isFreePlayMode) return '';
-    const { notes } = getNotesFromGuitarState(guitarStringState, tuning);
+    const { notes } = getNotesFromMultiNoteState(guitarStringState, tuning);
     return notes.join(' · ');
   }, [guitarStringState, tuning, isFreePlayMode]);
 
@@ -70,10 +74,17 @@ export function ScaleHeader() {
 
     // State 2: Free Play - notes on fretboard but no scale selected
     if (isFreePlayMode) {
+      const otherCount = scaleSuggestions.length - 1;
+      const suggestionText = topSuggestion
+        ? otherCount > 0
+          ? `${topSuggestion.display} (and ${otherCount} other${otherCount === 1 ? '' : 's'})`
+          : topSuggestion.display
+        : null;
+
       return {
         state: 'freeplay' as const,
         primaryText: playedNotesDisplay,
-        secondaryText: topSuggestion ? `${topSuggestion.display}?` : null,
+        secondaryText: suggestionText,
       };
     }
 

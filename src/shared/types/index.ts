@@ -9,6 +9,9 @@ export type FretNumber = number | null;
 /** Physical state of each guitar string */
 export type GuitarStringState = Record<StringIndex, FretNumber>;
 
+/** Multi-note state for scale exploration (multiple frets per string) */
+export type MultiNoteGuitarState = Record<StringIndex, number[]>;
+
 /** Playback modes for audio */
 export type PlaybackMode = 'block' | 'strum' | 'arpeggio';
 

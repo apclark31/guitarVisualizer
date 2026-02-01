@@ -18,6 +18,8 @@ import { getScale } from './lib/scale-data';
 import { getPositionNotes, getPlaybackNotes } from './lib/scale-positions';
 import { decodeTuningFromUrl } from '../../shared/config/constants';
 import { getNoteAtPosition } from '../../shared/lib';
+import { COLORS } from '../../shared/config/theme';
+import { Note } from '@tonaljs/tonal';
 import styles from './App.module.css';
 
 // Empty guitar state for display-only mode
@@ -37,7 +39,7 @@ function ScaleSageApp() {
     displayMode,
     playbackDirection,
     guitarStringState,
-    setFret,
+    toggleFret,
   } = useScaleStore();
   const { tuning } = useSharedStore();
 
@@ -112,10 +114,40 @@ function ScaleSageApp() {
     return getScale(scaleRoot, scaleType);
   }, [scaleRoot, scaleType]);
 
-  const highlightedNotes: HighlightedNote[] = useMemo(() => {
+  const scaleHighlightedNotes: HighlightedNote[] = useMemo(() => {
     if (!scaleInfo) return [];
     return getPositionNotes(scaleInfo, tuning, currentPosition, positionType);
   }, [scaleInfo, tuning, currentPosition, positionType]);
+
+  // Convert multi-note free-play state to HighlightedNote[] for display
+  const freePlayHighlightedNotes: HighlightedNote[] = useMemo(() => {
+    if (!isFreePlayMode) return [];
+
+    const notes: HighlightedNote[] = [];
+
+    for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
+      const frets = guitarStringState[stringIndex as StringIndex];
+      for (const fret of frets) {
+        const fullNote = getNoteAtPosition(stringIndex, fret, tuning);
+        const noteName = Note.pitchClass(fullNote) || fullNote;
+
+        // Default color (no root context in free-play)
+        const color = COLORS.ui.primary;
+
+        notes.push({
+          stringIndex: stringIndex as StringIndex,
+          fret,
+          note: noteName,
+          color,
+        });
+      }
+    }
+
+    return notes;
+  }, [isFreePlayMode, guitarStringState, tuning]);
+
+  // Use scale notes when scale selected, free-play notes otherwise
+  const highlightedNotes = hasScale ? scaleHighlightedNotes : freePlayHighlightedNotes;
 
   // Get playback notes (sorted for audio)
   const playbackNotes = useMemo(() => {
@@ -130,19 +162,14 @@ function ScaleSageApp() {
     }
   }, [playbackNotes, playScale]);
 
-  // Handle fret click in free-play mode
+  // Handle fret click in free-play mode (toggle note on/off)
   const handleFretClick = useCallback((stringIndex: StringIndex, fret: number) => {
     if (!isFreePlayMode) return;
+    // -1 is the "clear" signal from Fretboard, but we handle toggle in the store
+    if (fret < 0) return;
 
-    const currentFret = guitarStringState[stringIndex];
-    if (fret === -1 || currentFret === fret) {
-      // Clear the string
-      setFret(stringIndex, null);
-    } else {
-      // Set the fret
-      setFret(stringIndex, fret);
-    }
-  }, [isFreePlayMode, guitarStringState, setFret]);
+    toggleFret(stringIndex, fret);
+  }, [isFreePlayMode, toggleFret]);
 
   // Handle fret play (sound) in free-play mode
   const handleFretPlay = useCallback((stringIndex: StringIndex, fret: number) => {
@@ -167,14 +194,14 @@ function ScaleSageApp() {
         <main className={styles.main}>
           <section className={styles.visualizer}>
             <Fretboard
-              guitarStringState={isFreePlayMode ? guitarStringState : emptyGuitarState}
+              guitarStringState={emptyGuitarState}
               tuning={tuning}
               displayMode={displayMode}
               rootNote={scaleRoot}
               interactive={isFreePlayMode}
               onFretClick={handleFretClick}
               onFretPlay={handleFretPlay}
-              highlightedNotes={hasScale ? highlightedNotes : []}
+              highlightedNotes={highlightedNotes}
             />
           </section>
         </main>

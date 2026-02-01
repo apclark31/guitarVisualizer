@@ -70,7 +70,7 @@
 .primarySelected {
   font-size: 20px;
   font-weight: 600;
-  color: #22c55e; /* Green for Scale Sage */
+  color: #3b82f6;
 }
 
 /* Free-play mode: white notes display */
@@ -88,7 +88,7 @@
 
 /* Free-play mode: suggestion as secondary */
 .secondarySuggestion {
-  color: #22c55e;
+  color: #3b82f6;
   font-weight: 500;
 }
 
@@ -99,7 +99,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background-color: #22c55e;
+  background-color: #3b82f6;
   color: #fff;
   border: none;
   font-size: 14px;
@@ -113,7 +113,7 @@
 }
 
 .infoButton:hover {
-  background-color: #16a34a;
+  background-color: #2563eb;
 }
 
 /* Mobile Styles */

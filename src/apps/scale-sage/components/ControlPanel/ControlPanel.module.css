@@ -73,7 +73,7 @@
 }
 
 .positionLabelFreePlay {
-  color: #22c55e;
+  color: #3b82f6;
   font-weight: 500;
 }
 
@@ -181,7 +181,7 @@
   padding: 8px 16px;
   border-radius: 6px;
   border: none;
-  background-color: #22c55e; /* Green for Scale Sage */
+  background-color: #3b82f6;
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -191,7 +191,7 @@
 }
 
 .playButton:hover:not(:disabled) {
-  background-color: #16a34a;
+  background-color: #2563eb;
 }
 
 .playButton:active:not(:disabled) {

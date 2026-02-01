@@ -6,7 +6,7 @@
  */
 
 import { Note } from '@tonaljs/tonal';
-import type { GuitarStringState } from '../types';
+import type { GuitarStringState, MultiNoteGuitarState } from '../types';
 
 /**
  * Get notes from guitar state for detection algorithms
@@ -38,6 +38,51 @@ export function getNotesFromGuitarState(
           if (!notes.includes(noteName)) {
             notes.push(noteName);
           }
+        }
+      }
+    }
+  }
+
+  return { notes, bassNote };
+}
+
+/**
+ * Get notes from multi-note guitar state for detection algorithms
+ * Supports multiple frets per string (for scale exploration)
+ *
+ * @param guitarState Current fret positions for each string (array of frets per string)
+ * @param tuning Current tuning (array of note names with octaves)
+ * @returns Object with unique notes array and bass note (lowest sounding)
+ */
+export function getNotesFromMultiNoteState(
+  guitarState: MultiNoteGuitarState,
+  tuning: readonly string[]
+): { notes: string[]; bassNote: string | undefined } {
+  const notes: string[] = [];
+  let bassNote: string | undefined;
+  let lowestMidi = Infinity;
+
+  // Iterate from low to high string (0 = low E)
+  for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
+    const frets = guitarState[stringIndex as keyof MultiNoteGuitarState];
+    if (!frets || frets.length === 0) continue;
+
+    const openMidi = Note.midi(tuning[stringIndex]);
+    if (!openMidi) continue;
+
+    for (const fret of frets) {
+      const midi = openMidi + fret;
+      const noteName = Note.pitchClass(Note.fromMidi(midi));
+
+      if (noteName) {
+        // Track bass note (lowest MIDI pitch)
+        if (midi < lowestMidi) {
+          lowestMidi = midi;
+          bassNote = noteName;
+        }
+        // Add unique notes only
+        if (!notes.includes(noteName)) {
+          notes.push(noteName);
         }
       }
     }

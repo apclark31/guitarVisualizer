@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import type { DisplayMode, GuitarStringState, StringIndex } from '../../../shared/types';
+import type { DisplayMode, MultiNoteGuitarState, StringIndex } from '../../../shared/types';
 import { useSharedStore } from '../../../shared/store';
 import { detectScales, type ScaleSuggestion } from '../lib/scale-detector';
-import { detectKeys, getNotesFromGuitarState, type KeyMatch } from '../../../shared/lib';
+import { detectKeys, getNotesFromMultiNoteState, type KeyMatch } from '../../../shared/lib';
 
 /** Scale types supported */
 export type ScaleType =
@@ -18,14 +18,14 @@ export type PositionType = '3nps' | 'boxes' | 'full';
 /** Scale playback direction */
 export type PlaybackDirection = 'ascending' | 'descending';
 
-/** Initial guitar state - all strings muted */
-const initialGuitarState: GuitarStringState = {
-  0: null,
-  1: null,
-  2: null,
-  3: null,
-  4: null,
-  5: null,
+/** Initial multi-note guitar state - all strings empty */
+const initialGuitarState: MultiNoteGuitarState = {
+  0: [],
+  1: [],
+  2: [],
+  3: [],
+  4: [],
+  5: [],
 };
 
 /** Scale Sage app state */
@@ -42,8 +42,8 @@ export interface ScaleState {
   displayMode: DisplayMode;
   playbackDirection: PlaybackDirection;
 
-  // Free Play state
-  guitarStringState: GuitarStringState;
+  // Free Play state (multi-note per string)
+  guitarStringState: MultiNoteGuitarState;
   scaleSuggestions: ScaleSuggestion[];
   keySuggestions: KeyMatch[];
 
@@ -57,7 +57,7 @@ export interface ScaleState {
   clearScale: () => void;
 
   // Free Play actions
-  setFret: (stringIndex: StringIndex, fret: number | null) => void;
+  toggleFret: (stringIndex: StringIndex, fret: number) => void;
   clearFrets: () => void;
   applyScaleSuggestion: (suggestion: ScaleSuggestion) => void;
 }
@@ -104,25 +104,39 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     // Keep frets if any - user might want to continue exploring
   }),
 
-  // Free Play actions
-  setFret: (stringIndex: StringIndex, fret: number | null) => {
+  // Free Play actions - toggle fret (add if not present, remove if present)
+  toggleFret: (stringIndex: StringIndex, fret: number) => {
     const { guitarStringState } = get();
     const tuning = useSharedStore.getState().tuning;
 
-    const newGuitarState = {
+    const currentFrets = guitarStringState[stringIndex];
+    let newFrets: number[];
+
+    if (currentFrets.includes(fret)) {
+      // Remove the fret (toggle off)
+      newFrets = currentFrets.filter(f => f !== fret);
+    } else {
+      // Add the fret (toggle on), keep sorted
+      newFrets = [...currentFrets, fret].sort((a, b) => a - b);
+    }
+
+    const newGuitarState: MultiNoteGuitarState = {
       ...guitarStringState,
-      [stringIndex]: fret,
+      [stringIndex]: newFrets,
     };
 
-    // Count notes for detection
-    const noteCount = Object.values(newGuitarState).filter(f => f !== null).length;
+    // Count total notes for detection
+    const noteCount = Object.values(newGuitarState).reduce(
+      (sum, frets) => sum + frets.length,
+      0
+    );
 
     // Run detection if 2+ notes
     let scaleSuggestions: ScaleSuggestion[] = [];
     let keySuggestions: KeyMatch[] = [];
 
     if (noteCount >= 2) {
-      const { notes, bassNote } = getNotesFromGuitarState(newGuitarState, tuning);
+      const { notes, bassNote } = getNotesFromMultiNoteState(newGuitarState, tuning);
       scaleSuggestions = detectScales(notes, bassNote);
       keySuggestions = detectKeys(notes, bassNote);
     }

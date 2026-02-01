@@ -4,6 +4,7 @@ export type { KeyMatch, KeyType } from './key-detector';
 
 export {
   getNotesFromGuitarState,
+  getNotesFromMultiNoteState,
   normalizePitchClass,
   getNoteAtPosition,
   getPitchClassAtPosition,
