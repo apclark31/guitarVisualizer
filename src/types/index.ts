@@ -72,14 +72,9 @@ export interface ChordSuggestion {
   presentIntervals: string[];
 }
 
-/** A key suggestion from key detection */
-export interface KeySuggestion {
-  root: string;
-  type: KeyType;
-  display: string;
-  score: number;
-  reason: string;
-}
+// Re-export KeyMatch as KeySuggestion for backward compatibility
+import type { KeyMatch } from '../shared/lib';
+export type KeySuggestion = KeyMatch;
 
 /** A calculated chord voicing from the solver */
 export interface ChordVoicing {

@@ -9,7 +9,9 @@
  */
 
 import { Scale, Note } from '@tonaljs/tonal';
-import type { KeyType } from '../config/constants';
+
+/** Key type for major/minor */
+export type KeyType = 'major' | 'minor';
 
 /** Key match result */
 export interface KeyMatch {
@@ -27,7 +29,7 @@ const CHROMATIC_ROOTS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', '
  * Normalize a note to its pitch class for comparison
  * Handles enharmonic equivalents (Db -> C#, etc.)
  */
-function normalizePitchClass(note: string): string {
+export function normalizePitchClass(note: string): string {
   // Get pitch class and convert to sharps for consistent comparison
   const pc = Note.pitchClass(note);
   if (!pc) return note;
@@ -130,38 +132,4 @@ export function detectKeys(
 
   // Limit to top results
   return matches.slice(0, 8);
-}
-
-/**
- * Get notes from guitar state for key detection
- */
-export function getNotesFromGuitarState(
-  guitarState: Record<number, number | null>,
-  tuning: readonly string[]
-): { notes: string[]; bassNote: string | undefined } {
-  const notes: string[] = [];
-  let bassNote: string | undefined;
-
-  // Iterate from low to high string (0 = low E)
-  for (let i = 0; i < 6; i++) {
-    const fret = guitarState[i];
-    if (fret !== null) {
-      const openMidi = Note.midi(tuning[i]);
-      if (openMidi) {
-        const noteName = Note.pitchClass(Note.fromMidi(openMidi + fret));
-        if (noteName) {
-          // First note found is the bass note
-          if (!bassNote) {
-            bassNote = noteName;
-          }
-          // Add unique notes only
-          if (!notes.includes(noteName)) {
-            notes.push(noteName);
-          }
-        }
-      }
-    }
-  }
-
-  return { notes, bassNote };
 }

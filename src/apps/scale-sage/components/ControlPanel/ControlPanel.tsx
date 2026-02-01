@@ -9,6 +9,7 @@
  * - Play Scale button
  * - Share/Clear buttons
  *
+ * Mode-aware: Different behavior for Scale Selected vs Free Play mode.
  * Mirrors ControlPanel pattern from Chord Compass.
  */
 
@@ -43,16 +44,22 @@ export function ControlPanel({ isAudioLoaded, playScale, playNote }: ControlPane
     currentPosition,
     displayMode,
     playbackDirection,
+    guitarStringState,
     setPosition,
     setDisplayMode,
     setPlaybackDirection,
     clearScale,
+    clearFrets,
   } = useScaleStore();
 
   const { tuning, tuningName, setTuning } = useSharedStore();
 
   const hasScale = scaleRoot && scaleType;
   const positionCount = getPositionCount(scaleType);
+
+  // Check if we have notes on the fretboard (free-play mode)
+  const noteCount = Object.values(guitarStringState).filter(f => f !== null).length;
+  const isFreePlayMode = !hasScale && noteCount > 0;
 
   // Position navigation
   const handlePrevPosition = () => {
@@ -69,6 +76,7 @@ export function ControlPanel({ isAudioLoaded, playScale, playNote }: ControlPane
 
   // Format position label
   const getPositionLabel = () => {
+    if (isFreePlayMode) return 'Free Play';
     if (!hasScale) return 'Position';
     if (currentPosition === 0) return 'Full';
     return `${currentPosition} of ${positionCount}`;
@@ -143,6 +151,18 @@ export function ControlPanel({ isAudioLoaded, playScale, playNote }: ControlPane
     }
   };
 
+  // Clear handler - works for both modes
+  const handleClear = () => {
+    if (hasScale) {
+      clearScale();
+    } else if (isFreePlayMode) {
+      clearFrets();
+    }
+  };
+
+  // Determine if clear button should be enabled
+  const canClear = hasScale || isFreePlayMode;
+
   return (
     <div className={styles.controlPanel}>
       {/* Row 1: Position Navigation */}
@@ -155,7 +175,7 @@ export function ControlPanel({ isAudioLoaded, playScale, playNote }: ControlPane
         >
           &lt;
         </button>
-        <span className={`${styles.positionLabel} ${!hasScale ? styles.positionLabelInactive : ''}`}>
+        <span className={`${styles.positionLabel} ${!hasScale ? styles.positionLabelInactive : ''} ${isFreePlayMode ? styles.positionLabelFreePlay : ''}`}>
           {getPositionLabel()}
         </span>
         <button
@@ -232,8 +252,8 @@ export function ControlPanel({ isAudioLoaded, playScale, playNote }: ControlPane
             {copied ? 'Copied!' : 'Share'}
           </button>
           <button
-            onClick={clearScale}
-            disabled={!hasScale}
+            onClick={handleClear}
+            disabled={!canClear}
             className={styles.clearButton}
           >
             Clear

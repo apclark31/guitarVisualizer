@@ -72,6 +72,11 @@
   color: #3f3f46;
 }
 
+.positionLabelFreePlay {
+  color: #22c55e;
+  font-weight: 500;
+}
+
 /* Tuning row */
 .tuningRow {
   display: flex;

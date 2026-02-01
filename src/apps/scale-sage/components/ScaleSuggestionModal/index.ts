@@ -1,0 +1,1 @@
+export { ScaleSuggestionModal } from './ScaleSuggestionModal';

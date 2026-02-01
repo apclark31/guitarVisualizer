@@ -19,7 +19,7 @@ import type {
 import { getVoicingsForChord } from '../lib/chord-data';
 import { detectChord } from '../lib/chord-detector';
 import { analyzeVoicing } from '../lib/voicing-analyzer';
-import { detectKeys, getNotesFromGuitarState } from '../lib/key-detector';
+import { detectKeys, getNotesFromGuitarState } from '../shared/lib';
 import { getFamilyForType, FRET_COUNT } from '../config/constants';
 import { useSharedStore } from '../shared/store';
 import { Note } from '@tonaljs/tonal';

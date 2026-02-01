@@ -70,13 +70,50 @@
 .primarySelected {
   font-size: 20px;
   font-weight: 600;
-  color: #3b82f6; /* Blue for consistency with Chord Compass */
+  color: #22c55e; /* Green for Scale Sage */
+}
+
+/* Free-play mode: white notes display */
+.primaryFreeplay {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fafafa;
 }
 
 .secondaryText {
   font-size: 13px;
   color: #71717a;
   text-align: center;
+}
+
+/* Free-play mode: suggestion as secondary */
+.secondarySuggestion {
+  color: #22c55e;
+  font-weight: 500;
+}
+
+/* Info button for free-play suggestions */
+.infoButton {
+  position: absolute;
+  right: -40px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  font-style: italic;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.infoButton:hover {
+  background-color: #16a34a;
 }
 
 /* Mobile Styles */
@@ -106,14 +143,26 @@
     font-size: 18px;
   }
 
+  .primaryFreeplay {
+    font-size: 16px;
+  }
+
   .secondaryText {
+    font-size: 12px;
+  }
+
+  .infoButton {
+    right: -36px;
+    width: 24px;
+    height: 24px;
     font-size: 12px;
   }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .scaleCard {
+  .scaleCard,
+  .infoButton {
     transition: none;
   }
 }
