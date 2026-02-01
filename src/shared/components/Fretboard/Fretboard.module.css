@@ -50,6 +50,25 @@
   }
 }
 
+/* Active note ring (scale playback) - subtle pulse */
+.activeNoteRing {
+  animation: activeNotePulse 0.3s ease-out;
+}
+
+@keyframes activeNotePulse {
+  0% {
+    opacity: 0;
+    r: 14;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+    r: 20;
+  }
+}
+
 /* Scroll hint gradient overlay */
 .scrollHint {
   display: none;

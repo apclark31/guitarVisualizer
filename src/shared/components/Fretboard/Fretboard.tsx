@@ -51,6 +51,8 @@ export interface FretboardProps {
   onFretPlay?: (stringIndex: StringIndex, fret: number) => void;
   /** Pre-computed highlighted notes (for scale display) */
   highlightedNotes?: HighlightedNote[];
+  /** Currently playing note position (for scale playback highlighting) */
+  activeNotePosition?: { stringIndex: number; fret: number } | null;
   /** Data attribute for tour targeting */
   'data-tour'?: string;
 }
@@ -64,6 +66,7 @@ export function Fretboard({
   onFretClick,
   onFretPlay,
   highlightedNotes,
+  activeNotePosition,
   'data-tour': dataTour,
 }: FretboardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -530,6 +533,40 @@ export function Fretboard({
     });
   };
 
+  // Render active note indicator (subtle ring for scale playback)
+  const renderActiveNoteIndicator = () => {
+    if (!activeNotePosition) return null;
+
+    const x = getFretX(activeNotePosition.fret);
+    const y = getStringY(activeNotePosition.stringIndex);
+
+    return (
+      <g style={{ pointerEvents: 'none' }}>
+        {/* Outer ring - subtle pulse effect */}
+        <circle
+          cx={x}
+          cy={y}
+          r={DIM.DOT_RADIUS + 6}
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth={2}
+          opacity={0.8}
+          className={styles.activeNoteRing}
+        />
+        {/* Inner glow */}
+        <circle
+          cx={x}
+          cy={y}
+          r={DIM.DOT_RADIUS + 3}
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth={1}
+          opacity={0.4}
+        />
+      </g>
+    );
+  };
+
   return (
     <div className={styles.fretboardWrapper} data-tour={dataTour}>
       <div className={styles.fretboardContainer} ref={containerRef}>
@@ -571,6 +608,9 @@ export function Fretboard({
 
           {/* Active notes (clicked notes, render on top) */}
           {renderActiveNotes()}
+
+          {/* Active note indicator (scale playback highlighting) */}
+          {renderActiveNoteIndicator()}
 
           {/* Clickable areas */}
           {renderClickAreas()}

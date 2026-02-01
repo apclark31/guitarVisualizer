@@ -85,8 +85,12 @@ export function useScaleAudioEngine() {
     samplerRef.current.triggerAttackRelease(note, duration, now);
   }, [isAudioLoaded, startAudio]);
 
-  // Play scale notes in sequence
-  const playScale = useCallback(async (notes: string[]) => {
+  // Play scale notes in sequence with optional callback for visual sync
+  const playScale = useCallback(async (
+    notes: string[],
+    onNotePlay?: (index: number) => void,
+    onComplete?: () => void
+  ) => {
     await startAudio();
 
     if (!samplerRef.current || !isAudioLoaded || notes.length === 0) return;
@@ -98,12 +102,27 @@ export function useScaleAudioEngine() {
 
     // Play notes in sequence with timing
     notes.forEach((note, index) => {
+      const noteTime = now + index * SCALE_TIMING.NOTE_DELAY;
+
       samplerRef.current?.triggerAttackRelease(
         note,
         SCALE_TIMING.NOTE_DURATION,
-        now + index * SCALE_TIMING.NOTE_DELAY
+        noteTime
       );
+
+      // Schedule visual callback using setTimeout (synced to audio timing)
+      if (onNotePlay) {
+        setTimeout(() => {
+          onNotePlay(index);
+        }, index * SCALE_TIMING.NOTE_DELAY * 1000);
+      }
     });
+
+    // Schedule completion callback
+    if (onComplete) {
+      const totalDuration = notes.length * SCALE_TIMING.NOTE_DELAY * 1000;
+      setTimeout(onComplete, totalDuration);
+    }
   }, [isAudioLoaded, startAudio]);
 
   // Stop all currently playing notes

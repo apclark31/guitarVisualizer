@@ -10,7 +10,7 @@
   max-width: 600px;
 }
 
-/* Card row: scale card centered */
+/* Card row: scale card + (i) button (positioned absolutely) */
 .cardRow {
   position: relative;
   display: flex;
@@ -92,16 +92,18 @@
   font-weight: 500;
 }
 
-/* Info button for free-play suggestions */
+/* Info bubble button - absolutely positioned to not affect centering */
 .infoButton {
   position: absolute;
-  right: -40px;
-  width: 28px;
-  height: 28px;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background-color: #3b82f6;
-  color: #fff;
-  border: none;
+  border: 1px solid #3b82f6;
+  background-color: transparent;
+  color: #3b82f6;
   font-size: 14px;
   font-weight: 600;
   font-style: italic;
@@ -109,11 +111,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .infoButton:hover {
-  background-color: #2563eb;
+  background-color: #3b82f6;
+  color: #fff;
 }
 
 /* Mobile Styles */
@@ -152,9 +156,8 @@
   }
 
   .infoButton {
-    right: -36px;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     font-size: 12px;
   }
 }

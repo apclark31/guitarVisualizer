@@ -704,3 +704,51 @@ export function getPlaybackNotes(
 
   return uniqueNotes.map((n) => n.fullNote);
 }
+
+/** Playback note with position info for visual sync */
+export interface PlaybackNoteWithPosition {
+  note: string;           // Full note name with octave (e.g., "E2")
+  stringIndex: number;    // String position on fretboard
+  fret: number;           // Fret position on fretboard
+}
+
+/**
+ * Get playback notes with position info for visual highlighting
+ * Same as getPlaybackNotes but includes fretboard position for each note
+ */
+export function getPlaybackNotesWithPositions(
+  notes: HighlightedNote[],
+  tuning: readonly string[],
+  direction: 'ascending' | 'descending' = 'ascending'
+): PlaybackNoteWithPosition[] {
+  // Calculate actual pitch for each note
+  const notesWithPitch = notes.map((n) => {
+    const openMidi = Note.midi(tuning[n.stringIndex]) ?? 40;
+    const noteMidi = openMidi + n.fret;
+    const fullNote = Note.fromMidi(noteMidi);
+    return {
+      ...n,
+      midi: noteMidi,
+      fullNote,
+    };
+  });
+
+  // Sort by pitch
+  notesWithPitch.sort((a, b) =>
+    direction === 'ascending' ? a.midi - b.midi : b.midi - a.midi
+  );
+
+  // Remove duplicate pitches (same note from different strings)
+  const seen = new Set<number>();
+  const uniqueNotes = notesWithPitch.filter((n) => {
+    if (seen.has(n.midi)) return false;
+    seen.add(n.midi);
+    return true;
+  });
+
+  return uniqueNotes.map((n) => ({
+    note: n.fullNote,
+    stringIndex: n.stringIndex,
+    fret: n.fret,
+  }));
+}

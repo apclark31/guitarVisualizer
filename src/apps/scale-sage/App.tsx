@@ -6,7 +6,7 @@
  * Supports Free Play mode - tap notes to detect matching scales.
  */
 
-import { useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
 import { useScaleStore, useSharedStore, type ScaleType } from './store/useScaleStore';
 import { useScaleAudioEngine } from './hooks/useScaleAudioEngine';
 import { AppHeader } from '../../components/layout/AppHeader';
@@ -15,7 +15,7 @@ import { ScaleHeader } from './components/ScaleHeader';
 import { ControlPanel } from './components/ControlPanel';
 import type { GuitarStringState, HighlightedNote, StringIndex } from '../../shared/types';
 import { getScale } from './lib/scale-data';
-import { getPositionNotes, getPlaybackNotes } from './lib/scale-positions';
+import { getPositionNotes, getPlaybackNotesWithPositions, type PlaybackNoteWithPosition } from './lib/scale-positions';
 import { decodeTuningFromUrl } from '../../shared/config/constants';
 import { getNoteAtPosition } from '../../shared/lib';
 import { COLORS } from '../../shared/config/theme';
@@ -45,6 +45,9 @@ function ScaleSageApp() {
 
   // Audio engine
   const { isLoaded, playScale, playNote, startAudio } = useScaleAudioEngine();
+
+  // Track currently playing note for visual highlighting
+  const [activeNotePosition, setActiveNotePosition] = useState<{ stringIndex: number; fret: number } | null>(null);
 
   // Determine mode: scale selected or free-play
   const hasScale = scaleRoot && scaleType;
@@ -149,18 +152,33 @@ function ScaleSageApp() {
   // Use scale notes when scale selected, free-play notes otherwise
   const highlightedNotes = hasScale ? scaleHighlightedNotes : freePlayHighlightedNotes;
 
-  // Get playback notes (sorted for audio)
-  const playbackNotes = useMemo(() => {
+  // Get playback notes with positions (sorted for audio + visual sync)
+  const playbackNotesWithPositions: PlaybackNoteWithPosition[] = useMemo(() => {
     if (highlightedNotes.length === 0) return [];
-    return getPlaybackNotes(highlightedNotes, tuning, playbackDirection);
+    return getPlaybackNotesWithPositions(highlightedNotes, tuning, playbackDirection);
   }, [highlightedNotes, tuning, playbackDirection]);
 
-  // Play scale handler
+  // Play scale handler with visual highlighting
   const handlePlayScale = useCallback(async () => {
-    if (playbackNotes.length > 0) {
-      await playScale(playbackNotes);
-    }
-  }, [playbackNotes, playScale]);
+    if (playbackNotesWithPositions.length === 0) return;
+
+    const noteStrings = playbackNotesWithPositions.map(n => n.note);
+
+    await playScale(
+      noteStrings,
+      // onNotePlay callback - highlight the currently playing note
+      (index) => {
+        const pos = playbackNotesWithPositions[index];
+        if (pos) {
+          setActiveNotePosition({ stringIndex: pos.stringIndex, fret: pos.fret });
+        }
+      },
+      // onComplete callback - clear highlight
+      () => {
+        setActiveNotePosition(null);
+      }
+    );
+  }, [playbackNotesWithPositions, playScale]);
 
   // Handle fret click in free-play mode (toggle note on/off)
   const handleFretClick = useCallback((stringIndex: StringIndex, fret: number) => {
@@ -202,6 +220,7 @@ function ScaleSageApp() {
               onFretClick={handleFretClick}
               onFretPlay={handleFretPlay}
               highlightedNotes={highlightedNotes}
+              activeNotePosition={activeNotePosition}
             />
           </section>
         </main>
