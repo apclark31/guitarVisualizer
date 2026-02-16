@@ -61,6 +61,21 @@ function runChordDetection(
   };
 }
 
+/** Run voicing analysis and key detection on current guitar state */
+function analyzeGuitarState(
+  guitarState: GuitarStringState,
+  tuning: readonly string[]
+): { suggestions: ChordSuggestion[]; voicingType: VoicingType | null; keySuggestions: KeySuggestion[] } {
+  const analysis = analyzeVoicing(guitarState, tuning);
+  const { notes, bassNote } = getNotesFromGuitarState(guitarState, tuning);
+  const chordRoot = analysis.suggestions[0]?.root;
+  return {
+    suggestions: analysis.suggestions,
+    voicingType: analysis.voicingType,
+    keySuggestions: detectKeys(notes, bassNote, chordRoot),
+  };
+}
+
 /** Find voicing that best matches user's current fret positions */
 function findMatchingVoicing(
   currentState: GuitarStringState,
@@ -216,14 +231,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
     let keySuggestions: KeySuggestion[] = [];
     let voicingType: VoicingType | null = null;
     if (noteCount >= 2) {
-      const analysis = analyzeVoicing(newGuitarState, tuning);
-      suggestions = analysis.suggestions;
-      voicingType = analysis.voicingType;
-
-      // Run key detection
-      const { notes, bassNote } = getNotesFromGuitarState(newGuitarState, tuning);
-      const chordRoot = suggestions[0]?.root;
-      keySuggestions = detectKeys(notes, bassNote, chordRoot);
+      ({ suggestions, voicingType, keySuggestions } = analyzeGuitarState(newGuitarState, tuning));
     }
 
     set({
@@ -256,14 +264,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
     let keySuggestions: KeySuggestion[] = [];
     let voicingType: VoicingType | null = null;
     if (noteCount >= 2) {
-      const analysis = analyzeVoicing(newGuitarState, tuning);
-      suggestions = analysis.suggestions;
-      voicingType = analysis.voicingType;
-
-      // Run key detection
-      const { notes, bassNote } = getNotesFromGuitarState(newGuitarState, tuning);
-      const chordRoot = suggestions[0]?.root;
-      keySuggestions = detectKeys(notes, bassNote, chordRoot);
+      ({ suggestions, voicingType, keySuggestions } = analyzeGuitarState(newGuitarState, tuning));
     }
 
     set({
@@ -484,14 +485,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
       let keySuggestions: KeySuggestion[] = [];
       let voicingType: VoicingType | null = null;
       if (noteCount >= 2) {
-        const analysis = analyzeVoicing(guitarStringState, newTuning);
-        suggestions = analysis.suggestions;
-        voicingType = analysis.voicingType;
-
-        // Run key detection
-        const { notes, bassNote } = getNotesFromGuitarState(guitarStringState, newTuning);
-        const chordRoot = suggestions[0]?.root;
-        keySuggestions = detectKeys(notes, bassNote, chordRoot);
+        ({ suggestions, voicingType, keySuggestions } = analyzeGuitarState(guitarStringState, newTuning));
       }
 
       set({
@@ -575,14 +569,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
       let keySuggestions: KeySuggestion[] = [];
       let voicingType: VoicingType | null = null;
       if (noteCount >= 2) {
-        const analysis = analyzeVoicing(newGuitarState, newTuning);
-        suggestions = analysis.suggestions;
-        voicingType = analysis.voicingType;
-
-        // Run key detection
-        const { notes, bassNote } = getNotesFromGuitarState(newGuitarState, newTuning);
-        const chordRoot = suggestions[0]?.root;
-        keySuggestions = detectKeys(notes, bassNote, chordRoot);
+        ({ suggestions, voicingType, keySuggestions } = analyzeGuitarState(newGuitarState, newTuning));
       }
 
       set({
@@ -683,14 +670,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
       let keySuggestions: KeySuggestion[] = [];
       let voicingType: VoicingType | null = null;
       if (noteCount >= 2) {
-        const analysis = analyzeVoicing(guitarState, effectiveTuning);
-        suggestions = analysis.suggestions;
-        voicingType = analysis.voicingType;
-
-        // Run key detection
-        const { notes, bassNote } = getNotesFromGuitarState(guitarState, effectiveTuning);
-        const chordRoot = suggestions[0]?.root;
-        keySuggestions = detectKeys(notes, bassNote, chordRoot);
+        ({ suggestions, voicingType, keySuggestions } = analyzeGuitarState(guitarState, effectiveTuning));
       }
 
       set({
