@@ -1,15 +1,16 @@
 /**
  * useScaleAudioEngine - Audio hook for Scale Sage
  *
+ * Wraps the shared useSamplerEngine with scale-specific playback:
+ * - playScale: plays notes in sequence with timing + visual callbacks
+ *
  * Provides scale playback functionality using the same Tone.js infrastructure.
  * Plays scale notes in ascending or descending order with proper timing.
  */
 
 import { useEffect, useRef, useCallback } from 'react';
 import * as Tone from 'tone';
-import { useSharedStore } from '../../../shared/store';
-import { GUITAR_SAMPLER_CONFIG } from '../../../shared/config/instruments';
-import { unlockIOSAudio } from '../../../shared/lib/ios-audio-unlock';
+import { useSamplerEngine } from '../../../shared/hooks/useSamplerEngine';
 
 /** Timing constants for scale playback */
 const SCALE_TIMING = {
@@ -18,51 +19,8 @@ const SCALE_TIMING = {
 };
 
 export function useScaleAudioEngine() {
-  const samplerRef = useRef<Tone.Sampler | null>(null);
-  const reverbRef = useRef<Tone.Reverb | null>(null);
-  const limiterRef = useRef<Tone.Limiter | null>(null);
+  const { samplerRef, isLoaded, playNote, stopAll: baseStopAll, startAudio } = useSamplerEngine();
   const timerIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  const { isAudioLoaded, setAudioLoaded, volume } = useSharedStore();
-
-  // Initialize audio chain on mount
-  useEffect(() => {
-    // Create effects chain: Sampler -> Reverb -> Limiter -> Destination
-    const limiter = new Tone.Limiter(-1).toDestination();
-    const reverb = new Tone.Reverb({
-      decay: 1.5,
-      wet: 0.2,
-    }).connect(limiter);
-
-    const sampler = new Tone.Sampler({
-      ...GUITAR_SAMPLER_CONFIG,
-      onload: () => {
-        console.log('Scale Sage: Guitar samples loaded');
-        setAudioLoaded(true);
-      },
-      onerror: (error) => {
-        console.error('Failed to load samples:', error);
-      },
-    }).connect(reverb);
-
-    samplerRef.current = sampler;
-    reverbRef.current = reverb;
-    limiterRef.current = limiter;
-
-    // Cleanup on unmount
-    return () => {
-      sampler.dispose();
-      reverb.dispose();
-      limiter.dispose();
-    };
-  }, [setAudioLoaded]);
-
-  // Update volume when it changes
-  useEffect(() => {
-    if (samplerRef.current) {
-      samplerRef.current.volume.value = volume;
-    }
-  }, [volume]);
 
   // Clear all pending animation/completion timers
   const clearAllTimers = useCallback(() => {
@@ -77,28 +35,6 @@ export function useScaleAudioEngine() {
     };
   }, []);
 
-  // Start audio context (must be called from user interaction)
-  const startAudio = useCallback(async () => {
-    // Unlock iOS audio SYNCHRONOUSLY first (must stay in gesture call stack)
-    unlockIOSAudio();
-
-    // Then start Tone.js audio context
-    if (Tone.getContext().state !== 'running') {
-      await Tone.start();
-      console.log('Audio context started');
-    }
-  }, []);
-
-  // Play a single note
-  const playNote = useCallback(async (note: string, duration: number = 1) => {
-    await startAudio();
-
-    if (!samplerRef.current || !isAudioLoaded) return;
-
-    const now = Tone.now();
-    samplerRef.current.triggerAttackRelease(note, duration, now);
-  }, [isAudioLoaded, startAudio]);
-
   // Play scale notes in sequence with optional callback for visual sync
   const playScale = useCallback(async (
     notes: string[],
@@ -107,7 +43,7 @@ export function useScaleAudioEngine() {
   ) => {
     await startAudio();
 
-    if (!samplerRef.current || !isAudioLoaded || notes.length === 0) return;
+    if (!samplerRef.current || !isLoaded || notes.length === 0) return;
 
     const now = Tone.now();
 
@@ -140,18 +76,16 @@ export function useScaleAudioEngine() {
       const id = setTimeout(onComplete, totalDuration);
       timerIdsRef.current.push(id);
     }
-  }, [isAudioLoaded, startAudio, clearAllTimers]);
+  }, [isLoaded, startAudio, clearAllTimers, samplerRef]);
 
   // Stop all currently playing notes and cancel pending timers
   const stopAll = useCallback(() => {
     clearAllTimers();
-    if (samplerRef.current) {
-      samplerRef.current.releaseAll();
-    }
-  }, [clearAllTimers]);
+    baseStopAll();
+  }, [clearAllTimers, baseStopAll]);
 
   return {
-    isLoaded: isAudioLoaded,
+    isLoaded,
     playNote,
     playScale,
     stopAll,

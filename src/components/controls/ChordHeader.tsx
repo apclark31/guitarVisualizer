@@ -13,6 +13,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
+import { useSharedStore } from '../../shared/store';
 import { Note } from '@tonaljs/tonal';
 import type { StringIndex, PlaybackMode } from '../../types';
 import { ChordPicker } from './ChordPicker';
@@ -76,11 +77,12 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
     suggestions,
     keySuggestions,
     voicingType,
-    tuning,
     availableVoicings,
     currentVoicingIndex,
     keyContext,
   } = useMusicStore();
+
+  const { tuning } = useSharedStore();
 
   // Listen for tour event to force-close the picker
   useEffect(() => {

@@ -7,6 +7,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
+import { useSharedStore } from '../../shared/store';
 import { CHORD_FAMILIES, FAMILY_TO_TYPES, getDiatonicChords } from '../../config/constants';
 import { getVoicingsForChord } from '../../lib/chord-data';
 import { useTour } from '../../shared/tour/TourContext';
@@ -37,7 +38,8 @@ interface ChordPickerProps {
 }
 
 export function ChordPicker({ isOpen, onClose, playNotes }: ChordPickerProps) {
-  const { targetRoot, targetFamily, targetQuality, setChord, keyContext, tuning } = useMusicStore();
+  const { targetRoot, targetFamily, targetQuality, setChord, keyContext } = useMusicStore();
+  const { tuning } = useSharedStore();
   const { isActive: isTourActive } = useTour();
 
   const [pendingRoot, setPendingRoot] = useState(targetRoot || 'A');

@@ -5,9 +5,7 @@ import type {
   StringIndex as SharedStringIndex,
   FretNumber as SharedFretNumber,
   GuitarStringState as SharedGuitarStringState,
-  PlaybackMode as SharedPlaybackMode,
   DisplayMode as SharedDisplayMode,
-  Instrument as SharedInstrument,
 } from '../shared/types';
 
 // Re-export shared types
@@ -33,9 +31,7 @@ export type { ChordFamily, TuningCategory, KeyType } from '../config/constants';
 type StringIndex = SharedStringIndex;
 type FretNumber = SharedFretNumber;
 type GuitarStringState = SharedGuitarStringState;
-type PlaybackMode = SharedPlaybackMode;
 type DisplayMode = SharedDisplayMode;
-type Instrument = SharedInstrument;
 type ChordFamily = SharedChordFamily;
 type KeyType = SharedKeyType;
 
@@ -123,22 +119,12 @@ export interface AppState {
   voicingType: VoicingType | null;
   voicingTypeFilter: VoicingFilterType;
 
-  // Tuning State
-  tuning: string[];
-  tuningName: string;
-
   // Key Context
   keyContext: KeyContext | null;
 
   // UI State
   displayMode: DisplayMode;
   isCustomShape: boolean;
-
-  // Audio State
-  isAudioLoaded: boolean;
-  volume: number;
-  playbackMode: PlaybackMode;
-  currentInstrument: Instrument;
 
   // Actions
   setTargetChord: (root: string, quality: string) => void;
@@ -148,9 +134,6 @@ export interface AppState {
   clearString: (stringIndex: StringIndex) => void;
   clearAllStrings: () => void;
   setDisplayMode: (mode: DisplayMode) => void;
-  setPlaybackMode: (mode: PlaybackMode) => void;
-  setVolume: (volume: number) => void;
-  setAudioLoaded: (loaded: boolean) => void;
   applySuggestion: (suggestion: ChordSuggestion, filterOverride?: VoicingFilterType) => void;
   applyContext: (suggestion: ChordSuggestion) => void;
   setVoicingTypeFilter: (filter: VoicingFilterType) => void;

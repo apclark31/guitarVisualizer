@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
+import { useSharedStore } from '../../shared/store';
 import { TuningModal } from './TuningModal';
 import { TuningConfirmModal } from './TuningConfirmModal';
 import { KeyPicker } from './KeyPicker';
@@ -19,21 +20,19 @@ export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPane
     targetQuality,
     displayMode,
     setDisplayMode,
-    playbackMode,
-    setPlaybackMode,
     currentVoicingIndex,
     availableVoicings,
     setVoicingIndex,
     isCustomShape,
     clearAllStrings,
     guitarStringState,
-    tuning,
-    tuningName,
     setTuning,
     voicingTypeFilter,
     setVoicingTypeFilter,
     keyContext,
   } = useMusicStore();
+
+  const { tuning, tuningName, playbackMode, setPlaybackMode } = useSharedStore();
 
   // Position navigation
   const isFreeFormMode = !targetRoot || !targetQuality;

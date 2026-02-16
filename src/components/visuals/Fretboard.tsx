@@ -7,6 +7,7 @@
 
 import { Fretboard as SharedFretboard } from '../../shared/components/Fretboard';
 import { useMusicStore } from '../../store/useMusicStore';
+import { useSharedStore } from '../../shared/store';
 import type { StringIndex } from '../../types';
 
 interface FretboardProps {
@@ -21,8 +22,9 @@ export function Fretboard({ playFretNote }: FretboardProps) {
     displayMode,
     targetRoot,
     detectedChord,
-    tuning,
   } = useMusicStore();
+
+  const { tuning } = useSharedStore();
 
   // Determine the root note to use for interval coloring
   const colorRoot = targetRoot || detectedChord?.bassNote || null;

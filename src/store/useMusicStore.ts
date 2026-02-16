@@ -4,7 +4,6 @@ import type {
   StringIndex,
   FretNumber,
   DisplayMode,
-  PlaybackMode,
   GuitarStringState,
   DetectedChordInfo,
   VoicingType,
@@ -127,10 +126,6 @@ export const useMusicStore = create<AppState>((set, get) => ({
   voicingType: null,
   voicingTypeFilter: 'all',
 
-  // Tuning State - synced with shared store
-  tuning: [...getSharedState().tuning],
-  tuningName: getSharedState().tuningName,
-
   // Key Context
   keyContext: null,
 
@@ -138,15 +133,10 @@ export const useMusicStore = create<AppState>((set, get) => ({
   displayMode: 'notes',
   isCustomShape: false,
 
-  // Audio State - synced with shared store
-  isAudioLoaded: getSharedState().isAudioLoaded,
-  volume: getSharedState().volume,
-  playbackMode: getSharedState().playbackMode,
-  currentInstrument: getSharedState().currentInstrument,
-
   // Actions
   setTargetChord: (root: string, quality: string) => {
-    const { voicingTypeFilter, tuning } = get();
+    const { voicingTypeFilter } = get();
+    const tuning = getSharedState().tuning;
     // Get voicings from chords-db (falls back to solver), respecting filter
     const voicings = getVoicingsForChord(root, quality, 12, voicingTypeFilter, tuning);
 
@@ -172,7 +162,8 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   setChord: (root: string, family: ChordFamily, quality: string) => {
-    const { voicingTypeFilter, tuning } = get();
+    const { voicingTypeFilter } = get();
+    const tuning = getSharedState().tuning;
     // Get voicings from chords-db (falls back to solver), respecting filter
     const voicings = getVoicingsForChord(root, quality, 12, voicingTypeFilter, tuning);
 
@@ -214,7 +205,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   setFret: (stringIndex: StringIndex, fret: FretNumber) => {
-    const { tuning } = get();
+    const tuning = getSharedState().tuning;
     const newGuitarState = {
       ...get().guitarStringState,
       [stringIndex]: fret,
@@ -250,7 +241,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   clearString: (stringIndex: StringIndex) => {
-    const { tuning } = get();
+    const tuning = getSharedState().tuning;
     const newGuitarState = {
       ...get().guitarStringState,
       [stringIndex]: null,
@@ -298,27 +289,9 @@ export const useMusicStore = create<AppState>((set, get) => ({
     set({ displayMode: mode });
   },
 
-  setPlaybackMode: (mode: PlaybackMode) => {
-    // Update both local and shared store
-    getSharedState().setPlaybackMode(mode);
-    set({ playbackMode: mode });
-  },
-
-  setVolume: (volume: number) => {
-    // Update both local and shared store
-    const clampedVolume = Math.max(-60, Math.min(0, volume));
-    getSharedState().setVolume(clampedVolume);
-    set({ volume: clampedVolume });
-  },
-
-  setAudioLoaded: (loaded: boolean) => {
-    // Update both local and shared store
-    getSharedState().setAudioLoaded(loaded);
-    set({ isAudioLoaded: loaded });
-  },
-
   applySuggestion: (suggestion: ChordSuggestion, filterOverride?: VoicingFilterType) => {
-    const { guitarStringState, voicingTypeFilter, tuning } = get();
+    const { guitarStringState, voicingTypeFilter } = get();
+    const tuning = getSharedState().tuning;
 
     // Determine filter: use override if provided, otherwise current filter
     const filter = filterOverride ?? voicingTypeFilter;
@@ -353,7 +326,8 @@ export const useMusicStore = create<AppState>((set, get) => ({
 
   applyContext: (suggestion: ChordSuggestion) => {
     // Keep user's current frets, just set the chord context for display
-    const { voicingTypeFilter, tuning } = get();
+    const { voicingTypeFilter } = get();
+    const tuning = getSharedState().tuning;
     const voicings = getVoicingsForChord(suggestion.root, suggestion.quality, 12, voicingTypeFilter, tuning);
 
     // Derive family from quality
@@ -373,7 +347,8 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   setVoicingTypeFilter: (filter: VoicingFilterType) => {
-    const { targetRoot, targetQuality, tuning } = get();
+    const { targetRoot, targetQuality } = get();
+    const tuning = getSharedState().tuning;
 
     // If a chord is already selected, re-fetch voicings with new filter
     if (targetRoot && targetQuality) {
@@ -396,7 +371,8 @@ export const useMusicStore = create<AppState>((set, get) => ({
   },
 
   setTuning: (newTuning: string[], name: string, mode: TuningChangeMode) => {
-    const { tuning: oldTuning, guitarStringState, targetRoot, targetFamily, targetQuality, voicingTypeFilter } = get();
+    const oldTuning = getSharedState().tuning;
+    const { guitarStringState, targetRoot, targetFamily, targetQuality, voicingTypeFilter } = get();
 
     // Update shared store first (simple tuning change)
     getSharedState().setTuning(newTuning, name);
@@ -407,8 +383,6 @@ export const useMusicStore = create<AppState>((set, get) => ({
     // If no notes, just change tuning
     if (!hasNotes || mode === 'clear') {
       set({
-        tuning: newTuning,
-        tuningName: name,
         guitarStringState: { ...initialGuitarState },
         detectedChord: null,
         suggestions: [],
@@ -444,8 +418,6 @@ export const useMusicStore = create<AppState>((set, get) => ({
             const selectedIndex = matchingVoicing ? voicings.indexOf(matchingVoicing) : -1;
 
             set({
-              tuning: newTuning,
-              tuningName: name,
               guitarStringState, // Keep same frets
               targetRoot: topSuggestion.root,
               targetFamily: newFamily,
@@ -464,8 +436,6 @@ export const useMusicStore = create<AppState>((set, get) => ({
         // Fallback: couldn't detect a chord, enter free-form with detection
         const detectedChord = runChordDetection(guitarStringState, newTuning);
         set({
-          tuning: newTuning,
-          tuningName: name,
           isCustomShape: true,
           targetRoot: '',
           targetFamily: '',
@@ -489,8 +459,6 @@ export const useMusicStore = create<AppState>((set, get) => ({
       }
 
       set({
-        tuning: newTuning,
-        tuningName: name,
         isCustomShape: true,
         targetRoot: '',
         targetFamily: '',
@@ -546,8 +514,6 @@ export const useMusicStore = create<AppState>((set, get) => ({
       const selectedIndex = matchingVoicing ? voicings.indexOf(matchingVoicing) : -1;
 
       set({
-        tuning: newTuning,
-        tuningName: name,
         guitarStringState: newGuitarState,
         targetRoot,
         targetFamily,
@@ -573,8 +539,6 @@ export const useMusicStore = create<AppState>((set, get) => ({
       }
 
       set({
-        tuning: newTuning,
-        tuningName: name,
         guitarStringState: newGuitarState,
         isCustomShape: true,
         targetRoot: '',
@@ -612,8 +576,6 @@ export const useMusicStore = create<AppState>((set, get) => ({
         const selectedVoicing = voicings[voicingIndex];
 
         set({
-          tuning: [...effectiveTuning],
-          tuningName: tuningName || 'Standard',
           keyContext: keyContext ?? null,
           guitarStringState: voicingToGuitarState(selectedVoicing.frets),
           targetRoot: root,
@@ -646,8 +608,6 @@ export const useMusicStore = create<AppState>((set, get) => ({
       }
 
       set({
-        tuning: [...effectiveTuning],
-        tuningName: tuningName || 'Standard',
         keyContext: keyContext ?? null,
         guitarStringState: guitarState,
         targetRoot: root,
@@ -674,8 +634,6 @@ export const useMusicStore = create<AppState>((set, get) => ({
       }
 
       set({
-        tuning: [...effectiveTuning],
-        tuningName: tuningName || 'Standard',
         keyContext: keyContext ?? null,
         guitarStringState: guitarState,
         targetRoot: '',

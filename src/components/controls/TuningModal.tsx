@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useMusicStore } from '../../store/useMusicStore';
+import { useSharedStore } from '../../shared/store';
 import {
   TUNING_PRESETS,
   TUNING_CATEGORIES,
@@ -56,7 +56,7 @@ function transposeNote(note: string, semitones: number): string {
 }
 
 export function TuningModal({ isOpen, onClose, onSelectTuning, playNote, isAudioLoaded }: TuningModalProps) {
-  const { tuning } = useMusicStore();
+  const { tuning } = useSharedStore();
 
   const [activeTab, setActiveTab] = useState<'presets' | 'custom'>('presets');
   const [customTuning, setCustomTuning] = useState<string[]>([...tuning]);
