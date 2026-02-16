@@ -8,7 +8,8 @@
  * 4. Number of matching notes
  */
 
-import { Scale, Note } from '@tonaljs/tonal';
+import { Scale } from '@tonaljs/tonal';
+import { normalizePitchClass } from './note-utils';
 
 /** Key type for major/minor */
 export type KeyType = 'major' | 'minor';
@@ -24,29 +25,6 @@ export interface KeyMatch {
 
 /** All chromatic roots for iteration */
 const CHROMATIC_ROOTS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const;
-
-/**
- * Normalize a note to its pitch class for comparison
- * Handles enharmonic equivalents (Db -> C#, etc.)
- */
-export function normalizePitchClass(note: string): string {
-  // Get pitch class and convert to sharps for consistent comparison
-  const pc = Note.pitchClass(note);
-  if (!pc) return note;
-
-  // Map flats to sharps for comparison
-  const flatToSharp: Record<string, string> = {
-    'Db': 'C#',
-    'Eb': 'D#',
-    'Fb': 'E',
-    'Gb': 'F#',
-    'Ab': 'G#',
-    'Bb': 'A#',
-    'Cb': 'B',
-  };
-
-  return flatToSharp[pc] || pc;
-}
 
 /**
  * Check if a note is in a scale (handles enharmonics)

@@ -1,11 +1,13 @@
 // Shared library exports
-export { detectKeys, normalizePitchClass as normalizeKeyPitchClass } from './key-detector';
+export { detectKeys } from './key-detector';
 export type { KeyMatch, KeyType } from './key-detector';
 
 export {
   getNotesFromGuitarState,
   getNotesFromMultiNoteState,
   normalizePitchClass,
+  noteToPitchClass,
+  areEnharmonic,
   getNoteAtPosition,
   getPitchClassAtPosition,
 } from './note-utils';

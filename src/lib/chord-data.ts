@@ -9,6 +9,7 @@ import { Note } from '@tonaljs/tonal';
 import { findChord, type ChordsDbPosition } from '../data/chords-db';
 import { getBestVoicings, solveTriadVoicings } from './chord-solver';
 import { STANDARD_TUNING } from '../config/constants';
+import { areEnharmonic } from '../shared/lib';
 import type { ChordVoicing, FretNumber, VoicingFilterType } from '../types';
 
 /**
@@ -90,21 +91,6 @@ function getNoteAt(stringIndex: number, fret: number, tuning: readonly string[] 
  */
 function getPitchClassAt(stringIndex: number, fret: number, tuning: readonly string[] = STANDARD_TUNING): string {
   return Note.pitchClass(getNoteAt(stringIndex, fret, tuning)) || '';
-}
-
-/**
- * Normalize note names for comparison (handles enharmonics)
- */
-function normalizePitchClass(note: string): number {
-  const midi = Note.midi(note + '4');
-  return midi !== null ? midi % 12 : -1;
-}
-
-/**
- * Check if two notes are enharmonically equivalent
- */
-function areEnharmonic(note1: string, note2: string): boolean {
-  return normalizePitchClass(note1) === normalizePitchClass(note2);
 }
 
 /**

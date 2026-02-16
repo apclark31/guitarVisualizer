@@ -14,6 +14,7 @@ import {
   QUALITY_TO_SYMBOL,
   TRIAD_PATTERNS,
 } from '../config/constants';
+import { noteToPitchClass, areEnharmonic } from '../shared/lib';
 import type { ChordVoicing, FretNumber } from '../types';
 
 /**
@@ -52,18 +53,6 @@ function getNoteAt(stringIndex: number, fret: number, tuning: readonly string[])
   const midi = getMidiAt(stringIndex, fret, tuning);
   const note = Note.fromMidi(midi);
   return Note.pitchClass(note) || '';
-}
-
-/** Normalize note to pitch class for comparison (handles enharmonics) */
-function normalizePitchClass(note: string): number {
-  const midi = Note.midi(note + '4'); // Add octave for midi calculation
-  if (midi === null) return -1;
-  return midi % 12;
-}
-
-/** Check if two notes are enharmonically equivalent */
-function areEnharmonic(note1: string, note2: string): boolean {
-  return normalizePitchClass(note1) === normalizePitchClass(note2);
 }
 
 /** Find all frets on a string that produce any of the target notes */
@@ -119,13 +108,13 @@ function hasRequiredNotes(
 
   frets.forEach((fret, stringIndex) => {
     if (fret !== null) {
-      const pitchClass = normalizePitchClass(getNoteAt(stringIndex, fret, tuning));
+      const pitchClass = noteToPitchClass(getNoteAt(stringIndex, fret, tuning));
       presentNotes.add(pitchClass);
     }
   });
 
   return requiredNotes.every(note =>
-    presentNotes.has(normalizePitchClass(note))
+    presentNotes.has(noteToPitchClass(note))
   );
 }
 
@@ -293,7 +282,7 @@ export function solveChordShapes(
       // Check unique notes - need enough variety
       const uniqueNotes = new Set(
         frets
-          .map((f, i) => f !== null ? normalizePitchClass(getNoteAt(i, f, tuning)) : -1)
+          .map((f, i) => f !== null ? noteToPitchClass(getNoteAt(i, f, tuning)) : -1)
           .filter(n => n !== -1)
       );
       if (uniqueNotes.size < minRequiredNotes) continue;
@@ -430,11 +419,11 @@ function findFretsForNote(
   tuning: readonly string[]
 ): number[] {
   const frets: number[] = [];
-  const targetPc = normalizePitchClass(targetNote);
+  const targetPc = noteToPitchClass(targetNote);
 
   for (let fret = minFret; fret <= maxFret; fret++) {
     const noteAtFret = getNoteAt(stringIndex, fret, tuning);
-    if (normalizePitchClass(noteAtFret) === targetPc) {
+    if (noteToPitchClass(noteAtFret) === targetPc) {
       frets.push(fret);
     }
   }

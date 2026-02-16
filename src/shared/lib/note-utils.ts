@@ -114,6 +114,23 @@ export function normalizePitchClass(note: string): string {
 }
 
 /**
+ * Convert a note name to its numeric pitch class (0-11)
+ * Handles enharmonic equivalents via MIDI. Returns -1 on error.
+ */
+export function noteToPitchClass(note: string): number {
+  const midi = Note.midi(note + '4');
+  return midi !== null ? midi % 12 : -1;
+}
+
+/**
+ * Check if two notes are enharmonically equivalent
+ */
+export function areEnharmonic(note1: string, note2: string): boolean {
+  const pc1 = noteToPitchClass(note1);
+  return pc1 !== -1 && pc1 === noteToPitchClass(note2);
+}
+
+/**
  * Get the full note name at a specific string and fret position
  */
 export function getNoteAtPosition(
