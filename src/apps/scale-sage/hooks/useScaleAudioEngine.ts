@@ -21,6 +21,7 @@ export function useScaleAudioEngine() {
   const samplerRef = useRef<Tone.Sampler | null>(null);
   const reverbRef = useRef<Tone.Reverb | null>(null);
   const limiterRef = useRef<Tone.Limiter | null>(null);
+  const timerIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const { isAudioLoaded, setAudioLoaded, volume } = useSharedStore();
 
@@ -63,6 +64,19 @@ export function useScaleAudioEngine() {
     }
   }, [volume]);
 
+  // Clear all pending animation/completion timers
+  const clearAllTimers = useCallback(() => {
+    timerIdsRef.current.forEach(id => clearTimeout(id));
+    timerIdsRef.current = [];
+  }, []);
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      timerIdsRef.current.forEach(id => clearTimeout(id));
+    };
+  }, []);
+
   // Start audio context (must be called from user interaction)
   const startAudio = useCallback(async () => {
     // Unlock iOS audio SYNCHRONOUSLY first (must stay in gesture call stack)
@@ -97,7 +111,8 @@ export function useScaleAudioEngine() {
 
     const now = Tone.now();
 
-    // Stop any currently playing notes
+    // Stop any currently playing notes and cancel pending timers
+    clearAllTimers();
     samplerRef.current.releaseAll();
 
     // Play notes in sequence with timing
@@ -112,25 +127,28 @@ export function useScaleAudioEngine() {
 
       // Schedule visual callback using setTimeout (synced to audio timing)
       if (onNotePlay) {
-        setTimeout(() => {
+        const id = setTimeout(() => {
           onNotePlay(index);
         }, index * SCALE_TIMING.NOTE_DELAY * 1000);
+        timerIdsRef.current.push(id);
       }
     });
 
     // Schedule completion callback
     if (onComplete) {
       const totalDuration = notes.length * SCALE_TIMING.NOTE_DELAY * 1000;
-      setTimeout(onComplete, totalDuration);
+      const id = setTimeout(onComplete, totalDuration);
+      timerIdsRef.current.push(id);
     }
-  }, [isAudioLoaded, startAudio]);
+  }, [isAudioLoaded, startAudio, clearAllTimers]);
 
-  // Stop all currently playing notes
+  // Stop all currently playing notes and cancel pending timers
   const stopAll = useCallback(() => {
+    clearAllTimers();
     if (samplerRef.current) {
       samplerRef.current.releaseAll();
     }
-  }, []);
+  }, [clearAllTimers]);
 
   return {
     isLoaded: isAudioLoaded,
