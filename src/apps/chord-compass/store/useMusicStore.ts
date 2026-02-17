@@ -323,6 +323,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
         guitarStringState: voicingToGuitarState(selectedVoicing.frets),
         isCustomShape: false,
         suggestions: [],
+        keySuggestions: [],
         voicingType: null,
         voicingTypeFilter: filter, // Update filter to match selection
         detectedChord: null,
@@ -347,6 +348,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
       currentVoicingIndex: -1, // -1 indicates custom/user shape
       isCustomShape: true,
       suggestions: [],
+      keySuggestions: [],
       voicingType: null,
       detectedChord: null,
     });
@@ -596,6 +598,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
           isCustomShape: false, // Trust the provided index
           detectedChord: null,
           suggestions: [],
+          keySuggestions: [],
           voicingType: null,
         });
         return;
@@ -628,6 +631,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
         isCustomShape: isCustom,
         detectedChord: null,
         suggestions: [],
+        keySuggestions: [],
         voicingType: null,
       });
     } else {
