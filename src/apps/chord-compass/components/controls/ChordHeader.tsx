@@ -5,7 +5,7 @@
  * Four states:
  * 1. Blank: "Select a chord or tap fretboard"
  * 2. Notes (no matches): Shows note names + "Add more notes"
- * 3. Notes (with matches): Shows note names + voicing type + (i) button
+ * 3. Notes (with matches): Shows note names + voicing type + match count
  * 4. Chord Selected: Shows chord name + notes
  *
  * Position controls are included below the card.
@@ -17,7 +17,6 @@ import { useSharedStore } from '../../../../shared/store';
 import { Note } from '@tonaljs/tonal';
 import type { StringIndex, PlaybackMode } from '../../types';
 import { ChordPicker } from './ChordPicker';
-import { SuggestionModal } from './SuggestionModal';
 import { getRomanNumeral } from '../../config/constants';
 import styles from './ChordHeader.module.css';
 
@@ -43,7 +42,7 @@ function getPlayedNotesDisplay(
       }
     }
   }
-  return notes.length > 0 ? notes.join(' · ') : '';
+  return notes.length > 0 ? notes.join(' \u00B7 ') : '';
 }
 
 /** Format voicing type for display */
@@ -68,7 +67,6 @@ function formatMissingIntervals(missing: string[]): string | null {
 
 export function ChordHeader({ playNotes }: ChordHeaderProps) {
   const [showPickerModal, setShowPickerModal] = useState(false);
-  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
 
   const {
     targetRoot,
@@ -94,7 +92,7 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
   const hasSuggestions = suggestions.length > 0;
   const playedNotes = getPlayedNotesDisplay(guitarStringState, tuning);
   const hasNotes = playedNotes.length > 0;
-  const noteCount = playedNotes.split(' · ').filter(Boolean).length;
+  const noteCount = playedNotes.split(' \u00B7 ').filter(Boolean).length;
 
   // Get current voicing for inversion detection
   const currentVoicing = availableVoicings[currentVoicingIndex];
@@ -104,7 +102,7 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
 
   // Determine what to display based on state
   const getDisplayContent = () => {
-    // State 4: Chord selected - no (i) button, just display
+    // State 4: Chord selected
     if (targetRoot && targetQuality) {
       const isInversion = currentVoicing?.isInversion && currentVoicing?.bassNote;
       const chordName = isInversion
@@ -124,7 +122,7 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
       // Show notes, and key subtitle if present (both together)
       let secondaryText: string | null = null;
       if (keySubtitle && playedNotes) {
-        secondaryText = `${playedNotes} · ${keySubtitle}`;
+        secondaryText = `${playedNotes} \u00B7 ${keySubtitle}`;
       } else if (keySubtitle) {
         secondaryText = keySubtitle;
       } else if (playedNotes) {
@@ -135,7 +133,6 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
         state: 'selected' as const,
         primaryText: chordName,
         secondaryText,
-        showSuggestions: false, // No (i) when chord is selected
       };
     }
 
@@ -165,8 +162,7 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
       return {
         state: 'notes-with-match' as const,
         primaryText: chordName,
-        secondaryText: parts.join(' · '),
-        showSuggestions: true,
+        secondaryText: parts.join(' \u00B7 '),
       };
     }
 
@@ -176,7 +172,6 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
         state: 'notes-no-match' as const,
         primaryText: playedNotes,
         secondaryText: 'Add more notes to see matches',
-        showSuggestions: false,
       };
     }
 
@@ -185,11 +180,14 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
       state: 'blank' as const,
       primaryText: 'Select a chord or tap the fretboard to begin',
       secondaryText: null,
-      showSuggestions: false,
     };
   };
 
   const display = getDisplayContent();
+
+  // Context-aware default tab: open to Matches when in free-form with suggestions
+  const defaultPickerTab: 'library' | 'matches' =
+    display.state === 'notes-with-match' ? 'matches' : 'library';
 
   return (
     <div className={styles.chordHeader}>
@@ -211,18 +209,6 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
             <span className={styles.secondaryText}>{display.secondaryText}</span>
           )}
         </button>
-
-        {/* Info bubble - only when suggestions available in free-play mode */}
-        {display.showSuggestions && (
-          <button
-            className={styles.infoBubble}
-            onClick={() => setShowSuggestionModal(true)}
-            aria-label="View chord suggestions"
-            data-tour="info-button"
-          >
-            i
-          </button>
-        )}
       </div>
 
       {/* Chord Picker Modal */}
@@ -230,18 +216,8 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
         isOpen={showPickerModal}
         onClose={() => setShowPickerModal(false)}
         playNotes={playNotes}
+        defaultTab={defaultPickerTab}
       />
-
-      {/* Suggestion Modal */}
-      {showSuggestionModal && (
-        <SuggestionModal
-          suggestions={suggestions}
-          keySuggestions={keySuggestions}
-          voicingType={voicingType}
-          playedNotes={playedNotes}
-          onClose={() => setShowSuggestionModal(false)}
-        />
-      )}
     </div>
   );
 }

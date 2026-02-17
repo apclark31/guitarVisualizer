@@ -9,7 +9,7 @@
   max-width: 600px;
 }
 
-/* Card row: chord card + (i) button (positioned absolutely) */
+/* Card row: chord card centered */
 .cardRow {
   position: relative;
   display: flex;
@@ -85,34 +85,6 @@
   text-align: center;
 }
 
-/* Info bubble button - absolutely positioned to not affect centering */
-.infoBubble {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid #3b82f6;
-  background-color: transparent;
-  color: #3b82f6;
-  font-size: 14px;
-  font-weight: 600;
-  font-style: italic;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-
-.infoBubble:hover {
-  background-color: #3b82f6;
-  color: #fff;
-}
-
 /* Mobile Styles */
 @media (max-width: 768px) {
   .chordHeader {
@@ -147,18 +119,11 @@
   .secondaryText {
     font-size: 12px;
   }
-
-  .infoBubble {
-    width: 28px;
-    height: 28px;
-    font-size: 12px;
-  }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .chordCard,
-  .infoBubble {
+  .chordCard {
     transition: none;
   }
 }
