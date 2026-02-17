@@ -165,7 +165,7 @@ describe('useMusicStore', () => {
   // ── applySuggestion ───────────────────────────────────────────────
 
   describe('applySuggestion', () => {
-    it('sets target chord from suggestion, clears stale state', () => {
+    it('sets target chord from suggestion, clears chord suggestions', () => {
       const suggestion: ChordSuggestion = {
         root: 'E', quality: 'Minor', displayName: 'Em',
         confidence: 0.9, voicingType: 'triad',
@@ -176,7 +176,8 @@ describe('useMusicStore', () => {
       expect(state().targetRoot).toBe('E');
       expect(state().targetQuality).toBe('Minor');
       expect(state().isCustomShape).toBe(false);
-      expectStaleCleared();
+      expect(state().suggestions).toEqual([]);
+      expect(state().voicingType).toBeNull();
     });
 
     it('applies filterOverride when provided', () => {
@@ -190,8 +191,8 @@ describe('useMusicStore', () => {
       expect(state().voicingTypeFilter).toBe('triads');
     });
 
-    it('clears keySuggestions (regression test)', () => {
-      // Seed stale keySuggestions
+    it('recomputes keySuggestions from chord voicing (not stale free-play keys)', () => {
+      // Seed stale keySuggestions from a previous free-play session
       useMusicStore.setState({
         keySuggestions: [{ key: 'C major', confidence: 1 }] as never[],
       });
@@ -203,7 +204,14 @@ describe('useMusicStore', () => {
       };
 
       state().applySuggestion(suggestion);
-      expect(state().keySuggestions).toEqual([]);
+      // keySuggestions should be freshly computed from the chord voicing, not stale
+      const keys = state().keySuggestions;
+      // C Major chord notes belong to keys — should have results
+      expect(keys.length).toBeGreaterThan(0);
+      // Verify they are real KeySuggestion objects, not the stale seed data
+      expect(keys[0]).toHaveProperty('root');
+      expect(keys[0]).toHaveProperty('type');
+      expect(keys[0]).toHaveProperty('display');
     });
   });
 

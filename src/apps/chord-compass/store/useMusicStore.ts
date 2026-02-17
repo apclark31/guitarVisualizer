@@ -314,16 +314,21 @@ export const useMusicStore = create<AppState>((set, get) => ({
     const selectedVoicing = voicings[selectedIndex] || voicings[0];
 
     if (selectedVoicing) {
+      // Recompute key suggestions from the new voicing (chord notes still belong to keys)
+      const newGuitarState = voicingToGuitarState(selectedVoicing.frets);
+      const { notes, bassNote } = getNotesFromGuitarState(newGuitarState, tuning);
+      const newKeySuggestions = detectKeys(notes, bassNote, suggestion.root);
+
       set({
         targetRoot: suggestion.root,
         targetFamily: family,
         targetQuality: suggestion.quality,
         availableVoicings: voicings,
         currentVoicingIndex: selectedIndex,
-        guitarStringState: voicingToGuitarState(selectedVoicing.frets),
+        guitarStringState: newGuitarState,
         isCustomShape: false,
         suggestions: [],
-        keySuggestions: [],
+        keySuggestions: newKeySuggestions,
         voicingType: null,
         voicingTypeFilter: filter, // Update filter to match selection
         detectedChord: null,
