@@ -10,7 +10,7 @@
   max-width: 600px;
 }
 
-/* Card row: scale card + (i) button (positioned absolutely) */
+/* Card row: scale card centered */
 .cardRow {
   position: relative;
   display: flex;
@@ -59,6 +59,32 @@
   pointer-events: none;
 }
 
+/* Fade in to strong glow, then settle to subtle */
+@keyframes matchGlowIntro {
+  0% {
+    box-shadow: 0 0 0 0px rgba(59, 130, 246, 0), 0 0 0px 0px rgba(59, 130, 246, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.7), 0 0 20px 4px rgba(59, 130, 246, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 0 6px 0 rgba(59, 130, 246, 0.05);
+  }
+}
+
+@keyframes matchGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 0 6px 0 rgba(59, 130, 246, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 0 1.5px rgba(59, 130, 246, 0.45), 0 0 16px 2px rgba(59, 130, 246, 0.2);
+  }
+}
+
+.scaleCardHasMatches {
+  animation: matchGlowIntro 1.5s ease-out, matchGlow 2.5s ease-in-out 1.5s infinite;
+}
+
 .primaryText {
   font-size: 16px;
   font-weight: 500;
@@ -90,34 +116,6 @@
 .secondarySuggestion {
   color: #3b82f6;
   font-weight: 500;
-}
-
-/* Info bubble button - absolutely positioned to not affect centering */
-.infoButton {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid #3b82f6;
-  background-color: transparent;
-  color: #3b82f6;
-  font-size: 14px;
-  font-weight: 600;
-  font-style: italic;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-
-.infoButton:hover {
-  background-color: #3b82f6;
-  color: #fff;
 }
 
 /* Mobile Styles */
@@ -154,18 +152,16 @@
   .secondaryText {
     font-size: 12px;
   }
-
-  .infoButton {
-    width: 28px;
-    height: 28px;
-    font-size: 12px;
-  }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .scaleCard,
-  .infoButton {
+  .scaleCard {
     transition: none;
+  }
+
+  .scaleCardHasMatches {
+    animation: none;
+    box-shadow: 0 0 0 1.5px rgba(59, 130, 246, 0.35);
   }
 }

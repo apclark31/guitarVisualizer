@@ -4,7 +4,7 @@
  * A tappable card that shows contextual state and opens the scale picker modal.
  * Three states:
  * 1. Blank: "Tap notes or select a scale"
- * 2. Free Play: Shows played notes + top suggestion + info button
+ * 2. Free Play: Shows played notes + top suggestion + glow animation
  * 3. Scale Selected: Shows scale name + position info
  *
  * Mirrors ChordHeader pattern from Chord Compass.
@@ -13,21 +13,18 @@
 import { useState, useMemo } from 'react';
 import { useScaleStore, useSharedStore } from '../../store/useScaleStore';
 import { ScalePicker } from '../ScalePicker/ScalePicker';
-import { ScaleSuggestionModal } from '../ScaleSuggestionModal';
 import { SCALE_TYPE_DISPLAY, getScale } from '../../lib/scale-data';
 import { getNotesFromMultiNoteState } from '../../../../shared/lib';
 import styles from './ScaleHeader.module.css';
 
 export function ScaleHeader() {
   const [showPickerModal, setShowPickerModal] = useState(false);
-  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
 
   const {
     scaleRoot,
     scaleType,
     guitarStringState,
     scaleSuggestions,
-    keySuggestions,
   } = useScaleStore();
 
   const { tuning } = useSharedStore();
@@ -98,14 +95,15 @@ export function ScaleHeader() {
 
   const display = getDisplayContent();
 
+  // Determine default tab for picker
+  const defaultPickerTab: 'library' | 'matches' =
+    isFreePlayMode && scaleSuggestions.length > 0 ? 'matches' : 'library';
+
+  // Glow when matches available in free-play mode
+  const hasMatches = isFreePlayMode && scaleSuggestions.length > 0;
+
   const handleCardClick = () => {
-    // In free-play mode, open suggestion modal if we have suggestions
-    if (isFreePlayMode && scaleSuggestions.length > 0) {
-      setShowSuggestionModal(true);
-    } else {
-      // Otherwise open the scale picker
-      setShowPickerModal(true);
-    }
+    setShowPickerModal(true);
   };
 
   return (
@@ -113,9 +111,9 @@ export function ScaleHeader() {
       {/* Tappable scale card */}
       <div className={styles.cardRow}>
         <button
-          className={styles.scaleCard}
+          className={`${styles.scaleCard} ${hasMatches ? styles.scaleCardHasMatches : ''}`}
           onClick={handleCardClick}
-          aria-label={isFreePlayMode ? "View scale suggestions" : "Open scale picker"}
+          aria-label={hasMatches ? "View scale suggestions" : "Open scale picker"}
         >
           <span className={`${styles.primaryText} ${display.state === 'selected' ? styles.primarySelected : ''} ${display.state === 'freeplay' ? styles.primaryFreeplay : ''}`}>
             {display.primaryText}
@@ -126,34 +124,14 @@ export function ScaleHeader() {
             </span>
           )}
         </button>
-
-        {/* Info button for free-play mode with suggestions */}
-        {isFreePlayMode && scaleSuggestions.length > 0 && (
-          <button
-            className={styles.infoButton}
-            onClick={() => setShowSuggestionModal(true)}
-            aria-label="View all scale suggestions"
-          >
-            i
-          </button>
-        )}
       </div>
 
       {/* Scale Picker Modal */}
       <ScalePicker
         isOpen={showPickerModal}
         onClose={() => setShowPickerModal(false)}
+        defaultTab={defaultPickerTab}
       />
-
-      {/* Scale Suggestion Modal */}
-      {showSuggestionModal && (
-        <ScaleSuggestionModal
-          suggestions={scaleSuggestions}
-          keySuggestions={keySuggestions}
-          playedNotes={playedNotesDisplay}
-          onClose={() => setShowSuggestionModal(false)}
-        />
-      )}
     </div>
   );
 }
