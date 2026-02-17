@@ -9,7 +9,7 @@
 import { useMemo, useCallback, useEffect, useState } from 'react';
 import { useScaleStore, useSharedStore, type ScaleType } from './store/useScaleStore';
 import { useScaleAudioEngine } from './hooks/useScaleAudioEngine';
-import { AppHeader } from '../../components/layout/AppHeader';
+import { AppHeader } from '../../shared/components/layout/AppHeader';
 import { Fretboard } from '../../shared/components/Fretboard';
 import { ScaleHeader } from './components/ScaleHeader';
 import { ControlPanel } from './components/ControlPanel';

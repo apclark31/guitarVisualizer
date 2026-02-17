@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { useTour } from '../../shared/tour';
+import { useTour } from '../../tour';
 import styles from './AppHeader.module.css';
 
 interface NavItem {
