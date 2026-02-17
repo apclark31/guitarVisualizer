@@ -39,20 +39,6 @@ type MatchesSubTab = 'chords' | 'keys';
 
 // ---- Utility functions (moved from SuggestionModal) ----
 
-/** Format voicing type for display in header */
-function formatVoicingType(type: VoicingType): string {
-  const labels: Record<VoicingType, string> = {
-    'shell-major': 'Major Shell',
-    'shell-minor': 'Minor Shell',
-    'shell-dominant': 'Dom7 Shell',
-    'triad': 'Triad',
-    'partial': 'Partial',
-    'full': 'Full Voicing',
-    'unknown': 'Unknown',
-  };
-  return labels[type] || type;
-}
-
 /** Get short tag label for suggestion list */
 function getTypeTag(type: VoicingType): string {
   const tags: Record<VoicingType, string> = {

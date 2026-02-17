@@ -73,8 +73,6 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
     targetQuality,
     guitarStringState,
     suggestions,
-    keySuggestions,
-    voicingType,
     availableVoicings,
     currentVoicingIndex,
     keyContext,
