@@ -157,7 +157,10 @@ export const useMusicStore = create<AppState>((set, get) => ({
       currentVoicingIndex: 0,
       isCustomShape: false,
       guitarStringState: guitarState,
-      detectedChord: null, // Clear detection when using solver
+      detectedChord: null,
+      suggestions: [],
+      keySuggestions: [],
+      voicingType: null,
     });
   },
 
@@ -182,6 +185,9 @@ export const useMusicStore = create<AppState>((set, get) => ({
       isCustomShape: false,
       guitarStringState: guitarState,
       detectedChord: null,
+      suggestions: [],
+      keySuggestions: [],
+      voicingType: null,
     });
   },
 
@@ -386,6 +392,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
         guitarStringState: { ...initialGuitarState },
         detectedChord: null,
         suggestions: [],
+        keySuggestions: [],
         voicingType: null,
         targetRoot: '',
         targetFamily: '',
@@ -427,6 +434,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
               isCustomShape: selectedIndex < 0,
               detectedChord: null,
               suggestions: [],
+              keySuggestions: [],
               voicingType: null,
             });
             return;
@@ -443,6 +451,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
           availableVoicings: [],
           detectedChord,
           suggestions: [],
+          keySuggestions: [],
           voicingType: null,
         });
         return;
@@ -523,6 +532,7 @@ export const useMusicStore = create<AppState>((set, get) => ({
         isCustomShape: selectedIndex < 0, // Custom if adapted frets don't match any voicing
         detectedChord: null,
         suggestions: [],
+        keySuggestions: [],
         voicingType: null,
       });
     } else {

@@ -27,7 +27,7 @@ export function getNotesFromGuitarState(
     const fret = guitarState[i as keyof GuitarStringState];
     if (fret !== null) {
       const openMidi = Note.midi(tuning[i]);
-      if (openMidi) {
+      if (openMidi !== null) {
         const noteName = Note.pitchClass(Note.fromMidi(openMidi + fret));
         if (noteName) {
           // First note found is the bass note
@@ -68,7 +68,7 @@ export function getNotesFromMultiNoteState(
     if (!frets || frets.length === 0) continue;
 
     const openMidi = Note.midi(tuning[stringIndex]);
-    if (!openMidi) continue;
+    if (openMidi === null) continue;
 
     for (const fret of frets) {
       const midi = openMidi + fret;
