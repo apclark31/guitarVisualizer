@@ -131,8 +131,8 @@ export function ChordPicker({ isOpen, onClose, playNotes, defaultTab }: ChordPic
   const [pendingFamily, setPendingFamily] = useState<ChordFamily>(targetFamily || 'Major');
   const [pendingType, setPendingType] = useState(targetQuality || 'Major');
 
-  // Tab state
-  const [activeTab, setActiveTab] = useState<PanelTab>(defaultTab || 'library');
+  // Tab state — initialized lazily to avoid flash on open
+  const [activeTab, setActiveTab] = useState<PanelTab>('library');
   const [matchesSubTab, setMatchesSubTab] = useState<MatchesSubTab>('chords');
 
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -190,12 +190,16 @@ export function ChordPicker({ isOpen, onClose, playNotes, defaultTab }: ChordPic
     if (targetQuality) setPendingType(targetQuality);
   }, [targetRoot, targetFamily, targetQuality]);
 
-  // Sync activeTab when panel opens with a defaultTab
-  useEffect(() => {
-    if (isOpen && defaultTab) {
-      setActiveTab(defaultTab);
+  // Set the correct tab immediately when the panel opens (not in an effect)
+  const prevIsOpenRef = useRef(false);
+  if (isOpen && !prevIsOpenRef.current) {
+    // Panel is opening right now — set the tab before first render
+    const targetTab = defaultTab || 'library';
+    if (activeTab !== targetTab) {
+      setActiveTab(targetTab);
     }
-  }, [isOpen, defaultTab]);
+  }
+  prevIsOpenRef.current = isOpen;
 
   // Get types for selected family
   const typeOptions = FAMILY_TO_TYPES[pendingFamily] || FAMILY_TO_TYPES['Major'];
@@ -267,11 +271,16 @@ export function ChordPicker({ isOpen, onClose, playNotes, defaultTab }: ChordPic
     onClose();
   }, [applySuggestion, onClose]);
 
-  // Set a key from the Matches tab
+  // Set a key from the Matches tab — switch to Library (now filtered) instead of closing
   const handleSetKey = useCallback((keySuggestion: KeySuggestion) => {
     setKeyContext({ root: keySuggestion.root, type: keySuggestion.type });
-    onClose();
-  }, [setKeyContext, onClose]);
+    setActiveTab('library');
+  }, [setKeyContext]);
+
+  // Clear the active key context
+  const handleClearKey = useCallback(() => {
+    setKeyContext(null);
+  }, [setKeyContext]);
 
   // Close on outside click
   useEffect(() => {
@@ -408,7 +417,7 @@ export function ChordPicker({ isOpen, onClose, playNotes, defaultTab }: ChordPic
 
         {/* Library tab */}
         {activeTab === 'library' && (
-          <>
+          <div className={styles.libraryContent}>
             {/* Column headers */}
             <div className={styles.headers}>
               <div className={styles.header}>Root</div>
@@ -470,15 +479,33 @@ export function ChordPicker({ isOpen, onClose, playNotes, defaultTab }: ChordPic
                 Apply
               </button>
             </div>
-          </>
+          </div>
         )}
 
         {/* Matches tab */}
         {activeTab === 'matches' && (
           <div className={styles.matchesContent}>
+            {/* Active key banner */}
+            {keyContext && (
+              <div className={styles.keyActiveBanner}>
+                <span className={styles.keyActiveBannerText}>
+                  <strong>{keyContext.root} {keyContext.type === 'major' ? 'Major' : 'Minor'}</strong> key active — Library is filtered to diatonic chords.
+                  Clear to explore freely.
+                </span>
+                <button
+                  className={styles.keyActiveClearButton}
+                  onClick={handleClearKey}
+                >
+                  Clear Key
+                </button>
+              </div>
+            )}
+
             {matchCount === 0 ? (
               <p className={styles.matchesEmpty}>
-                Place 2+ notes on the fretboard to see chord and key matches.
+                {keyContext
+                  ? 'Place notes on the fretboard to find new matches.'
+                  : 'Place 2+ notes on the fretboard to see chord and key matches.'}
               </p>
             ) : (
               <>

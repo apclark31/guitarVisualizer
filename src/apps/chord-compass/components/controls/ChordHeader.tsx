@@ -185,16 +185,19 @@ export function ChordHeader({ playNotes }: ChordHeaderProps) {
 
   const display = getDisplayContent();
 
-  // Context-aware default tab: open to Matches when in free-form with suggestions
+  // Context-aware default tab:
+  // - Key set → Library (key is already filtering the library)
+  // - Free-form with matches, no key → Matches
+  // - Everything else → Library
   const defaultPickerTab: 'library' | 'matches' =
-    display.state === 'notes-with-match' ? 'matches' : 'library';
+    display.state === 'notes-with-match' && !keyContext ? 'matches' : 'library';
 
   return (
     <div className={styles.chordHeader}>
       {/* Tappable chord card */}
       <div className={styles.cardRow}>
         <button
-          className={styles.chordCard}
+          className={`${styles.chordCard} ${display.state === 'notes-with-match' ? styles.chordCardHasMatches : ''}`}
           onClick={() => setShowPickerModal(true)}
           aria-label="Open chord picker"
           data-tour="chord-card"

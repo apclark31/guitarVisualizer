@@ -85,6 +85,20 @@
   text-align: center;
 }
 
+/* Subtle glow when matches are available — draws attention to the card */
+@keyframes matchGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 0 6px 0 rgba(59, 130, 246, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 0 1.5px rgba(59, 130, 246, 0.45), 0 0 16px 2px rgba(59, 130, 246, 0.2);
+  }
+}
+
+.chordCardHasMatches {
+  animation: matchGlow 2.5s ease-in-out infinite;
+}
+
 /* Mobile Styles */
 @media (max-width: 768px) {
   .chordHeader {
@@ -125,5 +139,10 @@
 @media (prefers-reduced-motion: reduce) {
   .chordCard {
     transition: none;
+  }
+
+  .chordCardHasMatches {
+    animation: none;
+    box-shadow: 0 0 0 1.5px rgba(59, 130, 246, 0.35);
   }
 }
