@@ -1,1 +1,0 @@
-export { ScaleSuggestionModal } from './ScaleSuggestionModal';
