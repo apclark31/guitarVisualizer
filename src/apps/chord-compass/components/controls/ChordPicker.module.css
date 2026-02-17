@@ -1,4 +1,4 @@
-/* ChordPicker - Multi-column chord selector modal */
+/* ChordPicker - Harmonic panel with Library + Matches tabs */
 
 /* Picker modal - fixed position centered */
 .picker {
@@ -41,14 +41,69 @@
   color: var(--color-text, #e5e5e5);
 }
 
+/* =============================================
+   Panel Tabs (Library | Matches)
+   ============================================= */
+
+.panelTabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border, #404040);
+  background: var(--color-surface-dark, #1f1f1f);
+  border-radius: 12px 12px 0 0;
+}
+
+.panelTab {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-muted, #a3a3a3);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.panelTab:hover {
+  color: var(--color-text, #e5e5e5);
+}
+
+.panelTabActive {
+  color: var(--color-accent, #3b82f6);
+  border-bottom-color: var(--color-accent, #3b82f6);
+  font-weight: 600;
+}
+
+.matchesBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--color-accent, #3b82f6);
+  color: #fff;
+  border-radius: 9px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* =============================================
+   Library Tab - Column Picker
+   ============================================= */
+
 /* Column headers */
 .headers {
   display: grid;
   grid-template-columns: 80px 100px 1fr;
   border-bottom: 1px solid var(--color-border, #404040);
   background: var(--color-surface-dark, #1f1f1f);
-  border-radius: 12px 12px 0 0;
-  padding-top: 0.25rem;
 }
 
 .header {
@@ -152,7 +207,7 @@
   background: var(--color-border, #404040);
 }
 
-/* Apply button */
+/* Apply button (Library tab) */
 .applyButton {
   flex: 1;
   padding: 0.875rem;
@@ -184,6 +239,171 @@
 }
 
 /* =============================================
+   Matches Tab
+   ============================================= */
+
+.matchesContent {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow-y: auto;
+  min-height: 280px;
+  max-height: 400px;
+}
+
+.matchesEmpty {
+  text-align: center;
+  color: #737373;
+  font-size: 14px;
+  padding: 40px 20px;
+  margin: 0;
+}
+
+/* Segmented control (pill toggle) */
+.segmentedControl {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.segment {
+  flex: 1;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: #a3a3a3;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.segment:hover {
+  color: #d4d4d4;
+  background-color: #262626;
+}
+
+.segmentActive {
+  background-color: #333333;
+  color: #fafafa;
+}
+
+.segmentActive:hover {
+  background-color: #333333;
+  color: #fafafa;
+}
+
+/* Guidance text */
+.guidance {
+  font-size: 14px;
+  color: #a3a3a3;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  flex-shrink: 0;
+}
+
+.guidance strong {
+  color: #fafafa;
+  font-weight: 600;
+}
+
+/* Match list */
+.matchesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.matchItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background-color: #333333;
+  border-radius: 8px;
+  gap: 12px;
+}
+
+.matchInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.matchName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fafafa;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.typeTag {
+  font-size: 11px;
+  font-weight: 500;
+  color: #a3a3a3;
+  background-color: #404040;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: lowercase;
+}
+
+.matchIntervals {
+  font-size: 12px;
+  color: #a3a3a3;
+}
+
+.missingText {
+  color: #737373;
+  font-style: italic;
+}
+
+/* Match action buttons */
+.matchApplyButton {
+  padding: 8px 14px;
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.matchApplyButton:hover {
+  background-color: #2563eb;
+}
+
+.matchSetButton {
+  padding: 8px 14px;
+  background-color: #22c55e;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.matchSetButton:hover {
+  background-color: #16a34a;
+}
+
+/* =============================================
    Mobile Styles - Centered modal with margins
    ============================================= */
 
@@ -209,10 +429,13 @@
     font-size: 1rem;
   }
 
+  .panelTab {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
   .headers {
     grid-template-columns: 80px 110px 1fr;
-    padding-top: 0.5rem;
-    border-radius: 12px 12px 0 0;
   }
 
   /* Mobile headers - larger and more prominent than options */
@@ -256,6 +479,17 @@
     padding: 1rem;
     font-size: 1rem;
   }
+
+  .matchesContent {
+    min-height: 200px;
+    padding: 0.75rem;
+    flex: 1;
+  }
+
+  .matchesList {
+    flex: 1;
+    overflow-y: auto;
+  }
 }
 
 /* Animation for type column when family changes */
@@ -275,7 +509,11 @@
 
   .option,
   .previewButton,
-  .applyButton {
+  .applyButton,
+  .panelTab,
+  .segment,
+  .matchApplyButton,
+  .matchSetButton {
     transition: none;
   }
 }
