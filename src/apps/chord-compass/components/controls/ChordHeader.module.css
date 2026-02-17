@@ -85,7 +85,19 @@
   text-align: center;
 }
 
-/* Subtle glow when matches are available — draws attention to the card */
+/* Fade in to strong glow, then settle to subtle */
+@keyframes matchGlowIntro {
+  0% {
+    box-shadow: 0 0 0 0px rgba(59, 130, 246, 0), 0 0 0px 0px rgba(59, 130, 246, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.7), 0 0 20px 4px rgba(59, 130, 246, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 0 6px 0 rgba(59, 130, 246, 0.05);
+  }
+}
+
 @keyframes matchGlow {
   0%, 100% {
     box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 0 6px 0 rgba(59, 130, 246, 0.05);
@@ -96,7 +108,7 @@
 }
 
 .chordCardHasMatches {
-  animation: matchGlow 2.5s ease-in-out infinite;
+  animation: matchGlowIntro 1.5s ease-out, matchGlow 2.5s ease-in-out 1.5s infinite;
 }
 
 /* Mobile Styles */

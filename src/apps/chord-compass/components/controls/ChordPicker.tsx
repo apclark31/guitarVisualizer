@@ -184,6 +184,12 @@ export function ChordPicker({ isOpen, onClose, playNotes, defaultTab }: ChordPic
     if (activeTab !== targetTab) {
       setActiveTab(targetTab);
     }
+    // Default to non-empty sub-tab (e.g., keys after chord apply)
+    if (suggestions.length === 0 && keySuggestions.length > 0) {
+      setMatchesSubTab('keys');
+    } else {
+      setMatchesSubTab('chords');
+    }
   }
   prevIsOpenRef.current = isOpen;
 
@@ -372,16 +378,6 @@ export function ChordPicker({ isOpen, onClose, playNotes, defaultTab }: ChordPic
         />
       )}
       <div ref={pickerRef} className={styles.picker} data-tour="chord-picker">
-        {/* Close button */}
-        <button
-          className={styles.closeButton}
-          onClick={onClose}
-          aria-label="Close picker"
-          data-tour="picker-close"
-        >
-          &#x2715;
-        </button>
-
         {/* Panel tabs */}
         <div className={styles.panelTabs}>
           <button
