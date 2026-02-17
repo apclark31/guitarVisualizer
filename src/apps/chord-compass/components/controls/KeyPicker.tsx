@@ -8,7 +8,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import { useTour } from '../../shared/tour';
+import { useTour } from '../../../../shared/tour';
 import type { KeyType } from '../../config/constants';
 import styles from './KeyPicker.module.css';
 

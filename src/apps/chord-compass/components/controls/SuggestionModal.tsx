@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import { useTour } from '../../shared/tour';
+import { useTour } from '../../../../shared/tour';
 import type { ChordSuggestion, VoicingType, VoicingFilterType, KeySuggestion } from '../../types';
 import styles from './SuggestionModal.module.css';
 

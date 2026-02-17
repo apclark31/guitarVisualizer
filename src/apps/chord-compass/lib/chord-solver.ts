@@ -14,7 +14,7 @@ import {
   QUALITY_TO_SYMBOL,
   TRIAD_PATTERNS,
 } from '../config/constants';
-import { noteToPitchClass, areEnharmonic } from '../shared/lib';
+import { noteToPitchClass, areEnharmonic } from '../../../shared/lib';
 import type { ChordVoicing, FretNumber } from '../types';
 
 /**

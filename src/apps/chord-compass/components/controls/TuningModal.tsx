@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSharedStore } from '../../shared/store';
+import { useSharedStore } from '../../../../shared/store';
 import {
   TUNING_PRESETS,
   TUNING_CATEGORIES,

@@ -15,8 +15,8 @@
 
 import { useState } from 'react';
 import { useScaleStore, useSharedStore, type ScaleType } from '../../store/useScaleStore';
-import { TuningModal } from '../../../../components/controls/TuningModal';
-import { TuningConfirmModal } from '../../../../components/controls/TuningConfirmModal';
+import { TuningModal } from '../../../chord-compass/components/controls/TuningModal';
+import { TuningConfirmModal } from '../../../chord-compass/components/controls/TuningConfirmModal';
 import { encodeTuningForUrl } from '../../../../shared/config/constants';
 import type { TuningChangeMode } from '../../../../shared/types';
 import styles from './ControlPanel.module.css';

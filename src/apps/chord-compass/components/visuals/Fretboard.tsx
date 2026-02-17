@@ -5,9 +5,9 @@
  * passing state as props and handling callbacks.
  */
 
-import { Fretboard as SharedFretboard } from '../../shared/components/Fretboard';
+import { Fretboard as SharedFretboard } from '../../../../shared/components/Fretboard';
 import { useMusicStore } from '../../store/useMusicStore';
-import { useSharedStore } from '../../shared/store';
+import { useSharedStore } from '../../../../shared/store';
 import type { StringIndex } from '../../types';
 
 interface FretboardProps {

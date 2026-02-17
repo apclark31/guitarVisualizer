@@ -2,7 +2,7 @@
 // Re-exports shared constants and adds chord-specific ones
 
 // Import for local use
-import { CHROMATIC_NOTES as SHARED_CHROMATIC_NOTES } from '../shared/config/constants';
+import { CHROMATIC_NOTES as SHARED_CHROMATIC_NOTES } from '../../../shared/config/constants';
 
 // Re-export all shared constants
 export {
@@ -22,9 +22,9 @@ export {
   CHROMATIC_NOTES,
   PLAYBACK_TIMING,
   FRETBOARD_DIMENSIONS,
-} from '../shared/config/constants';
+} from '../../../shared/config/constants';
 
-export type { TuningPreset, TuningCategory } from '../shared/config/constants';
+export type { TuningPreset, TuningCategory } from '../../../shared/config/constants';
 
 // Local alias for use within this file
 const CHROMATIC_NOTES = SHARED_CHROMATIC_NOTES;

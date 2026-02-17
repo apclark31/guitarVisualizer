@@ -18,9 +18,9 @@ import type {
 import { getVoicingsForChord } from '../lib/chord-data';
 import { detectChord } from '../lib/chord-detector';
 import { analyzeVoicing } from '../lib/voicing-analyzer';
-import { detectKeys, getNotesFromGuitarState } from '../shared/lib';
+import { detectKeys, getNotesFromGuitarState } from '../../../shared/lib';
 import { getFamilyForType, FRET_COUNT } from '../config/constants';
-import { useSharedStore } from '../shared/store';
+import { useSharedStore } from '../../../shared/store';
 import { Note } from '@tonaljs/tonal';
 
 /** Initial guitar state - all strings muted */

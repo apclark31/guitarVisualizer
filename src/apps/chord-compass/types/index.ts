@@ -6,7 +6,7 @@ import type {
   FretNumber as SharedFretNumber,
   GuitarStringState as SharedGuitarStringState,
   DisplayMode as SharedDisplayMode,
-} from '../shared/types';
+} from '../../../shared/types';
 
 // Re-export shared types
 export type {
@@ -19,7 +19,7 @@ export type {
   HighlightedNote,
   FretboardConfig,
   Instrument,
-} from '../shared/types';
+} from '../../../shared/types';
 
 // Import constants types for local use
 import type { ChordFamily as SharedChordFamily, KeyType as SharedKeyType } from '../config/constants';
@@ -69,7 +69,7 @@ export interface ChordSuggestion {
 }
 
 // Re-export KeyMatch as KeySuggestion for backward compatibility
-import type { KeyMatch } from '../shared/lib';
+import type { KeyMatch } from '../../../shared/lib';
 export type KeySuggestion = KeyMatch;
 
 /** A calculated chord voicing from the solver */

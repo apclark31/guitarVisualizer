@@ -13,7 +13,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import { useSharedStore } from '../../shared/store';
+import { useSharedStore } from '../../../../shared/store';
 import { Note } from '@tonaljs/tonal';
 import type { StringIndex, PlaybackMode } from '../../types';
 import { ChordPicker } from './ChordPicker';

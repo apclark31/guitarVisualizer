@@ -7,10 +7,10 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import { useSharedStore } from '../../shared/store';
+import { useSharedStore } from '../../../../shared/store';
 import { CHORD_FAMILIES, FAMILY_TO_TYPES, getDiatonicChords } from '../../config/constants';
 import { getVoicingsForChord } from '../../lib/chord-data';
-import { useTour } from '../../shared/tour/TourContext';
+import { useTour } from '../../../../shared/tour/TourContext';
 import { Note } from '@tonaljs/tonal';
 import type { ChordFamily, PlaybackMode } from '../../types';
 import styles from './ChordPicker.module.css';

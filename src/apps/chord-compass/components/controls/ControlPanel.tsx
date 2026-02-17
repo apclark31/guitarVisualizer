@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
-import { useSharedStore } from '../../shared/store';
+import { useSharedStore } from '../../../../shared/store';
 import { TuningModal } from './TuningModal';
 import { TuningConfirmModal } from './TuningConfirmModal';
 import { KeyPicker } from './KeyPicker';

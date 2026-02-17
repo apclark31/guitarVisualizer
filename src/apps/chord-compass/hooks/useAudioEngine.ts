@@ -13,10 +13,10 @@
 
 import { useCallback } from 'react';
 import * as Tone from 'tone';
-import { useSamplerEngine } from '../shared/hooks/useSamplerEngine';
+import { useSamplerEngine } from '../../../shared/hooks/useSamplerEngine';
 import { useMusicStore } from '../store/useMusicStore';
-import { useSharedStore } from '../shared/store';
-import { PLAYBACK_TIMING } from '../shared/config/constants';
+import { useSharedStore } from '../../../shared/store';
+import { PLAYBACK_TIMING } from '../../../shared/config/constants';
 import { Note } from '@tonaljs/tonal';
 import type { StringIndex, PlaybackMode } from '../types';
 

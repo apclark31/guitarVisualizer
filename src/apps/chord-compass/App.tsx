@@ -3,11 +3,11 @@ import * as Tone from 'tone';
 import { Fretboard } from './components/visuals/Fretboard';
 import { ControlPanel } from './components/controls/ControlPanel';
 import { ChordHeader } from './components/controls/ChordHeader';
-import { AppHeader } from './shared/components/layout/AppHeader';
+import { AppHeader } from '../../shared/components/layout/AppHeader';
 import { useMusicStore } from './store/useMusicStore';
 import { useAudioEngine } from './hooks/useAudioEngine';
 import { decodeTuningFromUrl, decodeKeyFromUrl } from './config/constants';
-import { unlockIOSAudio } from './lib/ios-audio-unlock';
+import { unlockIOSAudio } from '../../shared/lib/ios-audio-unlock';
 import type { StringIndex, GuitarStringState } from './types';
 import './App.css';
 

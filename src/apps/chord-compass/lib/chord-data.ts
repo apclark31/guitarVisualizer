@@ -9,7 +9,7 @@ import { Note } from '@tonaljs/tonal';
 import { findChord, type ChordsDbPosition } from '../data/chords-db';
 import { getBestVoicings, solveTriadVoicings } from './chord-solver';
 import { STANDARD_TUNING } from '../config/constants';
-import { areEnharmonic } from '../shared/lib';
+import { areEnharmonic } from '../../../shared/lib';
 import type { ChordVoicing, FretNumber, VoicingFilterType } from '../types';
 
 /**
