@@ -10,7 +10,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { useScaleStore, useSharedStore, type ScaleType, type ScaleSuggestion, type KeyMatch } from '../../store/useScaleStore';
+import { useScaleStore, useSharedStore, type ScaleType, type ScaleSuggestion } from '../../store/useScaleStore';
 import { ROOT_OPTIONS, SCALE_TYPE_DISPLAY, SCALE_CATEGORIES } from '../../lib/scale-data';
 import { getNotesFromMultiNoteState } from '../../../../shared/lib';
 import styles from './ScalePicker.module.css';
