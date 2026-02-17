@@ -103,12 +103,11 @@ const freePlaySteps: TourStep[] = [
   },
   {
     id: 'cc-detection-intro',
-    element: '[data-tour="info-button"]',  // Highlight the (i) button directly
-    position: 'left',
+    element: '[data-tour="chord-card"]',
+    position: 'bottom',
     mobilePosition: 'bottom',
-    waitFor: '[data-tour="info-button"]',  // Wait for (i) button to appear
-    content: `See that <strong>(i) button</strong>? The detection system found chords that match your notes. Tap it to see suggestions.`,
-    action: 'Tap the (i) button',
+    content: `The detection system found chords that match your notes! Tap the <strong>Chord Card</strong> to see them.`,
+    action: 'Tap the Chord Card',
     interactive: true,
   },
   {
