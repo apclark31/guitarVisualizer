@@ -7,7 +7,7 @@
   width: 100%;
   overflow-x: auto;
   background-color: transparent;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 8px 0 12px;
   /* No horizontal padding - string labels align with control panel edge */
 }
@@ -78,7 +78,7 @@
 @media (max-width: 768px) {
   .fretboardContainer {
     padding: 8px 0 12px;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
   }
 
   /* Show scroll hint on mobile */
@@ -95,7 +95,7 @@
       rgba(9, 9, 11, 0.9)
     );
     pointer-events: none;
-    border-radius: 0 12px 12px 0;
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
   }
 
   .scrollHintScrolled {

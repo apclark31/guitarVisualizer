@@ -29,16 +29,16 @@
   width: 320px;
   height: 64px;
   padding: 10px 40px 10px 20px; /* Extra right padding for caret */
-  background-color: #2a2a2a;
+  background-color: var(--surface-container-high);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: background-color 0.15s ease;
   position: relative;
 }
 
 .scaleCard:hover {
-  background-color: #333333;
+  background-color: var(--surface-bright);
 }
 
 .scaleCard:focus {
@@ -53,8 +53,8 @@
   top: 50%;
   width: 7px;
   height: 7px;
-  border-right: 2px solid #a1a1aa;
-  border-bottom: 2px solid #a1a1aa;
+  border-right: 2px solid var(--on-surface-muted);
+  border-bottom: 2px solid var(--on-surface-muted);
   transform: translateY(-70%) rotate(45deg);
   pointer-events: none;
 }
@@ -88,7 +88,7 @@
 .primaryText {
   font-size: 16px;
   font-weight: 500;
-  color: #a1a1aa;
+  color: var(--on-surface-muted);
   text-align: center;
   line-height: 1.3;
 }
@@ -96,25 +96,25 @@
 .primarySelected {
   font-size: 20px;
   font-weight: 600;
-  color: #3b82f6;
+  color: var(--primary);
 }
 
 /* Free-play mode: white notes display */
 .primaryFreeplay {
   font-size: 18px;
   font-weight: 600;
-  color: #fafafa;
+  color: var(--on-primary);
 }
 
 .secondaryText {
   font-size: 13px;
-  color: #71717a;
+  color: var(--on-surface-subtle);
   text-align: center;
 }
 
 /* Free-play mode: suggestion as secondary */
 .secondarySuggestion {
-  color: #3b82f6;
+  color: var(--primary);
   font-weight: 500;
 }
 

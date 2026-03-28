@@ -1,11 +1,8 @@
-/* Control Panel - Simplified layout (voicing filter, tuning, toggles, buttons) */
+/* Control Panel - Card-based layout */
 .controlPanel {
-  background-color: #262626;
-  border-radius: 8px;
-  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
   max-width: 600px;
 }
@@ -19,7 +16,7 @@
 .sectionTitle {
   font-size: 11px;
   font-weight: 600;
-  color: #71717a;
+  color: var(--on-surface-subtle);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0;
@@ -36,10 +33,10 @@
 .navButton {
   width: 28px;
   height: 28px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border: none;
   background-color: transparent;
-  color: #a1a1aa;
+  color: var(--on-surface-muted);
   font-size: 18px;
   font-weight: 500;
   cursor: pointer;
@@ -51,23 +48,23 @@
 }
 
 .navButton:hover:not(:disabled) {
-  color: #ffffff;
+  color: var(--on-primary);
 }
 
 .navButton:disabled {
-  color: #3f3f46;
+  color: var(--surface-bright);
   cursor: not-allowed;
 }
 
 .positionLabel {
   font-size: 14px;
-  color: #a1a1aa;
+  color: var(--on-surface-muted);
   min-width: 80px;
   text-align: center;
 }
 
 .positionLabelInactive {
-  color: #3f3f46;
+  color: var(--surface-bright);
 }
 
 /* Key + Voicing + Tuning row - 3-column split */
@@ -87,17 +84,17 @@
   width: 100%;
   padding: 0 28px 0 12px;
   height: 38px;
-  background: #333333;
-  border: 1px solid #525252;
-  border-radius: 6px;
-  color: #e5e5e5;
+  background: var(--surface-container-high);
+  border: 1px solid var(--outline-hover);
+  border-radius: var(--radius-md);
+  color: var(--on-surface);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .keyButton:hover {
-  border-color: #3b82f6;
+  border-color: var(--primary);
 }
 
 /* Native select arrow style chevron */
@@ -108,8 +105,8 @@
   top: 50%;
   width: 6px;
   height: 6px;
-  border-right: 2px solid #a1a1aa;
-  border-bottom: 2px solid #a1a1aa;
+  border-right: 2px solid var(--on-surface-muted);
+  border-bottom: 2px solid var(--on-surface-muted);
   transform: translateY(-70%) rotate(45deg);
   pointer-events: none;
 }
@@ -128,8 +125,8 @@
   top: 50%;
   width: 6px;
   height: 6px;
-  border-right: 2px solid #a1a1aa;
-  border-bottom: 2px solid #a1a1aa;
+  border-right: 2px solid var(--on-surface-muted);
+  border-bottom: 2px solid var(--on-surface-muted);
   transform: translateY(-70%) rotate(45deg);
   pointer-events: none;
 }
@@ -138,10 +135,10 @@
 .voicingSelect {
   padding: 0 28px 0 12px;
   height: 38px;
-  background: #333333;
-  border: 1px solid #525252;
-  border-radius: 6px;
-  color: #e5e5e5;
+  background: var(--surface-container-high);
+  border: 1px solid var(--outline-hover);
+  border-radius: var(--radius-md);
+  color: var(--on-surface);
   font-size: 13px;
   cursor: pointer;
   transition: border-color 0.15s ease;
@@ -154,12 +151,12 @@
 }
 
 .voicingSelect:hover {
-  border-color: #3b82f6;
+  border-color: var(--primary);
 }
 
 .voicingSelect:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
@@ -172,17 +169,17 @@
   width: 100%;
   padding: 0 28px 0 12px;
   height: 38px;
-  background: #333333;
-  border: 1px solid #525252;
-  border-radius: 6px;
-  color: #e5e5e5;
+  background: var(--surface-container-high);
+  border: 1px solid var(--outline-hover);
+  border-radius: var(--radius-md);
+  color: var(--on-surface);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .tuningButton:hover {
-  border-color: #3b82f6;
+  border-color: var(--primary);
 }
 
 /* Native select arrow style chevron */
@@ -193,8 +190,8 @@
   top: 50%;
   width: 6px;
   height: 6px;
-  border-right: 2px solid #a1a1aa;
-  border-bottom: 2px solid #a1a1aa;
+  border-right: 2px solid var(--on-surface-muted);
+  border-bottom: 2px solid var(--on-surface-muted);
   transform: translateY(-70%) rotate(45deg);
   pointer-events: none;
 }
@@ -210,14 +207,14 @@
 
 .toggleLabel {
   font-size: 13px;
-  color: #a1a1aa;
+  color: var(--on-surface-muted);
 }
 
 .toggleSwitch {
   position: relative;
   width: 44px;
   height: 24px;
-  background-color: #404040;
+  background-color: var(--outline);
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -225,7 +222,7 @@
 }
 
 .toggleSwitch.active {
-  background-color: #3b82f6;
+  background-color: var(--primary);
 }
 
 .toggleSwitch::after {
@@ -235,7 +232,7 @@
   left: 2px;
   width: 20px;
   height: 20px;
-  background-color: #fff;
+  background-color: var(--on-primary);
   border-radius: 50%;
   transition: transform 0.2s ease;
 }
@@ -247,10 +244,10 @@
 /* Action buttons */
 .playButton {
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   border: none;
-  background-color: #22c55e;
-  color: #fff;
+  background-color: var(--success);
+  color: var(--on-primary);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -259,7 +256,7 @@
 }
 
 .playButton:hover:not(:disabled) {
-  background-color: #16a34a;
+  background-color: var(--success-hover);
 }
 
 .playButton:active:not(:disabled) {
@@ -267,17 +264,17 @@
 }
 
 .playButton:disabled {
-  background-color: #404040;
-  color: #737373;
+  background-color: var(--outline);
+  color: var(--on-surface-subtle);
   cursor: not-allowed;
 }
 
 .clearButton {
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   border: none;
-  background-color: #404040;
-  color: #e5e5e5;
+  background-color: var(--outline);
+  color: var(--on-surface);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -286,21 +283,21 @@
 }
 
 .clearButton:hover:not(:disabled) {
-  background-color: #525252;
+  background-color: var(--outline-hover);
 }
 
 .clearButton:disabled {
-  background-color: #333333;
-  color: #737373;
+  background-color: var(--surface-container-high);
+  color: var(--on-surface-subtle);
   cursor: not-allowed;
 }
 
 .shareButton {
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   border: none;
-  background-color: #404040;
-  color: #e5e5e5;
+  background-color: var(--outline);
+  color: var(--on-surface);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -309,12 +306,12 @@
 }
 
 .shareButton:hover:not(:disabled) {
-  background-color: #525252;
+  background-color: var(--outline-hover);
 }
 
 .shareButton:disabled {
-  background-color: #333333;
-  color: #737373;
+  background-color: var(--surface-container-high);
+  color: var(--on-surface-subtle);
   cursor: not-allowed;
 }
 
@@ -341,10 +338,7 @@
 /* Mobile styles */
 @media (max-width: 768px) {
   .controlPanel {
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: 0;
-    margin: 0;
+    gap: 8px;
     max-width: 100%;
   }
 

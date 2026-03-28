@@ -5,6 +5,10 @@ import { TourProvider } from './shared/tour';
 import './index.css';
 
 // Lazy load apps for code splitting
+const HomepageApp = lazy(() =>
+  import('./apps/homepage').then(module => ({ default: module.HomepageApp }))
+);
+
 const ChordCompassApp = lazy(() =>
   import('./apps/chord-compass').then(module => ({ default: module.ChordCompassApp }))
 );
@@ -21,9 +25,9 @@ function AppLoading() {
       justifyContent: 'center',
       alignItems: 'center',
       height: '100vh',
-      background: '#171717',
-      color: '#a3a3a3',
-      fontFamily: 'Inter, system-ui, sans-serif',
+      background: 'var(--surface)',
+      color: 'var(--on-surface-muted)',
+      fontFamily: 'var(--font-ui)',
     }}>
       Loading...
     </div>
@@ -36,10 +40,10 @@ createRoot(document.getElementById('root')!).render(
       <TourProvider>
         <Suspense fallback={<AppLoading />}>
           <Routes>
+            <Route path="/" element={<HomepageApp />} />
             <Route path="/chordcompass/*" element={<ChordCompassApp />} />
             <Route path="/scalesage/*" element={<ScaleSageApp />} />
-            <Route path="/" element={<Navigate to="/chordcompass/" replace />} />
-            <Route path="*" element={<Navigate to="/chordcompass/" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </TourProvider>

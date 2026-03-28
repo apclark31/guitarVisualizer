@@ -9,10 +9,10 @@
   z-index: 1000;
   width: 280px;
   max-width: 95vw;
-  background: var(--color-surface, #262626);
-  border: 1px solid var(--color-border, #404040);
-  border-radius: 12px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  background: var(--surface-container);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
   display: flex;
   flex-direction: column;
 }
@@ -27,27 +27,27 @@
   right: 0.75rem;
   width: 28px;
   height: 28px;
-  background: var(--color-surface-hover, #333333);
+  background: var(--surface-container-high);
   border: none;
   border-radius: 50%;
-  color: var(--color-text-muted, #a3a3a3);
+  color: var(--on-surface-muted);
   font-size: 0.875rem;
   cursor: pointer;
   z-index: 1;
 }
 
 .closeButton:hover {
-  background: var(--color-border, #404040);
-  color: var(--color-text, #e5e5e5);
+  background: var(--outline);
+  color: var(--on-surface);
 }
 
 /* Column headers */
 .headers {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-bottom: 1px solid var(--color-border, #404040);
-  background: var(--color-surface-dark, #1f1f1f);
-  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid var(--outline);
+  background: var(--surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   padding-top: 0.25rem;
 }
 
@@ -57,7 +57,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-text-muted, #a3a3a3);
+  color: var(--on-surface-muted);
   text-align: left;
 }
 
@@ -74,7 +74,7 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  border-right: 1px solid var(--color-border, #404040);
+  border-right: 1px solid var(--outline);
   scroll-behavior: smooth;
 }
 
@@ -92,12 +92,12 @@
 }
 
 .column::-webkit-scrollbar-thumb {
-  background: var(--color-border, #404040);
+  background: var(--outline);
   border-radius: 3px;
 }
 
 .column::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-hover, #525252);
+  background: var(--outline-hover);
 }
 
 /* Option buttons */
@@ -107,7 +107,7 @@
   padding: 0.625rem 0.75rem;
   background: transparent;
   border: none;
-  color: var(--color-text, #e5e5e5);
+  color: var(--on-surface);
   font-size: 0.875rem;
   text-align: left;
   cursor: pointer;
@@ -117,12 +117,12 @@
 }
 
 .option:hover {
-  background: var(--color-surface-hover, #333333);
+  background: var(--surface-container-high);
 }
 
 .option.active {
-  background: var(--color-accent-bg, rgba(59, 130, 246, 0.15));
-  color: var(--color-accent, #3b82f6);
+  background: var(--primary-bg);
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -130,7 +130,7 @@
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-top: 1px solid var(--color-border, #404040);
+  border-top: 1px solid var(--outline);
 }
 
 /* Clear button */
@@ -140,9 +140,9 @@
   padding: 0.875rem;
   background: transparent;
   border: none;
-  border-right: 1px solid var(--color-border, #404040);
-  border-radius: 0 0 0 12px;
-  color: var(--color-text-muted, #a3a3a3);
+  border-right: 1px solid var(--outline);
+  border-radius: 0 0 0 var(--radius-lg);
+  color: var(--on-surface-muted);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -150,8 +150,8 @@
 }
 
 .clearButton:hover {
-  background: var(--color-surface-hover, #333333);
-  color: var(--color-text, #e5e5e5);
+  background: var(--surface-container-high);
+  color: var(--on-surface);
 }
 
 /* Apply button */
@@ -159,10 +159,10 @@
   display: block;
   width: 100%;
   padding: 0.875rem;
-  background: var(--color-accent, #3b82f6);
+  background: var(--primary);
   border: none;
-  border-radius: 0 0 12px 0;
-  color: white;
+  border-radius: 0 0 var(--radius-lg) 0;
+  color: var(--on-primary);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -170,7 +170,7 @@
 }
 
 .applyButton:hover {
-  background: var(--color-accent-hover, #2563eb);
+  background: var(--primary-hover);
 }
 
 .applyButton:focus {
@@ -201,7 +201,7 @@
     max-width: 80%;
     max-height: 60%;
     transform: none;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
   }
@@ -214,7 +214,7 @@
 
   .headers {
     padding-top: 0.5rem;
-    border-radius: 12px 12px 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
 
   /* Mobile headers - larger and more prominent than options */
@@ -223,7 +223,7 @@
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: #a1a1aa;
+    color: var(--on-surface-muted);
   }
 
   .columns {

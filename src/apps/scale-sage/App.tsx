@@ -11,6 +11,9 @@ import { useScaleStore, useSharedStore, type ScaleType } from './store/useScaleS
 import { useScaleAudioEngine } from './hooks/useScaleAudioEngine';
 import { AppHeader } from '../../shared/components/layout/AppHeader';
 import { Fretboard } from '../../shared/components/Fretboard';
+import { Card } from '../../shared/components/Card';
+import { IntervalMap } from '../../shared/components/IntervalMap';
+import type { IntervalEntry } from '../../shared/components/IntervalMap';
 import { ScaleHeader } from './components/ScaleHeader';
 import { ControlPanel } from './components/ControlPanel';
 import type { GuitarStringState, HighlightedNote, StringIndex } from '../../shared/types';
@@ -19,7 +22,7 @@ import { getPositionNotes, getPlaybackNotesWithPositions, type PlaybackNoteWithP
 import { decodeTuningFromUrl } from '../../shared/config/constants';
 import { getNoteAtPosition } from '../../shared/lib';
 import { COLORS } from '../../shared/config/theme';
-import { Note } from '@tonaljs/tonal';
+import { Note, Interval } from '@tonaljs/tonal';
 import styles from './App.module.css';
 
 // Empty guitar state for display-only mode
@@ -152,6 +155,40 @@ function ScaleSageApp() {
   // Use scale notes when scale selected, free-play notes otherwise
   const highlightedNotes = hasScale ? scaleHighlightedNotes : freePlayHighlightedNotes;
 
+  // Derive interval entries for IntervalMap (deduplicated by interval)
+  const intervalEntries: IntervalEntry[] = useMemo(() => {
+    if (!hasScale || highlightedNotes.length === 0) return [];
+
+    const seen = new Set<string>();
+    const entries: IntervalEntry[] = [];
+
+    for (const hn of highlightedNotes) {
+      if (!hn.interval || seen.has(hn.interval)) continue;
+      seen.add(hn.interval);
+
+      const semitones = Interval.semitones(hn.interval) ?? 0;
+
+      // Build display label from interval string
+      const match = hn.interval.match(/^(\d+)(.*)/);
+      let label = hn.interval;
+      if (match) {
+        const degree = match[1];
+        const quality = match[2];
+        if (degree === '1') label = 'R';
+        else if (quality === 'P' || quality === 'M') label = degree;
+        else if (quality === 'm') label = `\u266D${degree}`;
+        else if (quality === 'A') label = `\u266F${degree}`;
+        else if (quality === 'd') label = degree === '5' ? '\u266D5' : `\u266D\u266D${degree}`;
+        else label = degree;
+      }
+
+      entries.push({ label, note: hn.note, semitones });
+    }
+
+    entries.sort((a, b) => a.semitones - b.semitones);
+    return entries;
+  }, [hasScale, highlightedNotes]);
+
   // Get playback notes with positions (sorted for audio + visual sync)
   const playbackNotesWithPositions: PlaybackNoteWithPosition[] = useMemo(() => {
     if (highlightedNotes.length === 0) return [];
@@ -227,6 +264,11 @@ function ScaleSageApp() {
 
         {/* Control Panel */}
         <div className={styles.controlsBar}>
+          {intervalEntries.length > 0 && (
+            <Card title="Interval Map" className={styles.intervalMapCard}>
+              <IntervalMap intervals={intervalEntries} />
+            </Card>
+          )}
           <ControlPanel
             isAudioLoaded={isLoaded}
             playScale={handlePlayScale}

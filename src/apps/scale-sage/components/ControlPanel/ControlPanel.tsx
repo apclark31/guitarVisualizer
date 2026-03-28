@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { useScaleStore, useSharedStore, type ScaleType } from '../../store/useScaleStore';
 import { TuningModal } from '../../../chord-compass/components/controls/TuningModal';
 import { TuningConfirmModal } from '../../../chord-compass/components/controls/TuningConfirmModal';
+import { Card } from '../../../../shared/components/Card';
 import { encodeTuningForUrl } from '../../../../shared/config/constants';
 import type { TuningChangeMode } from '../../../../shared/types';
 import styles from './ControlPanel.module.css';
@@ -169,76 +170,79 @@ export function ControlPanel({ isAudioLoaded, playScale, playNote }: ControlPane
 
   return (
     <div className={styles.controlPanel}>
-      {/* Row 1: Position Navigation */}
-      <div className={styles.positionRow}>
-        <button
-          onClick={handlePrevPosition}
-          disabled={!hasScale || currentPosition === 0}
-          className={styles.navButton}
-          aria-label="Previous position"
-        >
-          &lt;
-        </button>
-        <span className={`${styles.positionLabel} ${!hasScale ? styles.positionLabelInactive : ''} ${isFreePlayMode ? styles.positionLabelFreePlay : ''}`}>
-          {getPositionLabel()}
-        </span>
-        <button
-          onClick={handleNextPosition}
-          disabled={!hasScale || currentPosition >= positionCount}
-          className={styles.navButton}
-          aria-label="Next position"
-        >
-          &gt;
-        </button>
-      </div>
-
-      {/* Row 2: Tuning */}
-      <div className={styles.tuningRow}>
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Tuning</h3>
+      {/* Setup Card: Position nav + Tuning */}
+      <Card title="Setup">
+        <div className={styles.positionRow}>
           <button
-            className={styles.tuningButton}
-            onClick={() => setShowTuningModal(true)}
+            onClick={handlePrevPosition}
+            disabled={!hasScale || currentPosition === 0}
+            className={styles.navButton}
+            aria-label="Previous position"
           >
-            {tuningName}
+            &lt;
+          </button>
+          <span className={`${styles.positionLabel} ${!hasScale ? styles.positionLabelInactive : ''} ${isFreePlayMode ? styles.positionLabelFreePlay : ''}`}>
+            {getPositionLabel()}
+          </span>
+          <button
+            onClick={handleNextPosition}
+            disabled={!hasScale || currentPosition >= positionCount}
+            className={styles.navButton}
+            aria-label="Next position"
+          >
+            &gt;
           </button>
         </div>
-      </div>
 
-      {/* Row 3: Toggles (Display + Playback Direction) */}
-      <div className={styles.togglesRow}>
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Display</h3>
-          <div className={styles.toggleRow}>
-            <span className={styles.toggleLabel}>Intervals</span>
-            <div
-              className={`${styles.toggleSwitch} ${displayMode === 'intervals' ? styles.active : ''}`}
-              onClick={toggleDisplayMode}
-              role="switch"
-              aria-checked={displayMode === 'intervals'}
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && toggleDisplayMode()}
-            />
+        <div className={styles.tuningRow}>
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Tuning</h3>
+            <button
+              className={styles.tuningButton}
+              onClick={() => setShowTuningModal(true)}
+            >
+              {tuningName}
+            </button>
           </div>
         </div>
+      </Card>
 
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Direction</h3>
-          <div className={styles.toggleRow}>
-            <span className={styles.toggleLabel}>Descending</span>
-            <div
-              className={`${styles.toggleSwitch} ${playbackDirection === 'descending' ? styles.active : ''}`}
-              onClick={togglePlaybackDirection}
-              role="switch"
-              aria-checked={playbackDirection === 'descending'}
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && togglePlaybackDirection()}
-            />
+      {/* Display Card: Toggles */}
+      <Card title="Display">
+        <div className={styles.togglesRow}>
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Intervals</h3>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Show</span>
+              <div
+                className={`${styles.toggleSwitch} ${displayMode === 'intervals' ? styles.active : ''}`}
+                onClick={toggleDisplayMode}
+                role="switch"
+                aria-checked={displayMode === 'intervals'}
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && toggleDisplayMode()}
+              />
+            </div>
+          </div>
+
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Direction</h3>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Descending</span>
+              <div
+                className={`${styles.toggleSwitch} ${playbackDirection === 'descending' ? styles.active : ''}`}
+                onClick={togglePlaybackDirection}
+                role="switch"
+                aria-checked={playbackDirection === 'descending'}
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && togglePlaybackDirection()}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </Card>
 
-      {/* Row 4: Action Buttons */}
+      {/* Action Buttons — outside cards */}
       <div className={styles.buttonsRow}>
         <button
           onClick={playScale}

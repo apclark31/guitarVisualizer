@@ -37,23 +37,31 @@
   align-items: center;
 }
 
-/* Controls Bar - horizontal on desktop */
+/* Controls Bar */
 .controlsBar {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 /* Footer */
 .footer {
   text-align: center;
   padding: 12px;
-  color: #52525b;
+  color: var(--on-surface-subtle);
   font-size: 13px;
   margin-top: auto; /* Push to bottom */
 }
 
 .footer p {
   margin: 0;
+}
+
+/* Interval Map card - match control panel width */
+.intervalMapCard {
+  width: 100%;
+  max-width: 600px;
 }
 
 /* Mobile Layout */

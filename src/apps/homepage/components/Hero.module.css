@@ -1,0 +1,137 @@
+.hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 140px 24px 80px;
+  display: flex;
+  align-items: center;
+  gap: 64px;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.headline {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin: 0 0 20px;
+  color: var(--hp-text);
+}
+
+.accent {
+  color: var(--hp-primary);
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--hp-text-muted);
+  margin: 0 0 36px;
+  max-width: 520px;
+}
+
+.ctas {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 28px;
+  background: var(--hp-primary);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+.primaryBtn:hover {
+  background: var(--hp-primary-hover);
+  transform: translateY(-1px);
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 28px;
+  background: transparent;
+  color: var(--hp-text);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid var(--hp-border);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.secondaryBtn:hover {
+  border-color: var(--hp-primary);
+  transform: translateY(-1px);
+}
+
+.visual {
+  flex: 0 0 400px;
+}
+
+.placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--hp-primary) 15%, transparent),
+    color-mix(in srgb, var(--hp-primary) 5%, transparent)
+  );
+  border: 1px solid var(--hp-border);
+}
+
+@media (max-width: 960px) {
+  .hero {
+    flex-direction: column;
+    padding: 120px 20px 56px;
+    gap: 40px;
+    text-align: center;
+  }
+
+  .headline {
+    font-size: 2.5rem;
+  }
+
+  .subtitle {
+    max-width: none;
+    font-size: 1.05rem;
+  }
+
+  .ctas {
+    justify-content: center;
+  }
+
+  .visual {
+    flex: none;
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .headline {
+    font-size: 2rem;
+  }
+
+  .ctas {
+    flex-direction: column;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    justify-content: center;
+    width: 100%;
+  }
+}

@@ -1,0 +1,63 @@
+/* Homepage Theme Bridge — maps --hp-* to global design tokens */
+/* Homepage keeps its own green primary for branding distinction */
+
+.homepage {
+  min-height: 100vh;
+  font-family: var(--font-ui);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light theme */
+.homepage[data-theme='light'] {
+  --hp-bg: var(--surface-base);
+  --hp-bg-alt: var(--surface);
+  --hp-surface: var(--surface-base);
+  --hp-text: var(--on-surface);
+  --hp-text-muted: var(--on-surface-muted);
+  --hp-border: var(--outline);
+  --hp-primary: #006e37;
+  --hp-primary-hover: #005a2d;
+  --hp-nav-bg: rgba(255, 255, 255, 0.85);
+  --hp-card-shadow: var(--shadow-card);
+  --hp-card-shadow-hover: var(--shadow-elevated);
+}
+
+/* Dark theme */
+.homepage[data-theme='dark'] {
+  --hp-bg: var(--surface-base);
+  --hp-bg-alt: var(--surface);
+  --hp-surface: var(--surface-container);
+  --hp-text: var(--on-primary);
+  --hp-text-muted: var(--on-surface-muted);
+  --hp-border: var(--surface-container-high);
+  --hp-primary: var(--success);
+  --hp-primary-hover: var(--success-hover);
+  --hp-nav-bg: rgba(0, 0, 0, 0.85);
+  --hp-card-shadow: var(--shadow-card);
+  --hp-card-shadow-hover: var(--shadow-elevated);
+}
+
+.homepage {
+  background-color: var(--hp-bg);
+  color: var(--hp-text);
+}
+
+/* Headline font */
+.homepage h1,
+.homepage h2,
+.homepage h3 {
+  font-family: var(--font-display);
+}
+
+/* Shared section padding */
+.section {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 56px 20px;
+  }
+}

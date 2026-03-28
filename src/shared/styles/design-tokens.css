@@ -1,0 +1,111 @@
+/**
+ * Design Tokens — CSS Custom Properties
+ *
+ * Derived from design-tokens.ts. Dark theme is the default.
+ * Light theme overrides surface, text, outline, and shadow tokens.
+ * Primary, interval, fretboard, typography, spacing, and radius stay constant.
+ */
+
+:root,
+[data-theme="dark"] {
+  /* Surfaces */
+  --surface-base: #000000;
+  --surface: #121212;
+  --surface-container: #1a1a1a;
+  --surface-container-high: #232323;
+  --surface-bright: #2c2c2c;
+
+  /* Text */
+  --on-surface: #e5e5e5;
+  --on-surface-muted: #a3a3a3;
+  --on-surface-subtle: #737373;
+  --on-primary: #ffffff;
+
+  /* Primary */
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-dim: #1d4ed8;
+  --primary-bg: rgba(59,130,246,0.15);
+
+  /* Intervals */
+  --interval-root: #ef4444;
+  --interval-third: #3b82f6;
+  --interval-fifth: #22c55e;
+  --interval-seventh: #eab308;
+  --interval-extension: #a855f7;
+
+  /* Fretboard */
+  --fretboard-wood: #3d3533;
+  --fretboard-fret: #d4d4d8;
+  --fretboard-nut: #fafaf9;
+  --fretboard-string: #d4d4d8;
+  --fretboard-marker: #292524;
+  --fretboard-background: #1c1917;
+
+  /* Semantic */
+  --success: #22c55e;
+  --success-hover: #16a34a;
+  --danger: #ef4444;
+
+  /* Outlines */
+  --outline-ghost: rgba(72,72,71,0.15);
+  --outline: #404040;
+  --outline-hover: #525252;
+
+  /* Typography */
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --text-display-lg: 3.5rem;
+  --text-headline-md: 1.75rem;
+  --text-title-md: 1.125rem;
+  --text-body-md: 0.875rem;
+  --text-body-sm: 0.8125rem;
+  --text-label-sm: 0.6875rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-ambient: 0px 20px 40px rgba(59,130,246,0.06);
+  --shadow-elevated: 0px 8px 24px rgba(0,0,0,0.3);
+  --shadow-card: 0px 1px 3px rgba(0,0,0,0.2);
+}
+
+[data-theme="light"] {
+  /* Surfaces */
+  --surface-base: #ffffff;
+  --surface: #f5f5f5;
+  --surface-container: #ebebeb;
+  --surface-container-high: #e0e0e0;
+  --surface-bright: #d6d6d6;
+
+  /* Text */
+  --on-surface: #1a1a1a;
+  --on-surface-muted: #525252;
+  --on-surface-subtle: #737373;
+
+  /* Outlines */
+  --outline-ghost: rgba(0,0,0,0.08);
+  --outline: #d4d4d4;
+  --outline-hover: #a3a3a3;
+
+  /* Shadows */
+  --shadow-ambient: 0px 20px 40px rgba(59,130,246,0.04);
+  --shadow-elevated: 0px 8px 24px rgba(0,0,0,0.1);
+  --shadow-card: 0px 1px 3px rgba(0,0,0,0.08);
+
+  /* Primary, intervals, fretboard, typography, spacing, radius unchanged */
+}

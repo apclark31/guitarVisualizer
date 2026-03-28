@@ -4,6 +4,7 @@ import { useSharedStore } from '../../../../shared/store';
 import { TuningModal } from './TuningModal';
 import { TuningConfirmModal } from './TuningConfirmModal';
 import { KeyPicker } from './KeyPicker';
+import { Card } from '../../../../shared/components/Card';
 import { encodeTuningForUrl, encodeKeyForUrl, VOICING_FILTER_OPTIONS } from '../../config/constants';
 import type { StringIndex, TuningChangeMode, VoicingFilterType, PlaybackMode } from '../../types';
 import styles from './ControlPanel.module.css';
@@ -154,117 +155,120 @@ export function ControlPanel({ isAudioLoaded, playChord, playNote }: ControlPane
 
   return (
     <div className={styles.controlPanel} data-tour="control-panel">
-      {/* Row 1: Position Navigation */}
-      <div className={styles.positionRow} data-tour="position-nav">
-        <button
-          onClick={handlePrevVoicing}
-          disabled={isFreeFormMode || currentVoicingIndex === 0 || availableVoicings.length === 0}
-          className={styles.navButton}
-          aria-label="Previous voicing"
-        >
-          &lt;
-        </button>
-        <span className={`${styles.positionLabel} ${isFreeFormMode ? styles.positionLabelInactive : ''}`}>
-          {isFreeFormMode ? (
-            'Position'
-          ) : isCustomShape ? (
-            'Custom'
-          ) : availableVoicings.length > 0 ? (
-            `${currentVoicingIndex + 1} of ${availableVoicings.length}`
-          ) : (
-            'Position'
-          )}
-        </span>
-        <button
-          onClick={handleNextVoicing}
-          disabled={
-            isFreeFormMode ||
-            currentVoicingIndex >= availableVoicings.length - 1 ||
-            availableVoicings.length === 0
-          }
-          className={styles.navButton}
-          aria-label="Next voicing"
-        >
-          &gt;
-        </button>
-      </div>
-
-      {/* Row 2: Key + Voicing Filter + Tuning */}
-      <div className={styles.keyVoicingTuningRow}>
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Key</h3>
+      {/* Setup Card: Position nav + Key/Voicing/Tuning */}
+      <Card title="Setup">
+        <div className={styles.positionRow} data-tour="position-nav">
           <button
-            className={styles.keyButton}
-            onClick={() => setShowKeyModal(true)}
-            data-tour="key-button"
+            onClick={handlePrevVoicing}
+            disabled={isFreeFormMode || currentVoicingIndex === 0 || availableVoicings.length === 0}
+            className={styles.navButton}
+            aria-label="Previous voicing"
           >
-            {keyDisplayText}
+            &lt;
+          </button>
+          <span className={`${styles.positionLabel} ${isFreeFormMode ? styles.positionLabelInactive : ''}`}>
+            {isFreeFormMode ? (
+              'Position'
+            ) : isCustomShape ? (
+              'Custom'
+            ) : availableVoicings.length > 0 ? (
+              `${currentVoicingIndex + 1} of ${availableVoicings.length}`
+            ) : (
+              'Position'
+            )}
+          </span>
+          <button
+            onClick={handleNextVoicing}
+            disabled={
+              isFreeFormMode ||
+              currentVoicingIndex >= availableVoicings.length - 1 ||
+              availableVoicings.length === 0
+            }
+            className={styles.navButton}
+            aria-label="Next voicing"
+          >
+            &gt;
           </button>
         </div>
 
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Voicing</h3>
-          <div className={styles.selectWrapper}>
-            <select
-              value={voicingTypeFilter}
-              onChange={handleVoicingFilterChange}
-              className={styles.voicingSelect}
+        <div className={styles.keyVoicingTuningRow}>
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Key</h3>
+            <button
+              className={styles.keyButton}
+              onClick={() => setShowKeyModal(true)}
+              data-tour="key-button"
             >
-              {VOICING_FILTER_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              {keyDisplayText}
+            </button>
+          </div>
+
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Voicing</h3>
+            <div className={styles.selectWrapper}>
+              <select
+                value={voicingTypeFilter}
+                onChange={handleVoicingFilterChange}
+                className={styles.voicingSelect}
+              >
+                {VOICING_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Tuning</h3>
+            <button
+              className={styles.tuningButton}
+              onClick={() => setShowTuningModal(true)}
+              data-tour="tuning-button"
+            >
+              {tuningName}
+            </button>
           </div>
         </div>
+      </Card>
 
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Tuning</h3>
-          <button
-            className={styles.tuningButton}
-            onClick={() => setShowTuningModal(true)}
-            data-tour="tuning-button"
-          >
-            {tuningName}
-          </button>
-        </div>
-      </div>
+      {/* Display Card: Toggles */}
+      <Card title="Display">
+        <div className={styles.togglesRow}>
+          <div className={styles.section} data-tour="display-toggle">
+            <h3 className={styles.sectionTitle}>Intervals</h3>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Show</span>
+              <div
+                className={`${styles.toggleSwitch} ${displayMode === 'intervals' ? styles.active : ''}`}
+                onClick={toggleDisplayMode}
+                role="switch"
+                aria-checked={displayMode === 'intervals'}
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && toggleDisplayMode()}
+              />
+            </div>
+          </div>
 
-      {/* Row 2: Toggles (Display + Playback side by side) */}
-      <div className={styles.togglesRow}>
-        <div className={styles.section} data-tour="display-toggle">
-          <h3 className={styles.sectionTitle}>Display</h3>
-          <div className={styles.toggleRow}>
-            <span className={styles.toggleLabel}>Intervals</span>
-            <div
-              className={`${styles.toggleSwitch} ${displayMode === 'intervals' ? styles.active : ''}`}
-              onClick={toggleDisplayMode}
-              role="switch"
-              aria-checked={displayMode === 'intervals'}
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && toggleDisplayMode()}
-            />
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Playback</h3>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Block</span>
+              <div
+                className={`${styles.toggleSwitch} ${playbackMode === 'block' ? styles.active : ''}`}
+                onClick={togglePlaybackMode}
+                role="switch"
+                aria-checked={playbackMode === 'block'}
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && togglePlaybackMode()}
+              />
+            </div>
           </div>
         </div>
+      </Card>
 
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Playback</h3>
-          <div className={styles.toggleRow}>
-            <span className={styles.toggleLabel}>Block</span>
-            <div
-              className={`${styles.toggleSwitch} ${playbackMode === 'block' ? styles.active : ''}`}
-              onClick={togglePlaybackMode}
-              role="switch"
-              aria-checked={playbackMode === 'block'}
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && togglePlaybackMode()}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Row 3: Action Buttons */}
+      {/* Action Buttons — outside cards */}
       <div className={styles.buttonsRow}>
         <button
           onClick={() => playChord()}

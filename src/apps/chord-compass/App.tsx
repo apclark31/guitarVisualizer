@@ -1,20 +1,75 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import * as Tone from 'tone';
+import { Note } from '@tonaljs/tonal';
 import { Fretboard } from './components/visuals/Fretboard';
 import { ControlPanel } from './components/controls/ControlPanel';
 import { ChordHeader } from './components/controls/ChordHeader';
 import { AppHeader } from '../../shared/components/layout/AppHeader';
+import { Card } from '../../shared/components/Card';
+import { IntervalMap } from '../../shared/components/IntervalMap';
+import type { IntervalEntry } from '../../shared/components/IntervalMap';
 import { useMusicStore } from './store/useMusicStore';
+import { useSharedStore } from '../../shared/store';
 import { useAudioEngine } from './hooks/useAudioEngine';
 import { decodeTuningFromUrl, decodeKeyFromUrl } from './config/constants';
 import { unlockIOSAudio } from '../../shared/lib/ios-audio-unlock';
+import { getNoteAtPosition } from '../../shared/lib';
 import type { StringIndex, GuitarStringState } from './types';
 import './App.css';
 
+/** Semitone → interval label map */
+const INTERVAL_LABELS: Record<number, string> = {
+  0: 'R', 1: '\u266D2', 2: '2', 3: '\u266D3', 4: '3',
+  5: '4', 6: '\u266D5', 7: '5', 8: '\u266F5', 9: '6',
+  10: '\u266D7', 11: '7',
+};
+
 function App() {
-  const { restoreFromUrl } = useMusicStore();
+  const { restoreFromUrl, guitarStringState: ccGuitarState, targetRoot, detectedChord } = useMusicStore();
+  const { tuning } = useSharedStore();
   const audioWarmedRef = useRef(false);
   const { isLoaded, playChord, playFretNote, playNote, playNotes } = useAudioEngine();
+
+  // Compute interval entries for IntervalMap
+  const intervalEntries: IntervalEntry[] = useMemo(() => {
+    const rootNote = targetRoot || detectedChord?.bassNote || null;
+    if (!rootNote) return [];
+
+    const seen = new Set<number>();
+    const entries: IntervalEntry[] = [];
+    const rootMidi = Note.midi(rootNote + '4') || 60;
+
+    for (let s = 0; s < 6; s++) {
+      const fret = ccGuitarState[s as StringIndex];
+      if (fret === null) continue;
+
+      const fullNote = getNoteAtPosition(s, fret, tuning);
+      const noteName = Note.pitchClass(fullNote) || fullNote;
+      const noteMidi = Note.midi(fullNote) || 60;
+      const semitones = (noteMidi - rootMidi + 120) % 12;
+
+      if (!seen.has(semitones)) {
+        seen.add(semitones);
+        entries.push({
+          label: INTERVAL_LABELS[semitones] ?? String(semitones),
+          note: noteName,
+          semitones,
+        });
+      }
+    }
+
+    // Sort by semitones (root first)
+    entries.sort((a, b) => a.semitones - b.semitones);
+    return entries;
+  }, [ccGuitarState, targetRoot, detectedChord, tuning]);
+
+  // Set document title for this app
+  useEffect(() => {
+    document.title = 'Chord Compass | Fret Atlas';
+    return () => {
+      document.title = 'Fret Atlas';
+    };
+  }, []);
 
   // Parse URL params on mount to restore shared chord
   useEffect(() => {
@@ -130,6 +185,11 @@ function App() {
         </main>
 
         <div className="controlsBar">
+          {intervalEntries.length > 0 && (
+            <Card title="Interval Map" className="intervalMapCard">
+              <IntervalMap intervals={intervalEntries} />
+            </Card>
+          )}
           <ControlPanel
             isAudioLoaded={isLoaded}
             playChord={playChord}

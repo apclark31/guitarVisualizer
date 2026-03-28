@@ -1,37 +1,40 @@
 // Color theme for the chord visualizer
-// Balanced dark theme - not too dark, warm and inviting
+// Sources values from design-tokens.ts — single source of truth
+// Fretboard SVG rendering needs JS-side values, so this re-exports them.
+
+import { tokens } from './design-tokens';
 
 export const COLORS = {
   // Interval colors (with glow-friendly values)
   intervals: {
-    root: '#ef4444',      // Red
-    third: '#3b82f6',     // Blue
-    fifth: '#22c55e',     // Green
-    seventh: '#eab308',   // Yellow/Gold
-    extension: '#a1a1aa', // Zinc-400 (neutral)
+    root: tokens.color.interval.root,
+    third: tokens.color.interval.third,
+    fifth: tokens.color.interval.fifth,
+    seventh: tokens.color.interval.seventh,
+    extension: tokens.color.interval.extension,
   },
 
   // Fretboard colors (warmer, more visible)
   fretboard: {
-    wood: '#3d3533',        // Warmer brown-gray
-    fret: '#d4d4d8',        // Zinc-300 (brighter silver frets)
-    nut: '#fafaf9',         // Stone-50 (bright bone)
-    string: '#d4d4d8',      // Zinc-300 (brighter strings)
-    marker: '#292524',      // Stone-800 (subtle inset markers)
-    background: '#1c1917',  // Stone-900
+    wood: tokens.color.fretboard.wood,
+    fret: tokens.color.fretboard.fret,
+    nut: tokens.color.fretboard.nut,
+    string: tokens.color.fretboard.string,
+    marker: tokens.color.fretboard.marker,
+    background: tokens.color.fretboard.background,
   },
 
   // UI colors (lighter, more balanced)
   ui: {
-    background: '#171717',  // Neutral-900 (lighter than pure black)
-    surface: '#262626',     // Neutral-800
-    border: '#525252',      // Neutral-600
-    text: '#fafafa',        // Zinc-50
-    textMuted: '#a3a3a3',   // Neutral-400 (brighter muted text)
-    primary: '#3b82f6',     // Blue-500
-    primaryHover: '#2563eb',// Blue-600
-    success: '#22c55e',     // Green-500
-    danger: '#ef4444',      // Red-500
+    background: tokens.color.surface.default,
+    surface: tokens.color.surface.containerHigh,
+    border: tokens.color.outline.hover,
+    text: tokens.color.on.primary,
+    textMuted: tokens.color.on.surfaceMuted,
+    primary: tokens.color.primary.default,
+    primaryHover: tokens.color.primary.hover,
+    success: tokens.color.success,
+    danger: tokens.color.danger,
   },
 } as const;
 

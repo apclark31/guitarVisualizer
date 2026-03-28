@@ -18,10 +18,10 @@
   width: 420px;
   max-width: 95vw;
   max-height: 85vh;
-  background: var(--color-surface, #262626);
-  border: 1px solid var(--color-border, #404040);
-  border-radius: 12px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  background: var(--surface-container);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -33,15 +33,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--color-border, #404040);
-  background: var(--color-surface-dark, #1f1f1f);
+  border-bottom: 1px solid var(--outline);
+  background: var(--surface);
 }
 
 .title {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--color-text, #e5e5e5);
+  color: var(--on-surface);
 }
 
 .closeButton {
@@ -50,23 +50,23 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  background: var(--color-surface-hover, #333333);
+  background: var(--surface-container-high);
   border: none;
   border-radius: 50%;
-  color: var(--color-text-muted, #a3a3a3);
+  color: var(--on-surface-muted);
   font-size: 0.875rem;
   cursor: pointer;
 }
 
 .closeButton:hover {
-  background: var(--color-border, #404040);
-  color: var(--color-text, #e5e5e5);
+  background: var(--outline);
+  color: var(--on-surface);
 }
 
 /* Tabs */
 .tabs {
   display: flex;
-  border-bottom: 1px solid var(--color-border, #404040);
+  border-bottom: 1px solid var(--outline);
 }
 
 .tab {
@@ -75,7 +75,7 @@
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  color: var(--color-text-muted, #a3a3a3);
+  color: var(--on-surface-muted);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -83,12 +83,12 @@
 }
 
 .tab:hover {
-  color: var(--color-text, #e5e5e5);
+  color: var(--on-surface);
 }
 
 .tabActive {
-  color: var(--color-accent, #3b82f6);
-  border-bottom-color: var(--color-accent, #3b82f6);
+  color: var(--primary);
+  border-bottom-color: var(--primary);
 }
 
 /* Content area */
@@ -114,7 +114,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-text-muted, #a3a3a3);
+  color: var(--on-surface-muted);
 }
 
 .categoryPresets {
@@ -131,8 +131,8 @@
   padding: 0.625rem 0.75rem;
   background: transparent;
   border: none;
-  border-radius: 6px;
-  color: var(--color-text, #e5e5e5);
+  border-radius: var(--radius-md);
+  color: var(--on-surface);
   font-size: 0.875rem;
   text-align: left;
   cursor: pointer;
@@ -140,15 +140,15 @@
 }
 
 .presetButton:hover {
-  background: var(--color-surface-hover, #333333);
+  background: var(--surface-container-high);
 }
 
 .presetActive {
-  background: var(--color-accent-bg, rgba(59, 130, 246, 0.15));
+  background: var(--primary-bg);
 }
 
 .presetActive .presetName {
-  color: var(--color-accent, #3b82f6);
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -159,7 +159,7 @@
 .presetNotes {
   font-family: monospace;
   font-size: 0.75rem;
-  color: var(--color-text-muted, #a3a3a3);
+  color: var(--on-surface-muted);
   letter-spacing: 0.05em;
 }
 
@@ -171,7 +171,7 @@
 .customHint {
   margin: 0 0 1rem;
   font-size: 0.8125rem;
-  color: var(--color-text-muted, #a3a3a3);
+  color: var(--on-surface-muted);
   text-align: center;
 }
 
@@ -195,18 +195,18 @@
   justify-content: center;
   width: 32px;
   height: 28px;
-  background: var(--color-surface-hover, #333333);
-  border: 1px solid var(--color-border, #404040);
-  border-radius: 4px;
-  color: var(--color-text-muted, #a3a3a3);
+  background: var(--surface-container-high);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-sm);
+  color: var(--on-surface-muted);
   font-size: 0.625rem;
   cursor: pointer;
   transition: all 0.1s ease;
 }
 
 .arrowButton:hover {
-  background: var(--color-border, #404040);
-  color: var(--color-text, #e5e5e5);
+  background: var(--outline);
+  color: var(--on-surface);
 }
 
 .arrowButton:active {
@@ -220,37 +220,37 @@
   justify-content: center;
   width: 44px;
   height: 48px;
-  background: var(--color-surface-dark, #1f1f1f);
-  border: 1px solid var(--color-border, #404040);
-  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.1s ease;
 }
 
 .noteDisplay:hover {
-  border-color: var(--color-accent, #3b82f6);
+  border-color: var(--primary);
 }
 
 .noteDisplay:active {
-  background: var(--color-accent-bg, rgba(59, 130, 246, 0.15));
+  background: var(--primary-bg);
 }
 
 .notePitch {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--color-text, #e5e5e5);
+  color: var(--on-surface);
   line-height: 1;
 }
 
 .noteOctave {
   font-size: 0.625rem;
-  color: var(--color-text-muted, #a3a3a3);
+  color: var(--on-surface-muted);
   margin-top: 2px;
 }
 
 .stringLabel {
   font-size: 0.625rem;
-  color: var(--color-text-muted, #737373);
+  color: var(--on-surface-subtle);
 }
 
 /* Custom preview */
@@ -260,36 +260,36 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 0.75rem;
-  background: var(--color-surface-dark, #1f1f1f);
-  border-radius: 6px;
+  background: var(--surface);
+  border-radius: var(--radius-md);
 }
 
 .previewLabel {
   font-weight: 600;
-  color: var(--color-accent, #3b82f6);
+  color: var(--primary);
 }
 
 .previewNotes {
   font-family: monospace;
   font-size: 0.8125rem;
-  color: var(--color-text-muted, #a3a3a3);
+  color: var(--on-surface-muted);
   letter-spacing: 0.05em;
 }
 
 /* Footer */
 .footer {
   padding: 0.75rem 1rem;
-  border-top: 1px solid var(--color-border, #404040);
+  border-top: 1px solid var(--outline);
 }
 
 .applyButton {
   display: block;
   width: 100%;
   padding: 0.75rem;
-  background: var(--color-accent, #3b82f6);
+  background: var(--primary);
   border: none;
-  border-radius: 6px;
-  color: white;
+  border-radius: var(--radius-md);
+  color: var(--on-primary);
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
@@ -297,7 +297,7 @@
 }
 
 .applyButton:hover {
-  background: var(--color-accent-hover, #2563eb);
+  background: var(--primary-hover);
 }
 
 /* Mobile styles */
@@ -346,12 +346,12 @@
 }
 
 .content::-webkit-scrollbar-thumb {
-  background: var(--color-border, #404040);
+  background: var(--outline);
   border-radius: 3px;
 }
 
 .content::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-hover, #525252);
+  background: var(--outline-hover);
 }
 
 /* Reduced motion preference */
