@@ -9,7 +9,6 @@
   background-color: transparent;
   border-radius: var(--radius-lg);
   padding: 8px 0 12px;
-  /* No horizontal padding - string labels align with control panel edge */
   /* Hide scrollbar across browsers */
   -ms-overflow-style: none;
   scrollbar-width: none;

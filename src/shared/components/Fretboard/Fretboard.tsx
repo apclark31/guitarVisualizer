@@ -162,6 +162,49 @@ export function Fretboard({
     }
   }, [guitarStringState, highlightedNotes]);
 
+  // Manual touch scroll — SVG click areas prevent native touch scroll on mobile
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let startX = 0;
+    let startScrollLeft = 0;
+    let wasDragged = false;
+
+    const onTouchStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+      startScrollLeft = container.scrollLeft;
+      wasDragged = false;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const dx = e.touches[0].clientX - startX;
+      if (Math.abs(dx) > 5) {
+        wasDragged = true;
+        container.scrollLeft = startScrollLeft - dx;
+      }
+    };
+
+    // Suppress click if the touch was a drag (click fires after touchend)
+    const onClick = (e: MouseEvent) => {
+      if (wasDragged) {
+        e.stopPropagation();
+        e.preventDefault();
+        wasDragged = false;
+      }
+    };
+
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: true });
+    container.addEventListener('click', onClick, { capture: true });
+
+    return () => {
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('click', onClick, { capture: true });
+    };
+  }, []);
+
   // Calculate SVG dimensions (extra 4px bottom padding for fret numbers)
   const width = DIM.PADDING * 2 + DIM.NUT_WIDTH + FRET_COUNT * DIM.FRET_SPACING;
   const height = DIM.PADDING * 2 + (STRING_COUNT - 1) * DIM.STRING_SPACING + 4;

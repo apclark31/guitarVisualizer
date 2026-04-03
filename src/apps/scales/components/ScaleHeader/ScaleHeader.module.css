@@ -21,6 +21,8 @@
   border: none;
   cursor: pointer;
   position: relative;
+  /* Reserve space for tallest state (name + chips + secondary) to prevent DOM shift */
+  min-height: 110px;
 }
 
 .scaleCard:hover {
@@ -31,44 +33,39 @@
   outline: none;
 }
 
+/* All primary text states share the same size to prevent layout shift */
 .primaryText {
-  font-size: 16px;
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
   color: var(--on-surface-muted);
   text-align: center;
   line-height: 1.3;
 }
 
 .primarySelected {
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 700;
   color: var(--on-surface);
+  font-size: 28px;
   letter-spacing: -0.01em;
 }
 
 /* Free-play mode: white notes display */
 .primaryFreeplay {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 700;
   color: var(--on-surface);
 }
 
-/* Chip area — smooth reveal to prevent abrupt jump */
+/* Chip area — fixed height reservation, opacity-only reveal (no layout shift) */
 .chipArea {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  overflow: hidden;
-  transition: max-height 0.25s ease, opacity 0.2s ease;
-  max-height: 0;
+  min-height: 32px;
   opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
 .chipAreaVisible {
-  max-height: 120px;
   opacity: 1;
 }
 
@@ -98,18 +95,15 @@
 
   .scaleCard {
     padding: 6px 12px;
+    min-height: 90px;
   }
 
   .primaryText {
-    font-size: 15px;
+    font-size: 20px;
   }
 
   .primarySelected {
     font-size: 22px;
-  }
-
-  .primaryFreeplay {
-    font-size: 18px;
   }
 
   .secondaryText {
