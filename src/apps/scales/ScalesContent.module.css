@@ -1,0 +1,140 @@
+/* ScalesContent - Mode content layout */
+
+.modeContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px 24px 16px;
+  flex: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Scale Header Card - sits close to fretboard */
+.scaleBar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: -12px;
+}
+
+/* Main Content - fretboard */
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+.visualizer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Play / Share buttons row */
+.buttonsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.playButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 24px;
+  border-radius: var(--radius-lg);
+  border: none;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dim));
+  color: var(--on-primary);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+.playButton:hover:not(:disabled) {
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.playButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.playButton:disabled {
+  background: var(--outline);
+  color: var(--on-surface-subtle);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.shareButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--outline-ghost);
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.shareButton:hover:not(:disabled) {
+  background: var(--surface-bright);
+}
+
+.shareButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.shareButton:disabled {
+  color: var(--on-surface-subtle);
+  cursor: not-allowed;
+}
+
+/* Controls area */
+.controlsArea {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+
+/* Mobile Layout */
+@media (max-width: 767px) {
+  .modeContent {
+    padding: 14px 12px 12px;
+    gap: 8px;
+  }
+
+  .scaleBar {
+    padding: 0;
+  }
+
+  .main {
+    flex: none;
+    padding: 0;
+  }
+
+  /* Reorder: scale header, fretboard, buttons, controls */
+  .scaleBar { order: 1; }
+  .main { order: 2; }
+  .buttonsRow { order: 3; }
+  .controlsArea { order: 4; }
+}

@@ -1,14 +1,13 @@
 /**
- * AppHeader - Transparent header with brand and hamburger menu
+ * AppHeader - Fret Atlas header with brand, mode tabs, and hamburger menu
  *
- * Features:
- * - Dynamic branding based on current app (Chord Compass or Scale Sage)
- * - Hamburger menu that opens drawer from right
- * - Drawer contains nav links with active indicator
+ * Mobile: Shows "Fret Atlas" brand. Desktop: Shows mode tabs (Chords/Scales)
+ * with underline indicator. Hamburger opens drawer with site-wide navigation
+ * (Tour, Feedback, GitHub).
  */
 
 import { useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useTour } from '../../tour';
 import { useTheme } from '../../hooks/useTheme';
 import styles from './AppHeader.module.css';
@@ -16,22 +15,16 @@ import styles from './AppHeader.module.css';
 interface NavItem {
   label: string;
   href: string;
-  icon?: 'github' | 'compass' | 'scaleSage';
+  icon?: 'github';
   comingSoon?: boolean;
-  action?: 'tour'; // Special action instead of navigation
+  action?: 'tour';
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Chord Compass', href: '/chordcompass/', icon: 'compass' },
-  { label: 'Scale Sage', href: '/scalesage/', icon: 'scaleSage' },
   { label: 'Take the Tour', href: '#', action: 'tour' },
   { label: 'Feedback', href: '#', comingSoon: true },
   { label: 'GitHub', href: 'https://github.com/apclark31/guitarVisualizer', icon: 'github' },
 ];
-
-const compassIconUrl = `${import.meta.env.BASE_URL}compass-icon.png`;
-const scaleSageIconUrl = `${import.meta.env.BASE_URL}scale-sage-icon.png`;
-const fretAtlasIconUrl = `${import.meta.env.BASE_URL}fret-atlas-icon.png`;
 
 export function AppHeader() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -39,18 +32,15 @@ export function AppHeader() {
   const { startChordCompassTour } = useTour();
   const { theme, toggleTheme } = useTheme();
 
-  // Determine current app based on path
-  const isScaleSage = location.pathname.startsWith('/scalesage');
-  const currentAppName = isScaleSage ? 'Scale Sage' : 'Chord Compass';
-  const currentAppIcon = isScaleSage ? scaleSageIconUrl : compassIconUrl;
+  // Determine current mode for desktop header
+  const isScalesMode = location.pathname.startsWith('/scales');
 
   const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
   const closeDrawer = () => setIsDrawerOpen(false);
 
   const handleTourClick = () => {
     closeDrawer();
-    // Currently only Chord Compass tour is implemented
-    if (!isScaleSage) {
+    if (!isScalesMode) {
       startChordCompassTour();
     }
   };
@@ -59,8 +49,32 @@ export function AppHeader() {
     <>
       <header className={styles.header}>
         <div className={styles.brand}>
-          <img src={currentAppIcon} alt="" className={isScaleSage ? styles.brandIconLarge : styles.brandIcon} />
-          {currentAppName}
+          <a href="/" className={styles.brandMobile}>
+            <img
+              src={`${import.meta.env.BASE_URL}fret-atlas-logo.png`}
+              alt=""
+              className={styles.brandIcon}
+            />
+            Fret Atlas
+          </a>
+          <div className={styles.brandDesktop}>
+            <NavLink
+              to="/chords/"
+              className={({ isActive }) =>
+                `${styles.modeTab} ${isActive ? styles.modeTabActive : ''}`
+              }
+            >
+              Chords
+            </NavLink>
+            <NavLink
+              to="/scales/"
+              className={({ isActive }) =>
+                `${styles.modeTab} ${isActive ? styles.modeTabActive : ''}`
+              }
+            >
+              Scales
+            </NavLink>
+          </div>
         </div>
         <button
           className={styles.menuButton}
@@ -89,7 +103,6 @@ export function AppHeader() {
       <nav className={`${styles.drawer} ${isDrawerOpen ? styles.drawerOpen : ''}`}>
         <div className={styles.drawerHeader}>
           <div className={styles.drawerBrand}>
-            <img src={fretAtlasIconUrl} alt="" className={styles.drawerBrandIcon} />
             <span>Fret Atlas</span>
           </div>
           <button
@@ -97,20 +110,18 @@ export function AppHeader() {
             onClick={closeDrawer}
             aria-label="Close menu"
           >
-            <span className={styles.closeIcon}>×</span>
+            <span className={styles.closeIcon}>&times;</span>
           </button>
         </div>
         <ul className={styles.navList}>
           {NAV_ITEMS.map((item) => {
-            const isActive = location.pathname.startsWith(item.href.replace(/\/$/, ''));
             const isExternal = item.href.startsWith('http');
             const isTourAction = item.action === 'tour';
-            const isDisabled = item.comingSoon || (item.href === '#' && !isTourAction);
+            const isDisabled = item.comingSoon;
 
-            // Tour action button (only enabled for current app)
+            // Tour action button
             if (isTourAction) {
-              // Disable tour on Scale Sage until implemented
-              const tourDisabled = isScaleSage;
+              const tourDisabled = isScalesMode;
               return (
                 <li key={item.label}>
                   <button
@@ -125,7 +136,7 @@ export function AppHeader() {
               );
             }
 
-            // External links use <a>
+            // External links
             if (isExternal) {
               return (
                 <li key={item.label}>
@@ -157,27 +168,11 @@ export function AppHeader() {
               );
             }
 
-            // Internal links use React Router <Link>
-            return (
-              <li key={item.label}>
-                <Link
-                  to={item.href}
-                  className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
-                  onClick={closeDrawer}
-                >
-                  {item.icon === 'compass' && (
-                    <img src={compassIconUrl} alt="" className={styles.compassIcon} />
-                  )}
-                  {item.icon === 'scaleSage' && (
-                    <img src={scaleSageIconUrl} alt="" className={styles.scaleSageIcon} />
-                  )}
-                  <span>{item.label}</span>
-                </Link>
-              </li>
-            );
+            return null;
           })}
         </ul>
         <div className={styles.drawerFooter}>
+          <span className={styles.drawerVersion}>v2.0</span>
           <button className={styles.themeToggle} onClick={toggleTheme}>
             <span className={styles.themeIcon}>
               {theme === 'dark' ? (

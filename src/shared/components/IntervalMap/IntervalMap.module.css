@@ -1,49 +1,92 @@
-/* IntervalMap — Color-coded interval legend */
+/* IntervalMap — Grid and Inline variants */
+
+/* ── Grid variant (3-column cards) ─────────────────────── */
 
 .map {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  width: 100%;
 }
 
 .entry {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-1);
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-full);
-  flex-shrink: 0;
+  padding: var(--space-3);
+  background: var(--surface-base);
+  border-radius: var(--radius-md);
 }
 
 .label {
-  font-size: var(--text-body-sm);
-  font-weight: 600;
-  color: var(--on-surface);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .note {
-  font-size: var(--text-body-sm);
-  color: var(--on-surface-muted);
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  font-weight: 700;
+  color: var(--on-surface);
 }
 
-/* Mobile */
-@media (max-width: 768px) {
-  .map {
-    gap: var(--space-1) var(--space-2);
+/* ── Inline variant (horizontal chip row) ──────────────── */
+
+.inlineMap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  background: var(--surface-container-high);
+  min-width: 44px;
+}
+
+/* Note-only chip: no label, slightly more compact */
+.chipNoteOnly {
+  padding: 6px 10px;
+}
+
+.chipLabel {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.chipNote {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--on-surface);
+  line-height: 1.3;
+}
+
+@media (max-width: 767px) {
+  .chip {
+    min-width: 38px;
+    padding: 3px 8px;
   }
 
-  .dot {
-    width: 8px;
-    height: 8px;
+  .chipNoteOnly {
+    padding: 5px 8px;
   }
 
-  .label,
-  .note {
-    font-size: var(--text-label-sm);
+  .chipLabel {
+    font-size: 7px;
+  }
+
+  .chipNote {
+    font-size: 13px;
   }
 }

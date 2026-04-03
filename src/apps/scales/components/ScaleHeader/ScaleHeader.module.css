@@ -1,0 +1,118 @@
+/* ScaleHeader - Flat typographic scale display */
+
+.scaleHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 16px 4px;
+  width: 100%;
+}
+
+/* Tappable header area - flat, no card background */
+.scaleCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.scaleCard:hover {
+  background: transparent;
+}
+
+.scaleCard:focus {
+  outline: none;
+}
+
+.primaryText {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--on-surface-muted);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.primarySelected {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--on-surface);
+  letter-spacing: -0.01em;
+}
+
+/* Free-play mode: white notes display */
+.primaryFreeplay {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+/* Chip area — smooth reveal to prevent abrupt jump */
+.chipArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+  max-height: 0;
+  opacity: 0;
+}
+
+.chipAreaVisible {
+  max-height: 120px;
+  opacity: 1;
+}
+
+.secondaryText {
+  font-size: 13px;
+  color: var(--on-surface-subtle);
+  text-align: center;
+  letter-spacing: 0.02em;
+  min-height: 1.3em;
+}
+
+.secondaryHidden {
+  visibility: hidden;
+}
+
+/* Free-play mode: suggestion as secondary */
+.secondarySuggestion {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* Mobile Styles */
+@media (max-width: 767px) {
+  .scaleHeader {
+    padding: 4px 12px 2px;
+  }
+
+  .scaleCard {
+    padding: 6px 12px;
+  }
+
+  .primaryText {
+    font-size: 15px;
+  }
+
+  .primarySelected {
+    font-size: 22px;
+  }
+
+  .primaryFreeplay {
+    font-size: 18px;
+  }
+
+  .secondaryText {
+    font-size: 12px;
+  }
+}

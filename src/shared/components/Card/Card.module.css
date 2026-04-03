@@ -5,16 +5,26 @@
   background-color: var(--surface-container);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
-  box-shadow: var(--shadow-ambient);
+  border: 1px solid var(--outline-ghost);
+  box-shadow: var(--shadow-card), var(--shadow-ambient);
 }
 
 .title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: var(--text-label-sm);
   font-weight: 600;
   color: var(--on-surface-subtle);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 var(--space-3);
+}
+
+.titleIcon {
+  display: flex;
+  align-items: center;
+  opacity: 0.5;
 }
 
 .content {
@@ -24,7 +34,7 @@
 }
 
 /* Mobile */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .card {
     border-radius: var(--radius-md);
     padding: var(--space-3);

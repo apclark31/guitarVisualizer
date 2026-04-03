@@ -34,6 +34,15 @@ export interface HighlightedNote {
   color?: string;
 }
 
+/** Key types (major/minor) */
+export type KeyType = 'major' | 'minor';
+
+/** Key context state */
+export interface KeyContext {
+  root: string;
+  type: KeyType;
+}
+
 /** Mode for changing tuning with notes on fretboard */
 export type TuningChangeMode = 'adapt' | 'keep' | 'clear';
 

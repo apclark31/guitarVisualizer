@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { PlaybackMode, Instrument } from '../types';
+import type { PlaybackMode, Instrument, KeyContext } from '../types';
 import { STANDARD_TUNING } from '../config/constants';
 
 /** Shared state used across Fret Atlas apps */
@@ -14,6 +14,9 @@ export interface SharedState {
   playbackMode: PlaybackMode;
   currentInstrument: Instrument;
 
+  // Key Context (shared across modes)
+  keyContext: KeyContext | null;
+
   // Tuning Actions
   setTuning: (tuning: string[], name: string) => void;
 
@@ -22,6 +25,16 @@ export interface SharedState {
   setVolume: (volume: number) => void;
   setPlaybackMode: (mode: PlaybackMode) => void;
   setInstrument: (instrument: Instrument) => void;
+
+  // Key Context Actions
+  setKeyContext: (keyContext: KeyContext | null) => void;
+
+  // Library Panel
+  isLibraryOpen: boolean;
+  matchCount: number;
+  openLibrary: () => void;
+  closeLibrary: () => void;
+  setMatchCount: (count: number) => void;
 }
 
 /**
@@ -38,6 +51,9 @@ export const useSharedStore = create<SharedState>((set) => ({
   volume: -12, // dB
   playbackMode: 'strum',
   currentInstrument: 'guitar',
+
+  // Key Context
+  keyContext: null,
 
   // Tuning Actions
   setTuning: (tuning: string[], name: string) => {
@@ -60,4 +76,16 @@ export const useSharedStore = create<SharedState>((set) => ({
   setInstrument: (instrument: Instrument) => {
     set({ currentInstrument: instrument });
   },
+
+  // Key Context Actions
+  setKeyContext: (keyContext: KeyContext | null) => {
+    set({ keyContext });
+  },
+
+  // Library Panel
+  isLibraryOpen: false,
+  matchCount: 0,
+  openLibrary: () => set({ isLibraryOpen: true }),
+  closeLibrary: () => set({ isLibraryOpen: false }),
+  setMatchCount: (count: number) => set({ matchCount: count }),
 }));

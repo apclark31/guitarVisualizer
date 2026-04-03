@@ -1,0 +1,102 @@
+/* BottomSheet — iOS-style slide-up panel */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--surface-container);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: 0 -4px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 60px);
+  animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Drag handle touch target area */
+.handleArea {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 8px;
+  cursor: grab;
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+.handleArea:active {
+  cursor: grabbing;
+}
+
+.dragHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--on-surface-subtle);
+  opacity: 0.5;
+}
+
+/* Content fills remaining space */
+.sheetContent {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .sheet {
+    max-height: calc(100dvh - 40px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* ── Desktop (≥768px) ────────────────────────────────────── */
+
+@media (min-width: 768px) {
+  .sheet {
+    /* Account for 240px sidebar */
+    left: 240px;
+    max-width: 600px;
+    margin: 0 auto;
+    right: 0;
+    max-height: 65vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet {
+    animation: none;
+    transition: none;
+  }
+
+  .backdrop {
+    animation: none;
+  }
+}

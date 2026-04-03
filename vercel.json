@@ -1,45 +1,12 @@
 {
   "rewrites": [
-    {
-      "source": "/chordcompass/(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/scalesage",
-      "destination": "/scalesage.html"
-    },
-    {
-      "source": "/scalesage/",
-      "destination": "/scalesage.html"
-    },
-    {
-      "source": "/scalesage/(.*)",
-      "destination": "/scalesage.html"
-    },
-    {
-      "source": "/",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "redirects": [
-    {
-      "source": "/chordCompass",
-      "destination": "/chordcompass/",
-      "permanent": true
-    },
-    {
-      "source": "/chordCompass/",
-      "destination": "/chordcompass/",
-      "permanent": true
-    },
-    {
-      "source": "/chordCompass/:path*",
-      "destination": "/chordcompass/:path*",
-      "permanent": true
-    }
+    { "source": "/chordcompass/:path*", "destination": "/chords/:path*", "permanent": true },
+    { "source": "/chordCompass/:path*", "destination": "/chords/:path*", "permanent": true },
+    { "source": "/scalesage/:path*", "destination": "/scales/:path*", "permanent": true },
+    { "source": "/chordcompass", "destination": "/chords/", "permanent": true },
+    { "source": "/scalesage", "destination": "/scales/", "permanent": true }
   ]
 }

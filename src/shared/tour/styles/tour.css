@@ -292,7 +292,7 @@
   z-index: 1;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .tour-progress {
     top: 10px;
     left: 12px;
@@ -359,7 +359,7 @@
 
 /* ===== Mobile Adjustments ===== */
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   /* Constrain tooltip width on mobile - compact sizing */
   .shepherd-element.shepherd-enabled.fret-atlas-tour {
     max-width: calc(100vw - 24px);

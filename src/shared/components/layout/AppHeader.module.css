@@ -1,27 +1,83 @@
-/* AppHeader - Transparent header with drawer menu */
+/* AppHeader - Sticky glass-blur header with drawer menu */
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
-  background: transparent;
+  padding: 0 24px;
+  height: 56px;
+  background: var(--header-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--outline-ghost);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .brand {
   display: flex;
   align-items: center;
+  gap: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Mobile: show "FRET ATLAS" with icon, Desktop: show mode tabs */
+.brandMobile {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-  font-family: var(--font-ui);
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--on-surface);
-  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: inherit;
 }
 
 .brandIcon {
-  height: 24px;
-  width: auto;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.brandDesktop {
+  display: none;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.modeTab {
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--on-surface-muted);
+  text-decoration: none;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.modeTab:hover {
+  color: var(--on-surface);
+}
+
+.modeTabActive {
+  color: var(--on-surface);
+  font-weight: 600;
+  border-bottom-color: var(--primary);
+}
+
+@media (min-width: 768px) {
+  .brandMobile {
+    display: none;
+  }
+
+  .brandDesktop {
+    display: flex;
+  }
 }
 
 /* Hamburger menu button */
@@ -199,26 +255,19 @@
   height: 18px;
 }
 
-.compassIcon {
-  height: 18px;
-  width: auto;
-}
-
-.scaleSageIcon {
-  height: 28px;
-  width: auto;
-}
-
-/* Larger brand icon for Scale Sage */
-.brandIconLarge {
-  height: 32px;
-  width: auto;
-}
-
-/* Drawer footer with theme toggle */
+/* Drawer footer with version + theme toggle */
 .drawerFooter {
   padding: 12px 20px;
   border-top: 1px solid var(--surface-container-high);
+}
+
+.drawerVersion {
+  display: block;
+  font-size: 10px;
+  color: var(--on-surface-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-bottom: 8px;
 }
 
 .themeToggle {
@@ -250,19 +299,13 @@
 }
 
 /* Mobile adjustments */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .header {
-    padding: 10px 16px;
+    padding: 0 16px;
   }
 
   .brand {
-    font-size: 1.125rem;
-    gap: 6px;
-  }
-
-  .brandIcon {
-    height: 20px;
-    width: auto;
+    font-size: 0.875rem;
   }
 
   .drawer {
@@ -276,7 +319,8 @@
   .overlay,
   .menuButton,
   .closeButton,
-  .navLink {
+  .navLink,
+  .modeTab {
     transition: none;
   }
 }

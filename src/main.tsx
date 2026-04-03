@@ -2,19 +2,20 @@ import { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TourProvider } from './shared/tour';
+import { AppShell } from './shared/components/layout/AppShell';
 import './index.css';
 
-// Lazy load apps for code splitting
+// Lazy load mode content for code splitting
 const HomepageApp = lazy(() =>
   import('./apps/homepage').then(module => ({ default: module.HomepageApp }))
 );
 
-const ChordCompassApp = lazy(() =>
-  import('./apps/chord-compass').then(module => ({ default: module.ChordCompassApp }))
+const ChordsContent = lazy(() =>
+  import('./apps/chords/ChordsContent').then(module => ({ default: module.ChordsContent }))
 );
 
-const ScaleSageApp = lazy(() =>
-  import('./apps/scale-sage').then(module => ({ default: module.ScaleSageApp }))
+const ScalesContent = lazy(() =>
+  import('./apps/scales/ScalesContent').then(module => ({ default: module.ScalesContent }))
 );
 
 // Loading fallback component
@@ -41,9 +42,14 @@ createRoot(document.getElementById('root')!).render(
         <Suspense fallback={<AppLoading />}>
           <Routes>
             <Route path="/" element={<HomepageApp />} />
-            <Route path="/chordcompass/*" element={<ChordCompassApp />} />
-            <Route path="/scalesage/*" element={<ScaleSageApp />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route element={<AppShell />}>
+              <Route path="/chords/*" element={<ChordsContent />} />
+              <Route path="/scales/*" element={<ScalesContent />} />
+            </Route>
+            {/* Legacy redirects */}
+            <Route path="/chordcompass/*" element={<Navigate to="/chords/" replace />} />
+            <Route path="/scalesage/*" element={<Navigate to="/scales/" replace />} />
+            <Route path="*" element={<Navigate to="/chords/" replace />} />
           </Routes>
         </Suspense>
       </TourProvider>

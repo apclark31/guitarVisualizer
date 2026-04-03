@@ -10,6 +10,13 @@
   border-radius: var(--radius-lg);
   padding: 8px 0 12px;
   /* No horizontal padding - string labels align with control panel edge */
+  /* Hide scrollbar across browsers */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.fretboardContainer::-webkit-scrollbar {
+  display: none;
 }
 
 .fretboardSvg {
@@ -75,7 +82,7 @@
 }
 
 /* Mobile styles */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .fretboardContainer {
     padding: 8px 0 12px;
     border-radius: var(--radius-md);

@@ -10,10 +10,11 @@
 [data-theme="dark"] {
   /* Surfaces */
   --surface-base: #000000;
-  --surface: #121212;
-  --surface-container: #1a1a1a;
-  --surface-container-high: #232323;
+  --surface: #0a0a0a;
+  --surface-container: #161616;
+  --surface-container-high: #1e1e1e;
   --surface-bright: #2c2c2c;
+  --surface-input: #1a1a1a;
 
   /* Text */
   --on-surface: #e5e5e5;
@@ -82,6 +83,10 @@
   --shadow-ambient: 0px 20px 40px rgba(59,130,246,0.06);
   --shadow-elevated: 0px 8px 24px rgba(0,0,0,0.3);
   --shadow-card: 0px 1px 3px rgba(0,0,0,0.2);
+
+  /* Glass surfaces */
+  --header-glass: rgba(0,0,0,0.8);
+  --bottomtabs-glass: rgba(0,0,0,0.85);
 }
 
 [data-theme="light"] {
@@ -91,6 +96,7 @@
   --surface-container: #ebebeb;
   --surface-container-high: #e0e0e0;
   --surface-bright: #d6d6d6;
+  --surface-input: #e0e0e0;
 
   /* Text */
   --on-surface: #1a1a1a;
@@ -106,6 +112,10 @@
   --shadow-ambient: 0px 20px 40px rgba(59,130,246,0.04);
   --shadow-elevated: 0px 8px 24px rgba(0,0,0,0.1);
   --shadow-card: 0px 1px 3px rgba(0,0,0,0.08);
+
+  /* Glass surfaces */
+  --header-glass: rgba(255,255,255,0.8);
+  --bottomtabs-glass: rgba(255,255,255,0.85);
 
   /* Primary, intervals, fretboard, typography, spacing, radius unchanged */
 }
