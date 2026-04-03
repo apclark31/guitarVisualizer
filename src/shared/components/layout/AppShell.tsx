@@ -54,6 +54,21 @@ function ScalesIcon() {
   );
 }
 
+/** Harmony icon — connected chord progression bars */
+function HarmonyIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+      {/* Three connected bars suggesting progression flow */}
+      <rect x="2" y="8" width="5" height="8" rx="1.2" />
+      <rect x="9.5" y="6" width="5" height="12" rx="1.2" />
+      <rect x="17" y="9" width="5" height="6" rx="1.2" />
+      {/* Connecting line */}
+      <line x1="7" y1="12" x2="9.5" y2="12" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
+      <line x1="14.5" y1="12" x2="17" y2="12" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
+    </svg>
+  );
+}
+
 /** Library icon — open book */
 function LibraryIcon() {
   return (
@@ -95,6 +110,15 @@ export function AppShell() {
             <ScalesIcon />
             <span>Scales</span>
           </NavLink>
+          <NavLink
+            to="/harmony/"
+            className={({ isActive }) =>
+              `${styles.sidebarLink} ${isActive ? styles.sidebarLinkActive : ''}`
+            }
+          >
+            <HarmonyIcon />
+            <span>Harmony</span>
+          </NavLink>
           <button
             className={`${styles.sidebarLink} ${isLibraryOpen ? styles.sidebarLinkActive : ''}`}
             onClick={openLibrary}
@@ -129,6 +153,15 @@ export function AppShell() {
         >
           <ChordsIcon />
           <span className={styles.tabLabel}>Chords</span>
+        </NavLink>
+        <NavLink
+          to="/harmony/"
+          className={({ isActive }) =>
+            `${styles.tab} ${isActive ? styles.tabActive : ''}`
+          }
+        >
+          <HarmonyIcon />
+          <span className={styles.tabLabel}>Harmony</span>
         </NavLink>
         <button
           className={`${styles.tab} ${isLibraryOpen ? styles.tabActive : ''}`}

@@ -1,0 +1,28 @@
+.timeline {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--outline-ghost) transparent;
+  padding: 4px 0;
+  min-height: 88px;
+}
+
+.timeline::-webkit-scrollbar {
+  height: 4px;
+}
+
+.timeline::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timeline::-webkit-scrollbar-thumb {
+  background: var(--outline-ghost);
+  border-radius: 2px;
+}
+
+.track {
+  display: flex;
+  gap: 8px;
+  min-width: min-content;
+}

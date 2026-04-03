@@ -1,0 +1,85 @@
+.trigger {
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--outline-ghost);
+  background: var(--surface-container);
+  color: var(--on-surface);
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.trigger:hover {
+  background: var(--surface-container-high);
+  border-color: var(--primary);
+}
+
+.sheet {
+  padding: 8px 16px 24px;
+}
+
+.sheetTitle {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.presetCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--outline-ghost);
+  background: var(--surface-container);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.presetCard:hover {
+  border-color: var(--primary);
+  background: var(--surface-container-high);
+}
+
+.presetCard.active {
+  border-color: var(--primary);
+  background: var(--primary-bg);
+}
+
+.presetName {
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.presetDegrees {
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  color: var(--primary);
+}
+
+.presetDesc {
+  font-family: var(--font-ui);
+  font-size: 0.6875rem;
+  color: var(--on-surface-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger,
+  .presetCard {
+    transition: none;
+  }
+}

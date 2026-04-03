@@ -18,6 +18,10 @@ const ScalesContent = lazy(() =>
   import('./apps/scales/ScalesContent').then(module => ({ default: module.ScalesContent }))
 );
 
+const HarmonyContent = lazy(() =>
+  import('./apps/harmony/HarmonyContent').then(module => ({ default: module.HarmonyContent }))
+);
+
 // Loading fallback component
 function AppLoading() {
   return (
@@ -45,6 +49,7 @@ createRoot(document.getElementById('root')!).render(
             <Route element={<AppShell />}>
               <Route path="/chords/*" element={<ChordsContent />} />
               <Route path="/scales/*" element={<ScalesContent />} />
+              <Route path="/harmony/*" element={<HarmonyContent />} />
             </Route>
             {/* Legacy redirects */}
             <Route path="/chordcompass/*" element={<Navigate to="/chords/" replace />} />

@@ -34,6 +34,7 @@ export function AppHeader() {
 
   // Determine current mode for desktop header
   const isScalesMode = location.pathname.startsWith('/scales');
+  const isHarmonyMode = location.pathname.startsWith('/harmony');
 
   const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
   const closeDrawer = () => setIsDrawerOpen(false);
@@ -73,6 +74,14 @@ export function AppHeader() {
               }
             >
               Scales
+            </NavLink>
+            <NavLink
+              to="/harmony/"
+              className={({ isActive }) =>
+                `${styles.modeTab} ${isActive ? styles.modeTabActive : ''}`
+              }
+            >
+              Harmony
             </NavLink>
           </div>
         </div>
@@ -121,7 +130,7 @@ export function AppHeader() {
 
             // Tour action button
             if (isTourAction) {
-              const tourDisabled = isScalesMode;
+              const tourDisabled = isScalesMode || isHarmonyMode;
               return (
                 <li key={item.label}>
                   <button

@@ -1,0 +1,80 @@
+.builder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--on-surface-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chordBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--outline-ghost);
+  background: var(--surface-container);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 52px;
+}
+
+.chordBtn:hover {
+  background: var(--surface-container-high);
+  border-color: var(--primary);
+}
+
+.chordBtn:active {
+  transform: scale(0.96);
+}
+
+.numeral {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.root {
+  font-family: var(--font-ui);
+  font-size: 0.6875rem;
+  color: var(--on-surface-muted);
+}
+
+.customBtn {
+  border-style: dashed;
+  border-color: var(--on-surface-muted);
+}
+
+.customBtn .numeral {
+  font-size: 1.25rem;
+  color: var(--on-surface-muted);
+}
+
+.customBtn:hover {
+  border-color: var(--primary);
+}
+
+.customBtn:hover .numeral {
+  color: var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chordBtn {
+    transition: none;
+  }
+}

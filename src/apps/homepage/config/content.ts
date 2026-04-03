@@ -33,12 +33,11 @@ export const tools: ToolCard[] = [
     color: '#22c55e',
   },
   {
-    name: 'Harmony Hub',
+    name: 'Harmony',
     description:
-      'Build chord progressions, explore harmonic relationships, and bridge chords with scales.',
-    href: '#',
+      'Build chord progressions, explore harmonic relationships, and hear them played back with tempo control.',
+    href: '/harmony/',
     color: '#eab308',
-    comingSoon: true,
   },
 ];
 

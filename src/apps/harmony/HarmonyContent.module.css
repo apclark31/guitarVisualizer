@@ -1,0 +1,238 @@
+/* HarmonyContent - Chord progression builder layout */
+
+.harmonyLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Fretboard section ─────────────────────────────────────── */
+
+.fretboardSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.voicingNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.voicingNavBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--surface-container);
+  border: 1px solid var(--outline-ghost);
+  color: var(--on-surface);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.voicingNavBtn:hover:not(:disabled) {
+  background: var(--surface-container-high);
+}
+
+.voicingNavBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.voicingLabel {
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  color: var(--on-surface-muted);
+  min-width: 48px;
+  text-align: center;
+}
+
+/* ── Buttons row ──────────────────────────────────────────── */
+
+.buttonsRow {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--outline-ghost);
+  background: var(--surface-container);
+  color: var(--on-surface);
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.actionBtn:hover:not(:disabled) {
+  background: var(--surface-container-high);
+}
+
+.actionBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.playBtn {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+  min-width: 100px;
+}
+
+.playBtn:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.playBtn.playing {
+  background: var(--error, #ef4444);
+  border-color: var(--error, #ef4444);
+}
+
+/* ── Controls section ─────────────────────────────────────── */
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.controlRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.clearBtn {
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--outline-ghost);
+  background: transparent;
+  color: var(--on-surface-muted);
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.clearBtn:hover:not(:disabled) {
+  color: var(--error, #ef4444);
+  border-color: var(--error, #ef4444);
+}
+
+.clearBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* ── Library panel tabs ───────────────────────────────────── */
+
+.libraryPanel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.libraryTabs {
+  display: flex;
+  border-bottom: 1px solid var(--outline);
+  background: var(--surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.libraryTab {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--on-surface-muted);
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  text-align: center;
+}
+
+.libraryTab:hover {
+  color: var(--on-surface);
+}
+
+.libraryTabActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+/* ── Empty state ──────────────────────────────────────────── */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 48px 16px;
+  text-align: center;
+}
+
+.emptyText {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  color: var(--on-surface);
+  margin: 0;
+}
+
+.emptyHint {
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  color: var(--on-surface-muted);
+  margin: 0;
+}
+
+/* ── Desktop ──────────────────────────────────────────────── */
+
+@media (min-width: 768px) {
+  .harmonyLayout {
+    padding: 24px;
+    gap: 20px;
+  }
+
+  .buttonsRow {
+    gap: 12px;
+  }
+
+  .controls {
+    gap: 20px;
+  }
+}
+
+/* ── Reduced motion ───────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .voicingNavBtn,
+  .actionBtn,
+  .clearBtn {
+    transition: none;
+  }
+}
