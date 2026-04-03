@@ -19,11 +19,11 @@ export function Navbar({ theme, onToggleTheme }: NavbarProps) {
         </Link>
 
         <div className={styles.desktopLinks}>
-          <Link to="/chordcompass/" className={styles.link}>
-            Chord Compass
+          <Link to="/chords/" className={styles.link}>
+            Chords
           </Link>
-          <Link to="/scalesage/" className={styles.link}>
-            Scale Sage
+          <Link to="/scales/" className={styles.link}>
+            Scales
           </Link>
         </div>
 
@@ -54,18 +54,18 @@ export function Navbar({ theme, onToggleTheme }: NavbarProps) {
       {menuOpen && (
         <div className={styles.mobileMenu}>
           <Link
-            to="/chordcompass/"
+            to="/chords/"
             className={styles.mobileLink}
             onClick={() => setMenuOpen(false)}
           >
-            Chord Compass
+            Chords
           </Link>
           <Link
-            to="/scalesage/"
+            to="/scales/"
             className={styles.mobileLink}
             onClick={() => setMenuOpen(false)}
           >
-            Scale Sage
+            Scales
           </Link>
         </div>
       )}

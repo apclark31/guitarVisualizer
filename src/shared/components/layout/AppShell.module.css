@@ -42,8 +42,7 @@
   font-size: 1rem;
   font-weight: 700;
   color: var(--primary);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .sidebarNav {
@@ -159,7 +158,6 @@
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  text-transform: uppercase;
 }
 
 /* ── Library icon wrapper with match dot ─────────────────── */

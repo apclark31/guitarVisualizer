@@ -23,8 +23,7 @@
   font-size: 1rem;
   font-weight: 700;
   color: var(--primary);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 /* Mobile: show "FRET ATLAS" with icon, Desktop: show mode tabs */

@@ -14,11 +14,11 @@ export function Footer() {
         <div className={styles.links}>
           <div className={styles.group}>
             <span className={styles.groupLabel}>Platform</span>
-            <Link to="/chordcompass/" className={styles.link}>
-              Chord Compass
+            <Link to="/chords/" className={styles.link}>
+              Chords
             </Link>
-            <Link to="/scalesage/" className={styles.link}>
-              Scale Sage
+            <Link to="/scales/" className={styles.link}>
+              Scales
             </Link>
             <span className={styles.linkDisabled}>
               Harmony Hub <span className={styles.soon}>Soon</span>

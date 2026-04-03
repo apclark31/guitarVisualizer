@@ -3,10 +3,10 @@ export const hero = {
   accentWord: 'Fretboard.',
   subtitle:
     'A free toolkit for guitarists. Visualize chords, master scales, and understand music theory through an intuitive, interactive fretboard.',
-  primaryCta: 'Explore Chord Compass',
-  primaryHref: '/chordcompass/',
-  secondaryCta: 'Explore Scale Sage',
-  secondaryHref: '/scalesage/',
+  primaryCta: 'Explore Chords',
+  primaryHref: '/chords/',
+  secondaryCta: 'Explore Scales',
+  secondaryHref: '/scales/',
 } as const;
 
 export interface ToolCard {
@@ -19,17 +19,17 @@ export interface ToolCard {
 
 export const tools: ToolCard[] = [
   {
-    name: 'Chord Compass',
+    name: 'Chords',
     description:
       'Navigate voicings and inversions across the entire neck. Detect chords, explore suggestions, hear every voicing.',
-    href: '/chordcompass/',
+    href: '/chords/',
     color: '#3b82f6',
   },
   {
-    name: 'Scale Sage',
+    name: 'Scales',
     description:
       'Visualize scales and modes in any key. Navigate box and 3NPS positions with interval color coding.',
-    href: '/scalesage/',
+    href: '/scales/',
     color: '#22c55e',
   },
   {
@@ -91,10 +91,10 @@ export const cta = {
   headline: 'Start Exploring',
   subtitle:
     'Fret Atlas is completely free. No sign-ups, no paywalls — just open and play.',
-  primaryCta: 'Open Chord Compass',
-  primaryHref: '/chordcompass/',
-  secondaryText: 'Or try Scale Sage',
-  secondaryHref: '/scalesage/',
+  primaryCta: 'Explore Chords',
+  primaryHref: '/chords/',
+  secondaryText: 'Or explore Scales',
+  secondaryHref: '/scales/',
   badges: ['100% Free', 'No Account Required'],
 } as const;
 
