@@ -3,10 +3,8 @@ export const hero = {
   rotatingWords: ['beginners', 'musicians', 'exploration', 'learning', 'fun'] as const,
   subtitle:
     'A free, interactive toolkit to visualize chords, master scales, and unlock music theory on the guitar fretboard.',
-  primaryCta: 'Explore Chords',
+  primaryCta: 'Start Playing',
   primaryHref: '/chords/',
-  secondaryCta: 'Explore Scales',
-  secondaryHref: '/scales/',
 } as const;
 
 export const toolShowcase = {

@@ -47,9 +47,6 @@ export function Hero() {
           <Link to={hero.primaryHref} className={styles.primaryBtn}>
             {hero.primaryCta}
           </Link>
-          <Link to={hero.secondaryHref} className={styles.secondaryBtn}>
-            {hero.secondaryCta}
-          </Link>
         </div>
       </div>
     </section>
