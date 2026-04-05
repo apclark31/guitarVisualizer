@@ -1,14 +1,14 @@
 /**
  * HarmonyChordPicker - Three-column chord picker for inserting custom chords
  *
- * Simplified version of ChordPicker focused on chord insertion into progressions.
- * Root → Family → Type columns, with Preview and Insert actions.
+ * Two-tier library: "In Key" shows diatonic chords filtered by key context,
+ * "All Chords" shows full chromatic picker for substitutions and borrowed chords.
  */
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import * as Tone from 'tone';
 import { useSharedStore } from '../../../../shared/store';
-import { CHORD_FAMILIES, FAMILY_TO_TYPES } from '../../../chords/config/constants';
+import { CHORD_FAMILIES, FAMILY_TO_TYPES, getDiatonicChords } from '../../../chords/config/constants';
 import { getVoicingsForChord } from '../../../chords/lib/chord-data';
 import { useSamplerEngine } from '../../../../shared/hooks/useSamplerEngine';
 import { PLAYBACK_TIMING } from '../../../../shared/config/constants';
@@ -32,14 +32,17 @@ const ROOT_OPTIONS = [
   { value: 'G#', label: 'G\u266F/A\u266D' },
 ] as const;
 
+type PickerScope = 'inKey' | 'all';
+
 interface HarmonyChordPickerProps {
   onInsert: (root: string, quality: string) => void;
 }
 
 export function HarmonyChordPicker({ onInsert }: HarmonyChordPickerProps) {
-  const { tuning } = useSharedStore();
+  const { tuning, keyContext } = useSharedStore();
   const { samplerRef, isLoaded, startAudio } = useSamplerEngine();
 
+  const [scope, setScope] = useState<PickerScope>(keyContext ? 'inKey' : 'all');
   const [selectedRoot, setSelectedRoot] = useState('C');
   const [selectedFamily, setSelectedFamily] = useState<ChordFamily>('Major');
   const [selectedType, setSelectedType] = useState('Major');
@@ -48,11 +51,79 @@ export function HarmonyChordPicker({ onInsert }: HarmonyChordPickerProps) {
   const familyColumnRef = useRef<HTMLDivElement>(null);
   const typeColumnRef = useRef<HTMLDivElement>(null);
 
+  // Diatonic chords for key filtering
+  const diatonicChords = useMemo(() => {
+    if (!keyContext) return null;
+    return getDiatonicChords(keyContext.root, keyContext.type);
+  }, [keyContext]);
+
+  // Filtered root options based on scope
+  const rootOptions = useMemo(() => {
+    if (scope === 'all' || !diatonicChords) return ROOT_OPTIONS.map(o => ({ ...o }));
+
+    return diatonicChords.map(chord => ({
+      value: chord.root,
+      label: `${chord.root} - ${chord.numeral}`,
+      family: chord.family,
+      hasDominantOption: chord.hasDominantOption,
+    }));
+  }, [scope, diatonicChords]);
+
+  // Get diatonic info for selected root (when in-key)
+  const currentDiatonicInfo = useMemo(() => {
+    if (scope === 'all' || !diatonicChords) return null;
+    return diatonicChords.find(c => c.root === selectedRoot) || null;
+  }, [scope, diatonicChords, selectedRoot]);
+
+  // Filtered families based on scope + selected root
+  const availableFamilies = useMemo(() => {
+    if (!currentDiatonicInfo) return CHORD_FAMILIES;
+
+    // V chord gets both Major and Dominant
+    if (currentDiatonicInfo.hasDominantOption) {
+      if (currentDiatonicInfo.family === 'Major') {
+        return ['Major', 'Dominant'] as ChordFamily[];
+      }
+      if (currentDiatonicInfo.family === 'Minor') {
+        return ['Minor', 'Dominant'] as ChordFamily[];
+      }
+    }
+
+    return [currentDiatonicInfo.family] as ChordFamily[];
+  }, [currentDiatonicInfo]);
+
   // Available types for selected family
   const availableTypes = useMemo(
     () => FAMILY_TO_TYPES[selectedFamily] ?? [],
     [selectedFamily]
   );
+
+  // When scope changes, reset selection to first available option
+  useEffect(() => {
+    if (rootOptions.length > 0) {
+      const firstRoot = rootOptions[0].value;
+      setSelectedRoot(firstRoot);
+
+      // If in-key, auto-set family to diatonic family
+      if (scope === 'inKey' && diatonicChords) {
+        const info = diatonicChords.find(c => c.root === firstRoot);
+        if (info) {
+          setSelectedFamily(info.family);
+          const types = FAMILY_TO_TYPES[info.family];
+          if (types) setSelectedType(types[0]);
+        }
+      }
+    }
+  }, [scope]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // When root changes in-key mode, auto-select diatonic family
+  useEffect(() => {
+    if (currentDiatonicInfo) {
+      setSelectedFamily(currentDiatonicInfo.family);
+      const types = FAMILY_TO_TYPES[currentDiatonicInfo.family];
+      if (types) setSelectedType(types[0]);
+    }
+  }, [currentDiatonicInfo]);
 
   // When family changes, reset type to first option
   useEffect(() => {
@@ -113,8 +184,28 @@ export function HarmonyChordPicker({ onInsert }: HarmonyChordPickerProps) {
     onInsert(selectedRoot, selectedType);
   }, [selectedRoot, selectedType, onInsert]);
 
+  const hasKeyContext = !!keyContext;
+
   return (
     <div className={styles.picker}>
+      {/* Scope toggle — only show when key context is set */}
+      {hasKeyContext && (
+        <div className={styles.scopeToggle}>
+          <button
+            className={`${styles.scopeBtn} ${scope === 'inKey' ? styles.scopeBtnActive : ''}`}
+            onClick={() => setScope('inKey')}
+          >
+            In Key
+          </button>
+          <button
+            className={`${styles.scopeBtn} ${scope === 'all' ? styles.scopeBtnActive : ''}`}
+            onClick={() => setScope('all')}
+          >
+            All Chords
+          </button>
+        </div>
+      )}
+
       {/* Column headers */}
       <div className={styles.headers}>
         <div className={styles.header}>Root</div>
@@ -126,7 +217,7 @@ export function HarmonyChordPicker({ onInsert }: HarmonyChordPickerProps) {
       <div className={styles.columns}>
         {/* Root column */}
         <div className={styles.column} ref={rootColumnRef}>
-          {ROOT_OPTIONS.map(opt => (
+          {rootOptions.map(opt => (
             <button
               key={opt.value}
               className={`${styles.option} ${selectedRoot === opt.value ? styles.active : ''}`}
@@ -140,7 +231,7 @@ export function HarmonyChordPicker({ onInsert }: HarmonyChordPickerProps) {
 
         {/* Family column */}
         <div className={styles.column} ref={familyColumnRef}>
-          {CHORD_FAMILIES.map(family => (
+          {availableFamilies.map(family => (
             <button
               key={family}
               className={`${styles.option} ${selectedFamily === family ? styles.active : ''}`}

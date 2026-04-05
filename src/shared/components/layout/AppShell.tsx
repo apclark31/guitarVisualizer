@@ -121,7 +121,7 @@ export function AppShell() {
           </NavLink>
           <button
             className={`${styles.sidebarLink} ${isLibraryOpen ? styles.sidebarLinkActive : ''}`}
-            onClick={openLibrary}
+            onClick={() => openLibrary()}
           >
             <span className={styles.libraryIconWrap}>
               <LibraryIcon />
@@ -143,7 +143,7 @@ export function AppShell() {
         </div>
       </div>
 
-      {/* Mobile bottom tabs */}
+      {/* Mobile bottom tabs — matches sidebar order */}
       <nav className={styles.bottomTabs}>
         <NavLink
           to="/chords/"
@@ -153,6 +153,15 @@ export function AppShell() {
         >
           <ChordsIcon />
           <span className={styles.tabLabel}>Chords</span>
+        </NavLink>
+        <NavLink
+          to="/scales/"
+          className={({ isActive }) =>
+            `${styles.tab} ${isActive ? styles.tabActive : ''}`
+          }
+        >
+          <ScalesIcon />
+          <span className={styles.tabLabel}>Scales</span>
         </NavLink>
         <NavLink
           to="/harmony/"
@@ -165,7 +174,7 @@ export function AppShell() {
         </NavLink>
         <button
           className={`${styles.tab} ${isLibraryOpen ? styles.tabActive : ''}`}
-          onClick={openLibrary}
+          onClick={() => openLibrary()}
         >
           <span className={styles.libraryIconWrap}>
             <LibraryIcon />
@@ -173,15 +182,6 @@ export function AppShell() {
           </span>
           <span className={styles.tabLabel}>Library</span>
         </button>
-        <NavLink
-          to="/scales/"
-          className={({ isActive }) =>
-            `${styles.tab} ${isActive ? styles.tabActive : ''}`
-          }
-        >
-          <ScalesIcon />
-          <span className={styles.tabLabel}>Scales</span>
-        </NavLink>
       </nav>
     </div>
   );

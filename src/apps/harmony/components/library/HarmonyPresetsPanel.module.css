@@ -1,32 +1,10 @@
-.trigger {
-  padding: 8px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--outline-ghost);
-  background: var(--surface-container);
-  color: var(--on-surface);
-  font-family: var(--font-ui);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
+/* HarmonyPresetsPanel - Preset progression grid */
 
-.trigger:hover {
-  background: var(--surface-container-high);
-  border-color: var(--primary);
-}
-
-.sheet {
-  padding: 8px 16px 24px;
-}
-
-.sheetTitle {
-  font-family: var(--font-display);
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--on-surface);
-  margin-bottom: 16px;
-  text-align: center;
+.presetsPanel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
 }
 
 .grid {
@@ -78,7 +56,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .trigger,
   .presetCard {
     transition: none;
   }

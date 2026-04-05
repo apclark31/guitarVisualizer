@@ -10,21 +10,28 @@ import * as Tone from 'tone';
 import { Fretboard } from './components/visuals/Fretboard';
 import { ControlPanel } from './components/controls/ControlPanel';
 import { ChordHeader } from './components/controls/ChordHeader';
+import { TuningConfirmModal } from './components/controls/TuningConfirmModal';
 import { useMusicStore } from './store/useMusicStore';
 import { useSharedStore } from '../../shared/store';
 import { useAudioEngine } from './hooks/useAudioEngine';
+import { LibrarySheet, LibrarySheetProvider } from '../../shared/components/LibrarySheet';
+import { useChordLibraryTabs } from './components/library/useChordLibraryTabs';
 import { decodeTuningFromUrl, decodeKeyFromUrl, encodeTuningForUrl, encodeKeyForUrl } from './config/constants';
 import { unlockIOSAudio } from '../../shared/lib/ios-audio-unlock';
 import { getChordIntervalEntries } from '../../shared/lib/interval-map-utils';
-import type { StringIndex, GuitarStringState } from './types';
+import type { StringIndex, GuitarStringState, TuningChangeMode } from './types';
 import styles from './ChordsContent.module.css';
 
 export function ChordsContent() {
-  const { restoreFromUrl, guitarStringState, targetRoot, targetQuality, currentVoicingIndex, isCustomShape, suggestions } = useMusicStore();
+  const { restoreFromUrl, guitarStringState, targetRoot, targetQuality, currentVoicingIndex, isCustomShape, suggestions, setTuning } = useMusicStore();
   const { tuning, keyContext, setMatchCount } = useSharedStore();
   const audioWarmedRef = useRef(false);
   const { isLoaded, playChord, playFretNote, playNote, playNotes } = useAudioEngine();
   const [copied, setCopied] = useState(false);
+
+  // Tuning confirm modal state (moved from ControlPanel)
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingTuning, setPendingTuning] = useState<{ tuning: string[]; name: string } | null>(null);
 
   const hasNotes = Object.values(guitarStringState).some(fret => fret !== null);
 
@@ -37,6 +44,35 @@ export function ChordsContent() {
   useEffect(() => {
     setMatchCount(suggestions.length);
   }, [suggestions.length, setMatchCount]);
+
+  // Tuning selection handler — confirms when notes exist
+  const handleTuningSelect = useCallback((newTuning: string[], name: string) => {
+    if (!hasNotes) {
+      setTuning(newTuning, name, 'clear');
+      return;
+    }
+    setPendingTuning({ tuning: newTuning, name });
+    setShowConfirmModal(true);
+  }, [hasNotes, setTuning]);
+
+  const handleConfirmSelect = useCallback((mode: TuningChangeMode) => {
+    if (pendingTuning) {
+      setTuning(pendingTuning.tuning, pendingTuning.name, mode);
+      setPendingTuning(null);
+    }
+    setShowConfirmModal(false);
+  }, [pendingTuning, setTuning]);
+
+  const handleConfirmCancel = useCallback(() => {
+    setPendingTuning(null);
+    setShowConfirmModal(false);
+  }, []);
+
+  // Library tabs for the unified LibrarySheet
+  const chordTabs = useChordLibraryTabs({
+    playNotes,
+    onSelectTuning: handleTuningSelect,
+  });
 
   const handleShare = useCallback(async () => {
     const parts: string[] = [];
@@ -172,7 +208,7 @@ export function ChordsContent() {
   return (
     <div className={styles.modeContent}>
       <div className={styles.chordBar}>
-        <ChordHeader playNotes={playNotes} intervalEntries={intervalEntries} />
+        <ChordHeader intervalEntries={intervalEntries} />
       </div>
 
       <main className={styles.main}>
@@ -209,12 +245,19 @@ export function ChordsContent() {
       </div>
 
       <div className={styles.controlsArea}>
-        <ControlPanel
-          isAudioLoaded={isLoaded}
-          playNote={playNote}
-        />
+        <ControlPanel />
       </div>
 
+      <LibrarySheetProvider playNote={playNote} isAudioLoaded={isLoaded}>
+        <LibrarySheet tabs={chordTabs} />
+      </LibrarySheetProvider>
+
+      <TuningConfirmModal
+        isOpen={showConfirmModal}
+        tuningName={pendingTuning?.name || ''}
+        onSelect={handleConfirmSelect}
+        onCancel={handleConfirmCancel}
+      />
     </div>
   );
 }

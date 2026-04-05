@@ -1,0 +1,138 @@
+/* ScaleMatchesPanel - Scale/key detection results */
+
+.matchesContent {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.matchesEmpty {
+  text-align: center;
+  color: var(--on-surface-subtle);
+  font-size: 14px;
+  padding: 40px 20px;
+  margin: 0;
+}
+
+.segmentedControl {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  background-color: var(--surface-container);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.segment {
+  flex: 1;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--on-surface-muted);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.segment:hover {
+  color: var(--on-surface);
+  background-color: var(--surface-container);
+}
+
+.segmentActive {
+  background-color: var(--surface-container-high);
+  color: var(--on-primary);
+}
+
+.guidance {
+  font-size: 14px;
+  color: var(--on-surface-muted);
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  flex-shrink: 0;
+}
+
+.guidance strong {
+  color: var(--on-primary);
+  font-weight: 600;
+}
+
+.matchesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.matchItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background-color: var(--surface-container-high);
+  border-radius: var(--radius-md);
+  gap: 12px;
+}
+
+.matchInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.matchName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--on-primary);
+}
+
+.matchIntervals {
+  font-size: 12px;
+  color: var(--on-surface-muted);
+}
+
+.passingText {
+  color: var(--on-surface-subtle);
+  font-style: italic;
+}
+
+.matchApplyButton {
+  padding: 8px 14px;
+  background-color: var(--primary);
+  color: var(--on-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.matchApplyButton:hover {
+  background-color: var(--primary-hover);
+}
+
+@media (max-width: 767px) {
+  .matchesContent {
+    padding: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segment,
+  .matchApplyButton {
+    transition: none;
+  }
+}

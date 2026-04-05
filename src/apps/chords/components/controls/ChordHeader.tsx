@@ -17,13 +17,11 @@ import { useMusicStore } from '../../store/useMusicStore';
 import { useSharedStore } from '../../../../shared/store';
 import { IntervalMap, type IntervalEntry } from '../../../../shared/components/IntervalMap/IntervalMap';
 import { Note } from '@tonaljs/tonal';
-import type { StringIndex, PlaybackMode } from '../../types';
-import { ChordPicker } from './ChordPicker';
+import type { StringIndex } from '../../types';
 import { getRomanNumeral } from '../../config/constants';
 import styles from './ChordHeader.module.css';
 
 interface ChordHeaderProps {
-  playNotes: (notes: string[], mode?: PlaybackMode) => Promise<void>;
   intervalEntries: IntervalEntry[];
 }
 
@@ -68,7 +66,7 @@ function formatMissingIntervals(missing: string[]): string | null {
   return `no ${missing.join(', ')}`;
 }
 
-export function ChordHeader({ playNotes, intervalEntries }: ChordHeaderProps) {
+export function ChordHeader({ intervalEntries }: ChordHeaderProps) {
   const {
     targetRoot,
     targetQuality,
@@ -78,7 +76,7 @@ export function ChordHeader({ playNotes, intervalEntries }: ChordHeaderProps) {
     currentVoicingIndex,
   } = useMusicStore();
 
-  const { tuning, keyContext, isLibraryOpen, openLibrary, closeLibrary } = useSharedStore();
+  const { tuning, keyContext, openLibrary, closeLibrary } = useSharedStore();
 
   // Listen for tour event to force-close the picker
   useEffect(() => {
@@ -182,7 +180,7 @@ export function ChordHeader({ playNotes, intervalEntries }: ChordHeaderProps) {
       {/* Tappable chord card */}
       <button
         className={styles.chordCard}
-        onClick={openLibrary}
+        onClick={() => openLibrary(defaultPickerTab)}
         aria-label="Open chord picker"
         data-tour="chord-card"
       >
@@ -205,13 +203,6 @@ export function ChordHeader({ playNotes, intervalEntries }: ChordHeaderProps) {
         </span>
       </button>
 
-      {/* Chord Picker Modal */}
-      <ChordPicker
-        isOpen={isLibraryOpen}
-        onClose={closeLibrary}
-        playNotes={playNotes}
-        defaultTab={defaultPickerTab}
-      />
     </div>
   );
 }

@@ -1,53 +1,18 @@
-/* HarmonyChordPicker - Three-column chord picker for progression insertion */
+/* ChordLibraryPanel - Three-column chord picker */
 
-.picker {
+.libraryContent {
   display: flex;
   flex-direction: column;
+  flex: 1;
   min-height: 0;
-  flex: 1;
 }
 
-/* Scope toggle — In Key / All Chords */
-.scopeToggle {
-  display: flex;
-  gap: 4px;
-  padding: 8px 12px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--outline);
-}
-
-.scopeBtn {
-  flex: 1;
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--outline-ghost);
-  background: transparent;
-  color: var(--on-surface-muted);
-  font-family: var(--font-ui);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.scopeBtn:hover {
-  background: var(--surface-container);
-  color: var(--on-surface);
-}
-
-.scopeBtnActive {
-  background: var(--primary-bg);
-  color: var(--primary);
-  border-color: var(--primary);
-  font-weight: 600;
-}
-
-/* Column headers */
 .headers {
   display: grid;
   grid-template-columns: 80px 100px 1fr;
   border-bottom: 1px solid var(--outline);
   background: var(--surface);
+  flex-shrink: 0;
 }
 
 .header {
@@ -60,7 +25,6 @@
   text-align: left;
 }
 
-/* Columns container */
 .columns {
   display: grid;
   grid-template-columns: 80px 100px 1fr;
@@ -68,7 +32,6 @@
   min-height: 0;
 }
 
-/* Individual column */
 .column {
   display: flex;
   flex-direction: column;
@@ -94,7 +57,6 @@
   border-radius: 3px;
 }
 
-/* Option buttons */
 .option {
   display: block;
   width: 100%;
@@ -121,7 +83,6 @@
   font-weight: 600;
 }
 
-/* Action buttons */
 .actionButtons {
   display: flex;
   gap: 0;
@@ -134,7 +95,6 @@
   background: var(--surface-container-high);
   border: none;
   border-top: 1px solid var(--outline);
-  border-radius: 0 0 0 var(--radius-lg);
   color: var(--on-surface);
   font-family: var(--font-ui);
   font-size: 0.95rem;
@@ -147,12 +107,11 @@
   background: var(--outline);
 }
 
-.insertButton {
+.applyButton {
   flex: 1;
   padding: 0.875rem;
   background: var(--primary);
   border: none;
-  border-radius: 0 0 var(--radius-lg) 0;
   color: var(--on-primary);
   font-family: var(--font-ui);
   font-size: 0.95rem;
@@ -161,11 +120,10 @@
   transition: background-color 0.15s ease;
 }
 
-.insertButton:hover {
+.applyButton:hover {
   background: var(--primary-hover);
 }
 
-/* Mobile */
 @media (max-width: 767px) {
   .headers {
     grid-template-columns: 80px 110px 1fr;
@@ -180,14 +138,11 @@
 
   .columns {
     grid-template-columns: 80px 110px 1fr;
-    flex: 1;
-    min-height: 0;
     overflow: hidden;
   }
 
   .column {
     max-height: 100%;
-    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -197,7 +152,7 @@
   }
 
   .previewButton,
-  .insertButton {
+  .applyButton {
     padding: 1rem;
     font-size: 1rem;
   }
@@ -208,10 +163,9 @@
     scroll-behavior: auto;
   }
 
-  .scopeBtn,
   .option,
   .previewButton,
-  .insertButton {
+  .applyButton {
     transition: none;
   }
 }

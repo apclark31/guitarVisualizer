@@ -1,92 +1,38 @@
-/* TuningModal - Tuning selector modal */
+/* TuningPanel - Tuning selector with presets + custom editor */
 
-/* Backdrop overlay */
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-}
-
-/* Modal container */
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  width: 420px;
-  max-width: 95vw;
-  max-height: 85vh;
-  background: var(--surface-container);
-  border: 1px solid var(--outline);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-elevated);
+.tuningPanel {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-}
-
-/* Header */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--outline);
-  background: var(--surface);
-}
-
-.title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--on-surface);
-}
-
-.closeButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: var(--surface-container-high);
-  border: none;
-  border-radius: 50%;
-  color: var(--on-surface-muted);
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.closeButton:hover {
-  background: var(--outline);
-  color: var(--on-surface);
-}
-
-/* Tabs */
-.tabs {
-  display: flex;
-  border-bottom: 1px solid var(--outline);
-}
-
-.tab {
   flex: 1;
-  padding: 0.75rem 1rem;
+  min-height: 0;
+}
+
+/* Sub-tabs for Presets / Custom */
+.subTabs {
+  display: flex;
+  border-bottom: 1px solid var(--outline);
+  flex-shrink: 0;
+}
+
+.subTab {
+  flex: 1;
+  padding: 0.625rem 1rem;
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
   color: var(--on-surface-muted);
-  font-size: 0.875rem;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.tab:hover {
+.subTab:hover {
   color: var(--on-surface);
 }
 
-.tabActive {
+.subTabActive {
   color: var(--primary);
   border-bottom-color: var(--primary);
 }
@@ -96,6 +42,19 @@
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+}
+
+.content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: var(--outline);
+  border-radius: 3px;
 }
 
 /* Preset list */
@@ -133,6 +92,7 @@
   border: none;
   border-radius: var(--radius-md);
   color: var(--on-surface);
+  font-family: var(--font-ui);
   font-size: 0.875rem;
   text-align: left;
   cursor: pointer;
@@ -170,6 +130,7 @@
 
 .customHint {
   margin: 0 0 1rem;
+  font-family: var(--font-ui);
   font-size: 0.8125rem;
   color: var(--on-surface-muted);
   text-align: center;
@@ -253,7 +214,6 @@
   color: var(--on-surface-subtle);
 }
 
-/* Custom preview */
 .customPreview {
   display: flex;
   align-items: center;
@@ -280,6 +240,7 @@
 .footer {
   padding: 0.75rem 1rem;
   border-top: 1px solid var(--outline);
+  flex-shrink: 0;
 }
 
 .applyButton {
@@ -290,6 +251,7 @@
   border: none;
   border-radius: var(--radius-md);
   color: var(--on-primary);
+  font-family: var(--font-ui);
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
@@ -300,19 +262,8 @@
   background: var(--primary-hover);
 }
 
-/* Mobile styles */
+/* Mobile */
 @media (max-width: 767px) {
-  .modal {
-    top: 10%;
-    left: 4%;
-    right: 4%;
-    bottom: auto;
-    width: 92%;
-    max-width: 92%;
-    max-height: 80%;
-    transform: none;
-  }
-
   .stringGrid {
     gap: 0.25rem;
   }
@@ -336,27 +287,8 @@
   }
 }
 
-/* Scrollbar styling */
-.content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.content::-webkit-scrollbar-thumb {
-  background: var(--outline);
-  border-radius: 3px;
-}
-
-.content::-webkit-scrollbar-thumb:hover {
-  background: var(--outline-hover);
-}
-
-/* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
-  .tab,
+  .subTab,
   .presetButton,
   .arrowButton,
   .noteDisplay,

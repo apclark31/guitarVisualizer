@@ -11,6 +11,9 @@ import { useScaleAudioEngine } from './hooks/useScaleAudioEngine';
 import { Fretboard } from '../../shared/components/Fretboard';
 import { ScaleHeader } from './components/ScaleHeader';
 import { ControlPanel } from './components/ControlPanel';
+import { TuningConfirmModal } from '../chords/components/controls/TuningConfirmModal';
+import { LibrarySheet, LibrarySheetProvider } from '../../shared/components/LibrarySheet';
+import { useScaleLibraryTabs } from './components/library/useScaleLibraryTabs';
 import { getScaleIntervalEntries } from '../../shared/lib/interval-map-utils';
 import type { GuitarStringState, HighlightedNote, StringIndex } from '../../shared/types';
 import { getScale } from './lib/scale-data';
@@ -47,6 +50,10 @@ export function ScalesContent() {
 
   // Track currently playing note for visual highlighting
   const [activeNotePosition, setActiveNotePosition] = useState<{ stringIndex: number; fret: number } | null>(null);
+
+  // Tuning confirm modal state
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingTuning, setPendingTuning] = useState<{ tuning: string[]; name: string } | null>(null);
 
   // Determine mode: scale selected or free-play
   const hasScale = scaleRoot && scaleType;
@@ -87,6 +94,32 @@ export function ScalesContent() {
       }
     }
   }, []);
+
+  // Tuning selection handler
+  const handleTuningSelect = useCallback((newTuning: string[], name: string) => {
+    if (hasScale) {
+      setPendingTuning({ tuning: newTuning, name });
+      setShowConfirmModal(true);
+    } else {
+      useSharedStore.getState().setTuning(newTuning, name);
+    }
+  }, [hasScale]);
+
+  const handleConfirmSelect = useCallback((_mode: string) => {
+    if (pendingTuning) {
+      useSharedStore.getState().setTuning(pendingTuning.tuning, pendingTuning.name);
+      setPendingTuning(null);
+    }
+    setShowConfirmModal(false);
+  }, [pendingTuning]);
+
+  const handleConfirmCancel = useCallback(() => {
+    setPendingTuning(null);
+    setShowConfirmModal(false);
+  }, []);
+
+  // Library tabs
+  const scaleTabs = useScaleLibraryTabs({ onSelectTuning: handleTuningSelect });
 
   // Pre-warm audio context on first touch (iOS PWA requirement)
   useEffect(() => {
@@ -269,12 +302,19 @@ export function ScalesContent() {
       </div>
 
       <div className={styles.controlsArea}>
-        <ControlPanel
-          isAudioLoaded={isLoaded}
-          playNote={playNote}
-        />
+        <ControlPanel />
       </div>
 
+      <LibrarySheetProvider playNote={playNote} isAudioLoaded={isLoaded}>
+        <LibrarySheet tabs={scaleTabs} />
+      </LibrarySheetProvider>
+
+      <TuningConfirmModal
+        isOpen={showConfirmModal}
+        tuningName={pendingTuning?.name || ''}
+        onSelect={handleConfirmSelect}
+        onCancel={handleConfirmCancel}
+      />
     </div>
   );
 }

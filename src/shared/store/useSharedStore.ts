@@ -31,9 +31,11 @@ export interface SharedState {
 
   // Library Panel
   isLibraryOpen: boolean;
+  activeLibraryTab: string;
   matchCount: number;
-  openLibrary: () => void;
+  openLibrary: (tabId?: string) => void;
   closeLibrary: () => void;
+  setActiveLibraryTab: (tabId: string) => void;
   setMatchCount: (count: number) => void;
 }
 
@@ -84,8 +86,13 @@ export const useSharedStore = create<SharedState>((set) => ({
 
   // Library Panel
   isLibraryOpen: false,
+  activeLibraryTab: 'library',
   matchCount: 0,
-  openLibrary: () => set({ isLibraryOpen: true }),
+  openLibrary: (tabId?: string) => set((state) => ({
+    isLibraryOpen: true,
+    activeLibraryTab: tabId ?? state.activeLibraryTab,
+  })),
   closeLibrary: () => set({ isLibraryOpen: false }),
+  setActiveLibraryTab: (tabId: string) => set({ activeLibraryTab: tabId }),
   setMatchCount: (count: number) => set({ matchCount: count }),
 }));

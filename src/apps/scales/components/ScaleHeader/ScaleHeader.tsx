@@ -11,7 +11,6 @@
 import { useMemo, useEffect } from 'react';
 import { useScaleStore, useSharedStore } from '../../store/useScaleStore';
 import { useSharedStore as useGlobalSharedStore } from '../../../../shared/store';
-import { ScalePicker } from '../ScalePicker/ScalePicker';
 import { IntervalMap, type IntervalEntry } from '../../../../shared/components/IntervalMap/IntervalMap';
 import { SCALE_TYPE_DISPLAY } from '../../lib/scale-data';
 import { getNotesFromMultiNoteState } from '../../../../shared/lib';
@@ -30,7 +29,7 @@ export function ScaleHeader({ intervalEntries = [] }: ScaleHeaderProps) {
   } = useScaleStore();
 
   const { tuning } = useSharedStore();
-  const { isLibraryOpen, openLibrary, closeLibrary, setMatchCount } = useGlobalSharedStore();
+  const { openLibrary, setMatchCount } = useGlobalSharedStore();
 
   // Sync match count to shared store for Library tab badge
   useEffect(() => {
@@ -107,7 +106,7 @@ export function ScaleHeader({ intervalEntries = [] }: ScaleHeaderProps) {
       {/* Tappable header area */}
       <button
         className={styles.scaleCard}
-        onClick={openLibrary}
+        onClick={() => openLibrary(defaultPickerTab)}
         aria-label="Open scale picker"
       >
         {display.primaryText && (
@@ -128,12 +127,6 @@ export function ScaleHeader({ intervalEntries = [] }: ScaleHeaderProps) {
         </span>
       </button>
 
-      {/* Scale Picker as Bottom Sheet */}
-      <ScalePicker
-        isOpen={isLibraryOpen}
-        onClose={closeLibrary}
-        defaultTab={defaultPickerTab}
-      />
     </div>
   );
 }

@@ -101,6 +101,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-width: 0;
 }
 
 .content {
@@ -203,22 +204,9 @@
 
 @media (max-width: 767px) {
   .main {
-    height: 100vh;
-    height: 100dvh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    /* Hide scrollbar — standard mobile app behavior */
-    scrollbar-width: none;
+    min-height: auto;
     /* Bottom padding to clear fixed bottom tabs */
     padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-  }
-
-  .main::-webkit-scrollbar {
-    display: none;
-  }
-
-  .content {
-    flex: none;
   }
 }
 

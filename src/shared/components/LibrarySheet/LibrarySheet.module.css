@@ -1,0 +1,19 @@
+/* LibrarySheet - Fixed-height bottom sheet for all modes */
+
+.librarySheet {
+  height: min(calc(100dvh - 40px), 520px);
+}
+
+.panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .librarySheet {
+    height: min(65vh, 520px);
+  }
+}

@@ -17,9 +17,9 @@ interface ProgressionBuilderProps {
 export function ProgressionBuilder({ onAddChord, onCustomChord }: ProgressionBuilderProps) {
   const { keyContext } = useSharedStore();
 
-  if (!keyContext) return null;
-
-  const diatonicChords = getDiatonicChords(keyContext.root, keyContext.type);
+  const diatonicChords = keyContext
+    ? getDiatonicChords(keyContext.root, keyContext.type)
+    : [];
 
   return (
     <div className={styles.builder}>

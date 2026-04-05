@@ -22,12 +22,20 @@ export function BottomSheet({ isOpen, onClose, children, className }: BottomShee
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef({ startY: 0, currentY: 0, isDragging: false });
 
-  // Lock body scroll when open
+  // Lock body scroll when open, compensate for scrollbar removal
   useEffect(() => {
     if (isOpen) {
-      const original = document.body.style.overflow;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      const originalOverflow = document.body.style.overflow;
+      const originalPaddingRight = document.body.style.paddingRight;
       document.body.style.overflow = 'hidden';
-      return () => { document.body.style.overflow = original; };
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.paddingRight = originalPaddingRight;
+      };
     }
   }, [isOpen]);
 
