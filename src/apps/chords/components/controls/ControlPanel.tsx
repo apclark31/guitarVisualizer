@@ -1,20 +1,23 @@
-import { useState } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useMusicStore } from '../../store/useMusicStore';
 import { useSharedStore } from '../../../../shared/store';
-import { TuningModal } from './TuningModal';
-import { TuningConfirmModal } from './TuningConfirmModal';
-import { KeyPicker } from './KeyPicker';
 import { Card } from '../../../../shared/components/Card';
 import { VOICING_FILTER_OPTIONS } from '../../config/constants';
-import type { TuningChangeMode, VoicingFilterType } from '../../types';
+import type { VoicingFilterType } from '../../types';
 import styles from './ControlPanel.module.css';
 
-interface ControlPanelProps {
-  isAudioLoaded: boolean;
-  playNote: (note: string, duration?: number) => Promise<void>;
-}
+/** Voicing filter cycle order */
+const VOICING_CYCLE: VoicingFilterType[] = VOICING_FILTER_OPTIONS.map(o => o.value as VoicingFilterType);
 
-export function ControlPanel({ isAudioLoaded, playNote }: ControlPanelProps) {
+/** Display labels for voicing filter */
+const VOICING_LABELS: Record<string, string> = {
+  all: 'All',
+  triads: 'Triads',
+  shells: 'Shells',
+  full: 'Full',
+};
+
+export function ControlPanel() {
   const {
     targetRoot,
     targetQuality,
@@ -26,12 +29,36 @@ export function ControlPanel({ isAudioLoaded, playNote }: ControlPanelProps) {
     isCustomShape,
     clearAllStrings,
     guitarStringState,
-    setTuning,
     voicingTypeFilter,
     setVoicingTypeFilter,
   } = useMusicStore();
 
-  const { tuningName, playbackMode, setPlaybackMode, keyContext } = useSharedStore();
+  const { tuningName, playbackMode, setPlaybackMode, keyContext, openLibrary } = useSharedStore();
+
+  // Carousel state
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activePanel, setActivePanel] = useState(0);
+
+  const scrollToPanel = useCallback((index: number) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const panelWidth = el.children[0]?.clientWidth ?? 0;
+    el.scrollTo({ left: index * (panelWidth + 10), behavior: 'smooth' });
+  }, []);
+
+  // Track scroll position for dot indicator
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      const scrollLeft = el.scrollLeft;
+      const panelWidth = el.children[0]?.clientWidth ?? 1;
+      const index = Math.round(scrollLeft / panelWidth);
+      setActivePanel(index);
+    };
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Position navigation
   const isFreeFormMode = !targetRoot || !targetQuality;
@@ -48,178 +75,146 @@ export function ControlPanel({ isAudioLoaded, playNote }: ControlPanelProps) {
     }
   };
 
-  // Check if there are any notes to play
   const hasNotes = Object.values(guitarStringState).some(fret => fret !== null);
 
-  // Tuning modal state
-  const [showTuningModal, setShowTuningModal] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingTuning, setPendingTuning] = useState<{ tuning: string[]; name: string } | null>(null);
-
-  // Handle tuning selection from TuningModal
-  const handleTuningSelect = (newTuning: string[], name: string) => {
-    // If no notes on fretboard, apply directly with 'clear' mode (acts same as empty)
-    if (!hasNotes) {
-      setTuning(newTuning, name, 'clear');
-      return;
-    }
-
-    // Otherwise, show confirm modal for adapt/keep/clear choice
-    setPendingTuning({ tuning: newTuning, name });
-    setShowConfirmModal(true);
+  // Cycle voicing filter on tap
+  const cycleVoicingFilter = () => {
+    const idx = VOICING_CYCLE.indexOf(voicingTypeFilter);
+    const next = VOICING_CYCLE[(idx + 1) % VOICING_CYCLE.length];
+    setVoicingTypeFilter(next);
   };
 
-  // Handle confirm modal selection
-  const handleConfirmSelect = (mode: TuningChangeMode) => {
-    if (pendingTuning) {
-      setTuning(pendingTuning.tuning, pendingTuning.name, mode);
-      setPendingTuning(null);
-    }
-    setShowConfirmModal(false);
-  };
-
-  const handleConfirmCancel = () => {
-    setPendingTuning(null);
-    setShowConfirmModal(false);
-  };
-
-  const handleVoicingFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setVoicingTypeFilter(e.target.value as VoicingFilterType);
-  };
-
-  // Key picker modal state
-  const [showKeyModal, setShowKeyModal] = useState(false);
-
-  // Get display text for key button
+  // Selector display values
   const keyDisplayText = keyContext
     ? `${keyContext.root} ${keyContext.type === 'major' ? 'Major' : 'Minor'}`
-    : '--';
-
-  const toggleDisplayMode = () => {
-    setDisplayMode(displayMode === 'notes' ? 'intervals' : 'notes');
-  };
-
-  const togglePlaybackMode = () => {
-    setPlaybackMode(playbackMode === 'strum' ? 'block' : 'strum');
-  };
+    : 'Not set';
+  const keyIsActive = !!keyContext;
+  const voicingIsActive = voicingTypeFilter !== 'all';
+  const tuningIsActive = tuningName !== 'Standard';
 
   return (
     <div className={styles.controlPanel} data-tour="control-panel">
-      {/* Setup Card: Position nav + Key/Voicing/Tuning + Clear */}
-      <Card title="Setup" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg>}>
-        <div className={styles.positionRow} data-tour="position-nav">
-          <button
-            onClick={handlePrevVoicing}
-            disabled={isFreeFormMode || currentVoicingIndex === 0 || availableVoicings.length === 0}
-            className={styles.navButton}
-            aria-label="Previous voicing"
-          >
-            &lt;
-          </button>
-          <span className={`${styles.positionLabel} ${isFreeFormMode ? styles.positionLabelInactive : ''}`}>
-            {isFreeFormMode ? (
-              'Position'
-            ) : isCustomShape ? (
-              'Custom'
-            ) : availableVoicings.length > 0 ? (
-              `${currentVoicingIndex + 1} of ${availableVoicings.length}`
-            ) : (
-              'Position'
-            )}
-          </span>
-          <button
-            onClick={handleNextVoicing}
-            disabled={
-              isFreeFormMode ||
-              currentVoicingIndex >= availableVoicings.length - 1 ||
-              availableVoicings.length === 0
-            }
-            className={styles.navButton}
-            aria-label="Next voicing"
-          >
-            &gt;
-          </button>
-        </div>
+      {/* Position — persistent, above cards */}
+      <div className={styles.positionRow} data-tour="position-nav">
+        <button
+          onClick={handlePrevVoicing}
+          disabled={isFreeFormMode || currentVoicingIndex === 0 || availableVoicings.length === 0}
+          className={styles.navButton}
+          aria-label="Previous voicing"
+        >
+          &lt;
+        </button>
+        <span className={`${styles.positionLabel} ${isFreeFormMode ? styles.positionLabelInactive : ''}`}>
+          {isFreeFormMode ? (
+            'Position'
+          ) : isCustomShape ? (
+            'Custom'
+          ) : availableVoicings.length > 0 ? (
+            `${currentVoicingIndex + 1} of ${availableVoicings.length}`
+          ) : (
+            'Position'
+          )}
+        </span>
+        <button
+          onClick={handleNextVoicing}
+          disabled={
+            isFreeFormMode ||
+            currentVoicingIndex >= availableVoicings.length - 1 ||
+            availableVoicings.length === 0
+          }
+          className={styles.navButton}
+          aria-label="Next voicing"
+        >
+          &gt;
+        </button>
+      </div>
 
-        <div className={styles.keyVoicingTuningRow}>
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Key</h3>
-            <button
-              className={styles.keyButton}
-              onClick={() => setShowKeyModal(true)}
-              data-tour="key-button"
-            >
-              {keyDisplayText}
-            </button>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Voicing</h3>
-            <div className={styles.selectWrapper}>
-              <select
-                value={voicingTypeFilter}
-                onChange={handleVoicingFilterChange}
-                className={styles.voicingSelect}
+      {/* Carousel — two panels */}
+      <div className={styles.carousel} ref={carouselRef}>
+        {/* Panel 1: Selectors (What) */}
+        <div className={styles.panel}>
+          <Card>
+            <div className={styles.selectorRow}>
+              <button
+                className={`${styles.selectorItem} ${keyIsActive ? styles.active : ''} ${!keyContext ? styles.dimmed : ''}`}
+                onClick={() => openLibrary('key')}
+                data-tour="key-button"
               >
-                {VOICING_FILTER_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <span className={styles.selectorLabel}>Key</span>
+                <span className={styles.selectorValue}>{keyDisplayText}</span>
+              </button>
+              <button
+                className={`${styles.selectorItem} ${voicingIsActive ? styles.active : ''}`}
+                onClick={cycleVoicingFilter}
+              >
+                <span className={styles.selectorLabel}>Voicing</span>
+                <span className={styles.selectorValue}>{VOICING_LABELS[voicingTypeFilter]}</span>
+              </button>
+              <button
+                className={`${styles.selectorItem} ${tuningIsActive ? styles.active : ''}`}
+                onClick={() => openLibrary('tuning')}
+                data-tour="tuning-button"
+              >
+                <span className={styles.selectorLabel}>Tuning</span>
+                <span className={styles.selectorValue}>{tuningName}</span>
+              </button>
             </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Tuning</h3>
-            <button
-              className={styles.tuningButton}
-              onClick={() => setShowTuningModal(true)}
-              data-tour="tuning-button"
-            >
-              {tuningName}
-            </button>
-          </div>
+          </Card>
         </div>
 
-      </Card>
-
-      {/* Display Card: Toggles */}
-      <Card title="Display" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>}>
-        <div className={styles.togglesRow}>
-          <div className={styles.section} data-tour="display-toggle">
-            <h3 className={styles.sectionTitle}>Intervals</h3>
-            <div className={styles.toggleRow}>
-              <span className={styles.toggleLabel}>Show</span>
-              <div
-                className={`${styles.toggleSwitch} ${displayMode === 'intervals' ? styles.active : ''}`}
-                onClick={toggleDisplayMode}
-                role="switch"
-                aria-checked={displayMode === 'intervals'}
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && toggleDisplayMode()}
-              />
+        {/* Panel 2: Pill toggles (How) */}
+        <div className={styles.panel}>
+          <Card>
+            <div className={styles.pillRow}>
+              <div className={styles.pillCol}>
+                <span className={styles.pillLabel}>Labels</span>
+                <div
+                  className={styles.pillGroup}
+                  onClick={() => setDisplayMode(displayMode === 'notes' ? 'intervals' : 'notes')}
+                  data-tour="display-toggle"
+                >
+                  <span className={`${styles.pill} ${displayMode === 'notes' ? styles.active : ''}`}>
+                    Notes
+                  </span>
+                  <span className={`${styles.pill} ${displayMode === 'intervals' ? styles.active : ''}`}>
+                    Intervals
+                  </span>
+                </div>
+              </div>
+              <div className={styles.pillCol}>
+                <span className={styles.pillLabel}>Playback</span>
+                <div
+                  className={styles.pillGroup}
+                  onClick={() => setPlaybackMode(playbackMode === 'strum' ? 'block' : 'strum')}
+                >
+                  <span className={`${styles.pill} ${playbackMode === 'strum' ? styles.active : ''}`}>
+                    Strum
+                  </span>
+                  <span className={`${styles.pill} ${playbackMode === 'block' ? styles.active : ''}`}>
+                    Block
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Playback</h3>
-            <div className={styles.toggleRow}>
-              <span className={styles.toggleLabel}>Block</span>
-              <div
-                className={`${styles.toggleSwitch} ${playbackMode === 'block' ? styles.active : ''}`}
-                onClick={togglePlaybackMode}
-                role="switch"
-                aria-checked={playbackMode === 'block'}
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && togglePlaybackMode()}
-              />
-            </div>
-          </div>
+          </Card>
         </div>
-      </Card>
+      </div>
 
-      {/* Clear button — below all cards */}
+      {/* Dot indicators (mobile only via CSS) */}
+      <div className={styles.dots}>
+        <button
+          className={`${styles.dot} ${activePanel === 0 ? styles.active : ''}`}
+          onClick={() => scrollToPanel(0)}
+          aria-label="Selectors panel"
+        />
+        <button
+          className={`${styles.dot} ${activePanel === 1 ? styles.active : ''}`}
+          onClick={() => scrollToPanel(1)}
+          aria-label="Options panel"
+        />
+      </div>
+
+      {/* Clear button */}
       <button
         onClick={clearAllStrings}
         disabled={!hasNotes}
@@ -228,27 +223,6 @@ export function ControlPanel({ isAudioLoaded, playNote }: ControlPanelProps) {
       >
         Clear All
       </button>
-
-      {/* Tuning Modals */}
-      <TuningModal
-        isOpen={showTuningModal}
-        onClose={() => setShowTuningModal(false)}
-        onSelectTuning={handleTuningSelect}
-        playNote={playNote}
-        isAudioLoaded={isAudioLoaded}
-      />
-
-      <TuningConfirmModal
-        isOpen={showConfirmModal}
-        tuningName={pendingTuning?.name || ''}
-        onSelect={handleConfirmSelect}
-        onCancel={handleConfirmCancel}
-      />
-
-      <KeyPicker
-        isOpen={showKeyModal}
-        onClose={() => setShowKeyModal(false)}
-      />
     </div>
   );
 }
