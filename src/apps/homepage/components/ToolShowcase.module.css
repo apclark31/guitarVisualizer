@@ -69,13 +69,24 @@
 }
 
 @media (max-width: 767px) {
+  .heading {
+    font-size: 1.5rem;
+    margin: 0 0 32px;
+  }
+
   .grid {
     grid-template-columns: 1fr;
     max-width: 440px;
     margin: 0 auto;
   }
 
-  .cardImage {
-    height: 100px;
+  .cardImageWrap {
+    height: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardBody {
+    padding: 16px;
   }
 }

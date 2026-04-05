@@ -60,3 +60,9 @@
     padding: 56px 20px;
   }
 }
+
+@media (max-width: 480px) {
+  .section {
+    padding: 40px 16px;
+  }
+}

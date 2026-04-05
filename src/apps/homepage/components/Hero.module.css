@@ -36,11 +36,6 @@
   }
 }
 
-@media (max-width: 480px) {
-  .rotatingWord {
-    min-width: 0;
-  }
-}
 
 .subtitle {
   font-size: 1.15rem;
@@ -133,8 +128,17 @@
 }
 
 @media (max-width: 480px) {
+  .hero {
+    padding: 100px 16px 48px;
+  }
+
   .headline {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    margin: 0 0 28px;
   }
 
   .ctas {
@@ -145,5 +149,9 @@
   .secondaryBtn {
     justify-content: center;
     width: 100%;
+  }
+
+  .heroVideo {
+    border-radius: 14px;
   }
 }
