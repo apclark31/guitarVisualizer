@@ -1,15 +1,45 @@
+/* Full-bleed hero — 100vh with video background, content at bottom */
+
 .hero {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 140px 24px 80px;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
-  align-items: center;
-  gap: 64px;
+  align-items: flex-end;
 }
 
+/* Background video — covers entire hero */
+.bgVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Gradient overlay — darkens bottom for text readability */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    transparent 30%,
+    rgba(0, 0, 0, 0.25) 60%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  pointer-events: none;
+}
+
+/* Content — bottom-left on desktop */
 .content {
-  flex: 1;
-  min-width: 0;
+  position: relative;
+  z-index: 2;
+  padding: 0 48px 64px;
+  max-width: 640px;
 }
 
 .headline {
@@ -17,8 +47,8 @@
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.03em;
-  margin: 0 0 20px;
-  color: var(--hp-text);
+  margin: 0 0 16px;
+  color: #ffffff;
 }
 
 .rotatingWord {
@@ -28,21 +58,12 @@
   text-align: left;
 }
 
-@media (max-width: 960px) {
-  .rotatingWord {
-    display: block;
-    min-width: 0;
-    text-align: center;
-  }
-}
-
-
 .subtitle {
-  font-size: 1.15rem;
-  line-height: 1.65;
-  color: var(--hp-text-muted);
-  margin: 0 0 36px;
-  max-width: 520px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 28px;
+  max-width: 480px;
 }
 
 .ctas {
@@ -55,8 +76,8 @@
   display: inline-flex;
   align-items: center;
   padding: 14px 28px;
-  background: var(--hp-primary);
-  color: #ffffff;
+  background: #ffffff;
+  color: #000000;
   font-weight: 600;
   font-size: 0.95rem;
   border-radius: 12px;
@@ -65,7 +86,7 @@
 }
 
 .primaryBtn:hover {
-  background: var(--hp-primary-hover);
+  background: rgba(255, 255, 255, 0.9);
   transform: translateY(-1px);
 }
 
@@ -74,62 +95,72 @@
   align-items: center;
   padding: 14px 28px;
   background: transparent;
-  color: var(--hp-text);
+  color: #ffffff;
   font-weight: 600;
   font-size: 0.95rem;
-  border: 1px solid var(--hp-border);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 12px;
   text-decoration: none;
   transition: border-color 0.2s, transform 0.15s;
 }
 
 .secondaryBtn:hover {
-  border-color: var(--hp-primary);
+  border-color: rgba(255, 255, 255, 0.7);
   transform: translateY(-1px);
 }
 
-.visual {
-  flex: 0 0 400px;
-}
-
-.heroVideo {
-  width: 100%;
-  border-radius: 20px;
-  border: 1px solid var(--hp-border);
-  object-fit: cover;
-}
-
+/* Tablet */
 @media (max-width: 960px) {
+  .content {
+    padding: 0 32px 56px;
+  }
+
+  .headline {
+    font-size: 2.75rem;
+  }
+
+  .rotatingWord {
+    min-width: 220px;
+  }
+}
+
+/* Mobile — center bottom */
+@media (max-width: 767px) {
   .hero {
-    flex-direction: column;
-    padding: 120px 20px 56px;
-    gap: 40px;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .content {
+    padding: 0 20px 40px;
+    max-width: none;
     text-align: center;
   }
 
   .headline {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
+  }
+
+  .rotatingWord {
+    display: block;
+    min-width: 0;
+    text-align: center;
   }
 
   .subtitle {
     max-width: none;
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
 
   .ctas {
     justify-content: center;
   }
-
-  .visual {
-    flex: none;
-    width: 100%;
-    max-width: 400px;
-  }
 }
 
+/* Small mobile */
 @media (max-width: 480px) {
-  .hero {
-    padding: 100px 16px 48px;
+  .content {
+    padding: 0 16px 32px;
   }
 
   .headline {
@@ -137,8 +168,8 @@
   }
 
   .subtitle {
-    font-size: 0.95rem;
-    margin: 0 0 28px;
+    font-size: 0.9rem;
+    margin: 0 0 20px;
   }
 
   .ctas {
@@ -149,9 +180,5 @@
   .secondaryBtn {
     justify-content: center;
     width: 100%;
-  }
-
-  .heroVideo {
-    border-radius: 14px;
   }
 }

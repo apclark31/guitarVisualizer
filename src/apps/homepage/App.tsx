@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from '../../shared/hooks/useTheme';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -11,6 +11,7 @@ import styles from './App.module.css';
 
 function App() {
   const { theme, toggleTheme } = useTheme();
+  const [navTransparent, setNavTransparent] = useState(true);
 
   useEffect(() => {
     document.title = 'Fret Atlas';
@@ -19,9 +20,18 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const threshold = window.innerHeight * 0.6;
+    const onScroll = () => {
+      setNavTransparent(window.scrollY < threshold);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <div className={styles.homepage} data-theme={theme}>
-      <Navbar theme={theme} onToggleTheme={toggleTheme} />
+      <Navbar theme={theme} onToggleTheme={toggleTheme} transparent={navTransparent} />
       <main>
         <Hero />
         <ToolShowcase />

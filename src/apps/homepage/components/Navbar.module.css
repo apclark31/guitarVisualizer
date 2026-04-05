@@ -8,6 +8,42 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--hp-border);
+  transition: background-color 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+}
+
+/* Transparent state — over hero */
+.transparent {
+  background: transparent;
+  border-bottom-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.transparent .brand,
+.transparent .link,
+.transparent .hamburger {
+  color: #ffffff;
+}
+
+.transparent .hamburger {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.transparent .hamburger:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ThemeToggle inherits from .toggle in ThemeToggle.module.css,
+   but we can target buttons in the actions area */
+.transparent .actions button {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.transparent .actions button:hover {
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .inner {
@@ -21,16 +57,26 @@
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.25rem;
   color: var(--hp-primary);
   text-decoration: none;
   letter-spacing: -0.02em;
+  transition: color 0.3s;
 }
 
 .brand:hover {
   opacity: 0.85;
+}
+
+.brandIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
 .desktopLinks {
@@ -43,11 +89,15 @@
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: color 0.2s;
+  transition: color 0.3s;
 }
 
 .link:hover {
   color: var(--hp-text);
+}
+
+.transparent .link:hover {
+  color: #ffffff;
 }
 
 .actions {
@@ -67,7 +117,7 @@
   background: var(--hp-surface);
   color: var(--hp-text);
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.3s, color 0.3s;
 }
 
 .hamburger:hover {

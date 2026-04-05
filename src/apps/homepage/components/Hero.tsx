@@ -19,13 +19,24 @@ export function Hero() {
       const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
       tl.from(el.querySelector(`.${styles.headline}`), { opacity: 0, y: 20, duration: 0.6 })
         .from(el.querySelector(`.${styles.subtitle}`), { opacity: 0, y: 20, duration: 0.5 }, '-=0.3')
-        .from(el.querySelector(`.${styles.ctas}`), { opacity: 0, y: 20, duration: 0.5 }, '-=0.3')
-        .from(el.querySelector(`.${styles.visual}`), { opacity: 0, y: 30, duration: 0.7 }, '-=0.3');
+        .from(el.querySelector(`.${styles.ctas}`), { opacity: 0, y: 20, duration: 0.5 }, '-=0.3');
     });
   }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className={styles.hero}>
+      <video
+        className={styles.bgVideo}
+        autoPlay
+        muted
+        loop
+        playsInline
+        poster={`${import.meta.env.BASE_URL}images/homepage/hero-poster.webp`}
+      >
+        <source src={`${import.meta.env.BASE_URL}images/homepage/hero.webm`} type="video/webm" />
+        <source src={`${import.meta.env.BASE_URL}images/homepage/hero.mp4`} type="video/mp4" />
+      </video>
+      <div className={styles.overlay} />
       <div className={styles.content}>
         <h1 className={styles.headline}>
           {hero.headlinePrefix}{' '}
@@ -40,19 +51,6 @@ export function Hero() {
             {hero.secondaryCta}
           </Link>
         </div>
-      </div>
-      <div className={styles.visual}>
-        <video
-          className={styles.heroVideo}
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={`${import.meta.env.BASE_URL}images/homepage/hero-poster.webp`}
-        >
-          <source src={`${import.meta.env.BASE_URL}images/homepage/hero.webm`} type="video/webm" />
-          <source src={`${import.meta.env.BASE_URL}images/homepage/hero.mp4`} type="video/mp4" />
-        </video>
       </div>
     </section>
   );
