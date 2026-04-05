@@ -9,12 +9,15 @@ export const hero = {
   secondaryHref: '/scales/',
 } as const;
 
+export const toolShowcase = {
+  heading: 'Your Guitar Theory Toolkit',
+} as const;
+
 export interface ToolCard {
   name: string;
   description: string;
   href: string;
   color: string;
-  comingSoon?: boolean;
 }
 
 export const tools: ToolCard[] = [

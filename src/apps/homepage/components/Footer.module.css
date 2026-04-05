@@ -60,23 +60,6 @@
   color: var(--hp-primary);
 }
 
-.linkDisabled {
-  font-size: 0.88rem;
-  color: var(--hp-text-muted);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.soon {
-  font-size: 0.65rem;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #eab30815;
-  color: #eab308;
-}
-
 .bottom {
   padding-top: 24px;
   border-top: 1px solid var(--hp-border);

@@ -25,6 +25,9 @@ export function Navbar({ theme, onToggleTheme }: NavbarProps) {
           <Link to="/scales/" className={styles.link}>
             Scales
           </Link>
+          <Link to="/harmony/" className={styles.link}>
+            Harmony
+          </Link>
         </div>
 
         <div className={styles.actions}>
@@ -66,6 +69,13 @@ export function Navbar({ theme, onToggleTheme }: NavbarProps) {
             onClick={() => setMenuOpen(false)}
           >
             Scales
+          </Link>
+          <Link
+            to="/harmony/"
+            className={styles.mobileLink}
+            onClick={() => setMenuOpen(false)}
+          >
+            Harmony
           </Link>
         </div>
       )}

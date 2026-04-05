@@ -20,9 +20,9 @@ export function Footer() {
             <Link to="/scales/" className={styles.link}>
               Scales
             </Link>
-            <span className={styles.linkDisabled}>
-              Harmony Hub <span className={styles.soon}>Soon</span>
-            </span>
+            <Link to="/harmony/" className={styles.link}>
+              Harmony
+            </Link>
           </div>
           <div className={styles.group}>
             <span className={styles.groupLabel}>More</span>

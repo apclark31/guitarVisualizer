@@ -1,5 +1,4 @@
 /* Homepage Theme Bridge — maps --hp-* to global design tokens */
-/* Homepage keeps its own green primary for branding distinction */
 
 .homepage {
   min-height: 100vh;
@@ -15,8 +14,8 @@
   --hp-text: var(--on-surface);
   --hp-text-muted: var(--on-surface-muted);
   --hp-border: var(--outline);
-  --hp-primary: #006e37;
-  --hp-primary-hover: #005a2d;
+  --hp-primary: var(--primary);
+  --hp-primary-hover: var(--primary-hover);
   --hp-nav-bg: rgba(255, 255, 255, 0.85);
   --hp-card-shadow: var(--shadow-card);
   --hp-card-shadow-hover: var(--shadow-elevated);
@@ -30,8 +29,8 @@
   --hp-text: var(--on-primary);
   --hp-text-muted: var(--on-surface-muted);
   --hp-border: var(--surface-container-high);
-  --hp-primary: var(--success);
-  --hp-primary-hover: var(--success-hover);
+  --hp-primary: var(--primary);
+  --hp-primary-hover: var(--primary-hover);
   --hp-nav-bg: rgba(0, 0, 0, 0.85);
   --hp-card-shadow: var(--shadow-card);
   --hp-card-shadow-hover: var(--shadow-elevated);
