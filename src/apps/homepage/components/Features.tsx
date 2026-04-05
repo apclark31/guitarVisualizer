@@ -1,12 +1,18 @@
 import { featuresLeft, featuresRight } from '../config/content';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import appStyles from '../App.module.css';
 import styles from './Features.module.css';
 
 export function Features() {
+  const layoutRef = useScrollReveal<HTMLDivElement>({
+    selector: `.${styles.block}, .${styles.row}`,
+    stagger: 0.1,
+  });
+
   return (
     <section className={appStyles.section}>
       <h2 className={styles.heading}>Master theory with a hands-on workflow</h2>
-      <div className={styles.layout}>
+      <div ref={layoutRef} className={styles.layout}>
         <div className={styles.left}>
           {featuresLeft.map((f) => (
             <div key={f.title} className={styles.block}>

@@ -1,13 +1,19 @@
 import { Link } from 'react-router-dom';
 import { tools, toolShowcase } from '../config/content';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import appStyles from '../App.module.css';
 import styles from './ToolShowcase.module.css';
 
 export function ToolShowcase() {
+  const gridRef = useScrollReveal<HTMLDivElement>({
+    selector: `.${styles.card}`,
+    stagger: 0.12,
+  });
+
   return (
     <section className={appStyles.section} style={{ background: 'var(--hp-bg-alt)' }}>
       <h2 className={styles.heading}>{toolShowcase.heading}</h2>
-      <div className={styles.grid}>
+      <div ref={gridRef} className={styles.grid}>
         {tools.map((tool) => (
           <Link key={tool.name} to={tool.href} className={styles.card}>
             <div

@@ -1,12 +1,18 @@
 import { techStack, footer as footerContent } from '../config/content';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import appStyles from '../App.module.css';
 import styles from './TechStack.module.css';
 
 export function TechStack() {
+  const gridRef = useScrollReveal<HTMLDivElement>({
+    selector: `.${styles.pill}`,
+    stagger: 0.08,
+  });
+
   return (
     <section className={appStyles.section} style={{ background: 'var(--hp-bg-alt)' }}>
       <h2 className={styles.heading}>Built with modern tools</h2>
-      <div className={styles.grid}>
+      <div ref={gridRef} className={styles.grid}>
         {techStack.map((item) => {
           if (item.label === 'Open Source') {
             return (
