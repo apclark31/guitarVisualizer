@@ -1,11 +1,6 @@
 .timeline {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--outline-ghost) transparent;
-  padding: 4px 0;
-  min-height: 88px;
+  width: 100%;
+  padding: 6px 0;
 }
 
 .timeline::-webkit-scrollbar {
@@ -25,4 +20,5 @@
   display: flex;
   gap: 8px;
   min-width: min-content;
+  justify-content: center;
 }

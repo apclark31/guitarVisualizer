@@ -137,7 +137,7 @@ export function ControlPanel() {
           className={styles.navButton}
           aria-label="Previous position"
         >
-          &lt;
+          &lsaquo;
         </button>
         <span className={`${styles.positionLabel} ${!hasScale && !isFreePlayMode ? styles.positionLabelInactive : ''} ${isFreePlayMode ? styles.positionLabelFreePlay : ''}`}>
           {getPositionLabel()}
@@ -148,7 +148,7 @@ export function ControlPanel() {
           className={styles.navButton}
           aria-label="Next position"
         >
-          &gt;
+          &rsaquo;
         </button>
       </div>
 

@@ -102,7 +102,7 @@ export function ControlPanel() {
           className={styles.navButton}
           aria-label="Previous voicing"
         >
-          &lt;
+          &lsaquo;
         </button>
         <span className={`${styles.positionLabel} ${isFreeFormMode ? styles.positionLabelInactive : ''}`}>
           {isFreeFormMode ? (
@@ -125,7 +125,7 @@ export function ControlPanel() {
           className={styles.navButton}
           aria-label="Next voicing"
         >
-          &gt;
+          &rsaquo;
         </button>
       </div>
 
