@@ -21,8 +21,25 @@
   color: var(--hp-text);
 }
 
-.accent {
+.rotatingWord {
+  display: inline-block;
+  min-width: 280px;
   color: var(--hp-primary);
+  text-align: left;
+}
+
+@media (max-width: 960px) {
+  .rotatingWord {
+    display: block;
+    min-width: 0;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .rotatingWord {
+    min-width: 0;
+  }
 }
 
 .subtitle {

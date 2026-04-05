@@ -1,14 +1,17 @@
 import { Link } from 'react-router-dom';
 import { hero } from '../config/content';
+import { useRotatingText } from '../hooks/useRotatingText';
 import styles from './Hero.module.css';
 
 export function Hero() {
+  const rotatingRef = useRotatingText({ words: hero.rotatingWords });
+
   return (
     <section className={styles.hero}>
       <div className={styles.content}>
         <h1 className={styles.headline}>
-          Demystify the{' '}
-          <span className={styles.accent}>{hero.accentWord}</span>
+          {hero.headlinePrefix}{' '}
+          <span ref={rotatingRef} className={styles.rotatingWord} />
         </h1>
         <p className={styles.subtitle}>{hero.subtitle}</p>
         <div className={styles.ctas}>

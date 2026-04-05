@@ -15,6 +15,9 @@ export function CallToAction() {
           <Link to={cta.secondaryHref} className={styles.secondaryLink}>
             {cta.secondaryText} &rarr;
           </Link>
+          <Link to={cta.tertiaryHref} className={styles.secondaryLink}>
+            {cta.tertiaryCta} &rarr;
+          </Link>
         </div>
         <div className={styles.badges}>
           {cta.badges.map((b) => (

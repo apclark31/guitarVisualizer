@@ -1,8 +1,8 @@
 export const hero = {
-  headline: 'Demystify the Fretboard.',
-  accentWord: 'Fretboard.',
+  headlinePrefix: 'Built for',
+  rotatingWords: ['beginners', 'musicians', 'exploration', 'learning', 'fun'] as const,
   subtitle:
-    'A free toolkit for guitarists. Visualize chords, master scales, and understand music theory through an intuitive, interactive fretboard.',
+    'A free, interactive toolkit to visualize chords, master scales, and unlock music theory on the guitar fretboard.',
   primaryCta: 'Explore Chords',
   primaryHref: '/chords/',
   secondaryCta: 'Explore Scales',
@@ -56,7 +56,7 @@ export const featuresLeft: Feature[] = [
   },
   {
     title: 'Dynamic Feedback',
-    description: 'Tap any fret and instantly see chord detection, quality analysis, and ranked suggestions update in real time.',
+    description: 'Tap any fret and instantly see chord detection, quality, and ranked suggestions update in real time.',
   },
 ];
 
@@ -90,18 +90,20 @@ export const techStack: TechItem[] = [
 ];
 
 export const cta = {
-  headline: 'Start Exploring',
+  headline: 'Ready to Explore?',
   subtitle:
-    'Fret Atlas is completely free. No sign-ups, no paywalls — just open and play.',
+    'Fret Atlas is completely free. No sign-ups, no paywalls. Open it and start playing.',
   primaryCta: 'Explore Chords',
   primaryHref: '/chords/',
-  secondaryText: 'Or explore Scales',
+  secondaryText: 'Explore Scales',
   secondaryHref: '/scales/',
+  tertiaryCta: 'Try Harmony',
+  tertiaryHref: '/harmony/',
   badges: ['100% Free', 'No Account Required'],
 } as const;
 
 export const footer = {
-  tagline: 'Making guitar theory visual and interactive',
+  tagline: 'Guitar theory, visualized.',
   github: 'https://github.com/apclark31/guitarVisualizer',
   copyright: `\u00A9 ${new Date().getFullYear()} Fret Atlas`,
 } as const;
