@@ -97,16 +97,11 @@
   flex: 0 0 400px;
 }
 
-.placeholder {
+.heroVideo {
   width: 100%;
-  aspect-ratio: 4 / 3;
   border-radius: 20px;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--hp-primary) 15%, transparent),
-    color-mix(in srgb, var(--hp-primary) 5%, transparent)
-  );
   border: 1px solid var(--hp-border);
+  object-fit: cover;
 }
 
 @media (max-width: 960px) {

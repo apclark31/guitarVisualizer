@@ -24,7 +24,17 @@ export function Hero() {
         </div>
       </div>
       <div className={styles.visual}>
-        <div className={styles.placeholder} aria-hidden="true" />
+        <video
+          className={styles.heroVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster={`${import.meta.env.BASE_URL}images/homepage/hero-poster.webp`}
+        >
+          <source src={`${import.meta.env.BASE_URL}images/homepage/hero.webm`} type="video/webm" />
+          <source src={`${import.meta.env.BASE_URL}images/homepage/hero.mp4`} type="video/mp4" />
+        </video>
       </div>
     </section>
   );

@@ -11,12 +11,20 @@ export function ToolShowcase() {
         {tools.map((tool) => (
           <Link key={tool.name} to={tool.href} className={styles.card}>
             <div
-              className={styles.cardImage}
+              className={styles.cardImageWrap}
               style={{
                 background: `linear-gradient(135deg, ${tool.color}22, ${tool.color}08)`,
               }}
-              aria-hidden="true"
-            />
+            >
+              <img
+                src={tool.image}
+                alt={`${tool.name} screenshot`}
+                className={styles.cardImage}
+                loading="lazy"
+                width={600}
+                height={300}
+              />
+            </div>
             <div className={styles.cardBody}>
               <h3 className={styles.cardTitle} style={{ color: tool.color }}>
                 {tool.name}
