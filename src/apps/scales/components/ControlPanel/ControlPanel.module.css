@@ -8,58 +8,6 @@
   max-width: 900px;
 }
 
-/* ── Position row: outside cards, always visible ─── */
-.positionRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding-top: 10px;
-  padding-bottom: 6px;
-}
-
-.navButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  background: var(--surface-container);
-  border: 1px solid var(--outline-ghost);
-  color: var(--on-surface);
-  font-size: 1.125rem;
-  cursor: pointer;
-  transition: background 0.15s ease;
-  padding: 0;
-}
-
-.navButton:hover:not(:disabled) {
-  background: var(--surface-container-high);
-}
-
-.navButton:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.positionLabel {
-  font-family: var(--font-ui);
-  font-size: 14px;
-  color: var(--on-surface-muted);
-  min-width: 80px;
-  text-align: center;
-}
-
-.positionLabelInactive {
-  color: var(--surface-bright);
-}
-
-.positionLabelFreePlay {
-  color: var(--primary);
-  font-weight: 500;
-}
-
 /* ── Carousel: scroll-snap on mobile, flex on desktop ─── */
 .carousel {
   display: flex;
@@ -238,21 +186,6 @@
   .controlPanel {
     max-width: 100%;
     gap: 6px;
-  }
-
-  .positionRow {
-    gap: 12px;
-  }
-
-  .navButton {
-    width: 24px;
-    height: 24px;
-    font-size: 16px;
-  }
-
-  .positionLabel {
-    font-size: 13px;
-    min-width: 70px;
   }
 
   .carousel {

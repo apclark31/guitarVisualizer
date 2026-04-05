@@ -108,6 +108,9 @@
   cursor: not-allowed;
 }
 
+/* Position nav wrapper (for flex ordering) */
+.positionNavArea {}
+
 /* Controls area */
 .controlsArea {
   width: 100%;
@@ -125,6 +128,7 @@
 
   .chordBar {
     padding: 0;
+    height: 100px;
   }
 
   .main {
@@ -137,9 +141,10 @@
     order: -1;
   }
 
-  /* Reorder: chord, fretboard, buttons, controls */
+  /* Reorder: chord, fretboard, buttons, position nav, controls */
   .chordBar { order: 1; }
   .main { order: 2; }
   .buttonsRow { order: 3; }
-  .controlsArea { order: 4; }
+  .positionNavArea { order: 4; }
+  .controlsArea { order: 5; }
 }

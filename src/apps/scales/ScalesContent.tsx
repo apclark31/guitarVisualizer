@@ -11,6 +11,7 @@ import { useScaleAudioEngine } from './hooks/useScaleAudioEngine';
 import { Fretboard } from '../../shared/components/Fretboard';
 import { ScaleHeader } from './components/ScaleHeader';
 import { ControlPanel } from './components/ControlPanel';
+import { PositionNav } from '../../shared/components/PositionNav/PositionNav';
 import { TuningConfirmModal } from '../chords/components/controls/TuningConfirmModal';
 import { LibrarySheet, LibrarySheetProvider } from '../../shared/components/LibrarySheet';
 import { useScaleLibraryTabs } from './components/library/useScaleLibraryTabs';
@@ -42,6 +43,7 @@ export function ScalesContent() {
     playbackDirection,
     guitarStringState,
     toggleFret,
+    setPosition,
   } = useScaleStore();
   const { tuning } = useSharedStore();
 
@@ -58,6 +60,34 @@ export function ScalesContent() {
   // Determine mode: scale selected or free-play
   const hasScale = scaleRoot && scaleType;
   const isFreePlayMode = !hasScale;
+
+  // Position navigation
+  const positionCount = useMemo(() => {
+    if (!scaleType) return 0;
+    if (scaleType === 'major-pentatonic' || scaleType === 'minor-pentatonic' || scaleType === 'blues') return 5;
+    return 7;
+  }, [scaleType]);
+
+  const noteCount = useMemo(
+    () => Object.values(guitarStringState).reduce((sum, frets) => sum + frets.length, 0),
+    [guitarStringState]
+  );
+  const isFreePlayActive = !hasScale && noteCount > 0;
+
+  const handlePrevPosition = useCallback(() => {
+    if (currentPosition > 0) setPosition(currentPosition - 1);
+  }, [currentPosition, setPosition]);
+
+  const handleNextPosition = useCallback(() => {
+    if (currentPosition < positionCount) setPosition(currentPosition + 1);
+  }, [currentPosition, positionCount, setPosition]);
+
+  const getPositionLabel = () => {
+    if (isFreePlayActive) return 'Free Play';
+    if (!hasScale) return 'Position';
+    if (currentPosition === 0) return 'Full';
+    return `${currentPosition} of ${positionCount}`;
+  };
 
   // Set document title
   useEffect(() => {
@@ -299,6 +329,18 @@ export function ScalesContent() {
           </svg>
           {copied ? 'Copied!' : 'Share'}
         </button>
+      </div>
+
+      <div className={styles.positionNavArea}>
+        <PositionNav
+          label={getPositionLabel()}
+          onPrev={handlePrevPosition}
+          onNext={handleNextPosition}
+          prevDisabled={!hasScale || currentPosition === 0}
+          nextDisabled={!hasScale || currentPosition >= positionCount}
+          inactive={!hasScale && !isFreePlayActive}
+          highlight={isFreePlayActive}
+        />
       </div>
 
       <div className={styles.controlsArea}>

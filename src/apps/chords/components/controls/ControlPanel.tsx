@@ -19,14 +19,8 @@ const VOICING_LABELS: Record<string, string> = {
 
 export function ControlPanel() {
   const {
-    targetRoot,
-    targetQuality,
     displayMode,
     setDisplayMode,
-    currentVoicingIndex,
-    availableVoicings,
-    setVoicingIndex,
-    isCustomShape,
     clearAllStrings,
     guitarStringState,
     voicingTypeFilter,
@@ -60,21 +54,6 @@ export function ControlPanel() {
     return () => el.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Position navigation
-  const isFreeFormMode = !targetRoot || !targetQuality;
-
-  const handlePrevVoicing = () => {
-    if (currentVoicingIndex > 0) {
-      setVoicingIndex(currentVoicingIndex - 1);
-    }
-  };
-
-  const handleNextVoicing = () => {
-    if (currentVoicingIndex < availableVoicings.length - 1) {
-      setVoicingIndex(currentVoicingIndex + 1);
-    }
-  };
-
   const hasNotes = Object.values(guitarStringState).some(fret => fret !== null);
 
   // Cycle voicing filter on tap
@@ -94,41 +73,6 @@ export function ControlPanel() {
 
   return (
     <div className={styles.controlPanel} data-tour="control-panel">
-      {/* Position — persistent, above cards */}
-      <div className={styles.positionRow} data-tour="position-nav">
-        <button
-          onClick={handlePrevVoicing}
-          disabled={isFreeFormMode || currentVoicingIndex === 0 || availableVoicings.length === 0}
-          className={styles.navButton}
-          aria-label="Previous voicing"
-        >
-          &lsaquo;
-        </button>
-        <span className={`${styles.positionLabel} ${isFreeFormMode ? styles.positionLabelInactive : ''}`}>
-          {isFreeFormMode ? (
-            'Position'
-          ) : isCustomShape ? (
-            'Custom'
-          ) : availableVoicings.length > 0 ? (
-            `${currentVoicingIndex + 1} of ${availableVoicings.length}`
-          ) : (
-            'Position'
-          )}
-        </span>
-        <button
-          onClick={handleNextVoicing}
-          disabled={
-            isFreeFormMode ||
-            currentVoicingIndex >= availableVoicings.length - 1 ||
-            availableVoicings.length === 0
-          }
-          className={styles.navButton}
-          aria-label="Next voicing"
-        >
-          &rsaquo;
-        </button>
-      </div>
-
       {/* Carousel — two panels */}
       <div className={styles.carousel} ref={carouselRef}>
         {/* Panel 1: Selectors (What) */}

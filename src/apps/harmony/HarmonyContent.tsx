@@ -18,6 +18,7 @@ import { Fretboard } from '../../shared/components/Fretboard';
 import { LibrarySheet, LibrarySheetProvider } from '../../shared/components/LibrarySheet';
 import { useHarmonyLibraryTabs } from './components/library/useHarmonyLibraryTabs';
 import { getPresetById } from './config/presets';
+import { PositionNav } from '../../shared/components/PositionNav/PositionNav';
 import { decodeKeyFromUrl, encodeKeyForUrl } from '../chords/config/constants';
 import styles from './HarmonyContent.module.css';
 
@@ -274,29 +275,14 @@ export function HarmonyContent() {
         </button>
       </div>
 
-      <div className={styles.voicingNav}>
-        <button
-          className={styles.voicingNavBtn}
-          onClick={handlePrevVoicing}
-          disabled={!selectedChord || availableVoicings.length <= 1}
-          aria-label="Previous voicing"
-        >
-          &lsaquo;
-        </button>
-        <span className={`${styles.voicingLabel} ${!selectedChord ? styles.voicingLabelInactive : ''}`}>
-          {selectedChord
-            ? `${selectedChord.voicingIndex + 1} / ${availableVoicings.length}`
-            : 'Position'}
-        </span>
-        <button
-          className={styles.voicingNavBtn}
-          onClick={handleNextVoicing}
-          disabled={!selectedChord || availableVoicings.length <= 1}
-          aria-label="Next voicing"
-        >
-          &rsaquo;
-        </button>
-      </div>
+      <PositionNav
+        label={selectedChord ? `${selectedChord.voicingIndex + 1} of ${availableVoicings.length}` : 'Position'}
+        onPrev={handlePrevVoicing}
+        onNext={handleNextVoicing}
+        prevDisabled={!selectedChord || availableVoicings.length <= 1}
+        nextDisabled={!selectedChord || availableVoicings.length <= 1}
+        inactive={!selectedChord}
+      />
 
       <div className={styles.controls}>
         <ProgressionBuilder

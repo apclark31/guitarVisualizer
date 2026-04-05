@@ -5,6 +5,7 @@
   flex-direction: column;
   gap: 16px;
   padding: 14px 24px 16px;
+  flex: 1;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
@@ -117,52 +118,6 @@
 
 .fretboardOverlayBtn:hover {
   opacity: 0.85;
-}
-
-.voicingNav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding-top: 10px;
-  padding-bottom: 6px;
-}
-
-.voicingNavBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  background: var(--surface-container);
-  border: 1px solid var(--outline-ghost);
-  color: var(--on-surface);
-  font-size: 1.125rem;
-  cursor: pointer;
-  transition: background 0.15s ease;
-  padding: 0;
-}
-
-.voicingNavBtn:hover:not(:disabled) {
-  background: var(--surface-container-high);
-}
-
-.voicingNavBtn:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.voicingLabel {
-  font-family: var(--font-ui);
-  font-size: 14px;
-  color: var(--on-surface-muted);
-  min-width: 80px;
-  text-align: center;
-}
-
-.voicingLabelInactive {
-  color: var(--surface-bright);
 }
 
 /* ── Buttons row ──────────────────────────────────────────── */
@@ -331,10 +286,6 @@
 /* ── Desktop ─────────────────────────────────────────────── */
 
 @media (min-width: 768px) {
-  .buttonsRow {
-    gap: 12px;
-  }
-
   .controls {
     gap: 20px;
   }
@@ -343,7 +294,6 @@
 /* ── Reduced motion ───────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .voicingNavBtn,
   .playButton,
   .shareButton,
   .clearBtn,

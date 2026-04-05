@@ -1,0 +1,80 @@
+/* PositionNav — Shared position/voicing navigator */
+/* < 1 of 5 > style nav used across Chords, Scales, Harmony */
+
+.positionNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding-top: 10px;
+  padding-bottom: 6px;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--surface-container);
+  border: 1px solid var(--outline-ghost);
+  color: var(--on-surface);
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  padding: 0;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: var(--surface-container-high);
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--on-surface-muted);
+  min-width: 80px;
+  text-align: center;
+}
+
+.labelInactive {
+  color: var(--surface-bright);
+}
+
+.labelHighlight {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* ── Mobile ───────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .positionNav {
+    gap: var(--space-3);
+  }
+
+  .navBtn {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+  }
+
+  .label {
+    font-size: 13px;
+    min-width: 70px;
+  }
+}
+
+/* ── Reduced motion ───────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .navBtn {
+    transition: none;
+  }
+}

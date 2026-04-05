@@ -9,19 +9,10 @@
  */
 
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { useScaleStore, useSharedStore, type ScaleType } from '../../store/useScaleStore';
+import { useScaleStore, useSharedStore } from '../../store/useScaleStore';
 import { useSharedStore as useGlobalSharedStore } from '../../../../shared/store';
 import { Card } from '../../../../shared/components/Card';
 import styles from './ControlPanel.module.css';
-
-/** Get position count based on scale type */
-function getPositionCount(scaleType: ScaleType | null): number {
-  if (!scaleType) return 0;
-  if (scaleType === 'major-pentatonic' || scaleType === 'minor-pentatonic' || scaleType === 'blues') {
-    return 5;
-  }
-  return 7;
-}
 
 export function ControlPanel() {
   const {
@@ -42,7 +33,6 @@ export function ControlPanel() {
   const { openLibrary } = useGlobalSharedStore();
 
   const hasScale = scaleRoot && scaleType;
-  const positionCount = getPositionCount(scaleType);
 
   // Check for free-play mode
   const noteCount = Object.values(guitarStringState).reduce(
@@ -74,26 +64,6 @@ export function ControlPanel() {
     el.addEventListener('scroll', handleScroll, { passive: true });
     return () => el.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Position navigation
-  const handlePrevPosition = () => {
-    if (currentPosition > 0) {
-      setPosition(currentPosition - 1);
-    }
-  };
-
-  const handleNextPosition = () => {
-    if (currentPosition < positionCount) {
-      setPosition(currentPosition + 1);
-    }
-  };
-
-  const getPositionLabel = () => {
-    if (isFreePlayMode) return 'Free Play';
-    if (!hasScale) return 'Position';
-    if (currentPosition === 0) return 'Full';
-    return `${currentPosition} of ${positionCount}`;
-  };
 
   // Selector display
   const keyIsActive = !!keyContext;
@@ -129,29 +99,6 @@ export function ControlPanel() {
 
   return (
     <div className={styles.controlPanel}>
-      {/* Position — persistent, above cards */}
-      <div className={styles.positionRow}>
-        <button
-          onClick={handlePrevPosition}
-          disabled={!hasScale || currentPosition === 0}
-          className={styles.navButton}
-          aria-label="Previous position"
-        >
-          &lsaquo;
-        </button>
-        <span className={`${styles.positionLabel} ${!hasScale && !isFreePlayMode ? styles.positionLabelInactive : ''} ${isFreePlayMode ? styles.positionLabelFreePlay : ''}`}>
-          {getPositionLabel()}
-        </span>
-        <button
-          onClick={handleNextPosition}
-          disabled={!hasScale || currentPosition >= positionCount}
-          className={styles.navButton}
-          aria-label="Next position"
-        >
-          &rsaquo;
-        </button>
-      </div>
-
       {/* Carousel — two panels */}
       <div className={styles.carousel} ref={carouselRef}>
         {/* Panel 1: Selectors (What) */}

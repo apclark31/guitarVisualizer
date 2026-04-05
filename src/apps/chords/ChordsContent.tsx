@@ -10,6 +10,7 @@ import * as Tone from 'tone';
 import { Fretboard } from './components/visuals/Fretboard';
 import { ControlPanel } from './components/controls/ControlPanel';
 import { ChordHeader } from './components/controls/ChordHeader';
+import { PositionNav } from '../../shared/components/PositionNav/PositionNav';
 import { TuningConfirmModal } from './components/controls/TuningConfirmModal';
 import { useMusicStore } from './store/useMusicStore';
 import { useSharedStore } from '../../shared/store';
@@ -23,7 +24,7 @@ import type { StringIndex, GuitarStringState, TuningChangeMode } from './types';
 import styles from './ChordsContent.module.css';
 
 export function ChordsContent() {
-  const { restoreFromUrl, guitarStringState, targetRoot, targetQuality, currentVoicingIndex, isCustomShape, suggestions, setTuning } = useMusicStore();
+  const { restoreFromUrl, guitarStringState, targetRoot, targetQuality, currentVoicingIndex, availableVoicings, setVoicingIndex, isCustomShape, suggestions, setTuning } = useMusicStore();
   const { tuning, keyContext, setMatchCount } = useSharedStore();
   const audioWarmedRef = useRef(false);
   const { isLoaded, playChord, playFretNote, playNote, playNotes } = useAudioEngine();
@@ -34,6 +35,15 @@ export function ChordsContent() {
   const [pendingTuning, setPendingTuning] = useState<{ tuning: string[]; name: string } | null>(null);
 
   const hasNotes = Object.values(guitarStringState).some(fret => fret !== null);
+  const isFreeFormMode = !targetRoot || !targetQuality;
+
+  const handlePrevVoicing = useCallback(() => {
+    if (currentVoicingIndex > 0) setVoicingIndex(currentVoicingIndex - 1);
+  }, [currentVoicingIndex, setVoicingIndex]);
+
+  const handleNextVoicing = useCallback(() => {
+    if (currentVoicingIndex < availableVoicings.length - 1) setVoicingIndex(currentVoicingIndex + 1);
+  }, [currentVoicingIndex, availableVoicings.length, setVoicingIndex]);
 
   const intervalEntries = useMemo(
     () => getChordIntervalEntries(guitarStringState, tuning, targetRoot || null),
@@ -242,6 +252,26 @@ export function ChordsContent() {
           </svg>
           {copied ? 'Copied!' : 'Share'}
         </button>
+      </div>
+
+      <div className={styles.positionNavArea}>
+        <PositionNav
+          label={
+            isFreeFormMode
+              ? 'Position'
+              : isCustomShape
+                ? 'Custom'
+                : availableVoicings.length > 0
+                  ? `${currentVoicingIndex + 1} of ${availableVoicings.length}`
+                  : 'Position'
+          }
+          onPrev={handlePrevVoicing}
+          onNext={handleNextVoicing}
+          prevDisabled={isFreeFormMode || currentVoicingIndex === 0 || availableVoicings.length === 0}
+          nextDisabled={isFreeFormMode || currentVoicingIndex >= availableVoicings.length - 1 || availableVoicings.length === 0}
+          inactive={isFreeFormMode}
+          dataTour="position-nav"
+        />
       </div>
 
       <div className={styles.controlsArea}>
