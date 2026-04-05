@@ -26,7 +26,7 @@ export const tools: ToolCard[] = [
       'Navigate voicings and inversions across the entire neck. Detect chords from any fingering, explore suggestions, and hear every voicing.',
     href: '/chords/',
     color: '#3b82f6',
-    image: '/images/homepage/tool-chords.webp',
+    image: '/images/homepage/chords_image.png',
   },
   {
     name: 'Scales',
@@ -34,7 +34,7 @@ export const tools: ToolCard[] = [
       'Visualize any scale or mode in every key. Navigate CAGED boxes and 3NPS positions with interval color coding.',
     href: '/scales/',
     color: '#22c55e',
-    image: '/images/homepage/tool-scales.webp',
+    image: '/images/homepage/scales_image.png',
   },
   {
     name: 'Harmony',
@@ -42,7 +42,7 @@ export const tools: ToolCard[] = [
       'Build chord progressions, explore harmonic relationships, and hear them played back with adjustable tempo.',
     href: '/harmony/',
     color: '#eab308',
-    image: '/images/homepage/tool-harmony.webp',
+    image: '/images/homepage/harmony_image.png',
   },
 ];
 

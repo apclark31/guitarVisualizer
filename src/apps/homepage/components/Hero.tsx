@@ -31,10 +31,9 @@ export function Hero() {
         muted
         loop
         playsInline
-        poster={`${import.meta.env.BASE_URL}images/homepage/hero-poster.webp`}
+        poster={`${import.meta.env.BASE_URL}images/homepage/chords_image.png`}
       >
-        <source src={`${import.meta.env.BASE_URL}images/homepage/hero.webm`} type="video/webm" />
-        <source src={`${import.meta.env.BASE_URL}images/homepage/hero.mp4`} type="video/mp4" />
+        <source src={`${import.meta.env.BASE_URL}images/homepage/chords_video_desktop.mp4`} type="video/mp4" />
       </video>
       <div className={styles.overlay} />
       <div className={styles.content}>
