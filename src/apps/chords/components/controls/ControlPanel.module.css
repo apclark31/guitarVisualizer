@@ -93,11 +93,13 @@
   display: flex;
   align-items: flex-end;
   gap: 16px;
+  flex: 1;
 }
 
 .selectorItem {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 2px;
   flex: 1;
   cursor: pointer;
@@ -252,7 +254,6 @@
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    gap: 10px;
   }
 
   .carousel::-webkit-scrollbar {
@@ -260,8 +261,7 @@
   }
 
   .panel {
-    flex: none;
-    width: 100%;
+    flex: 0 0 100%;
     scroll-snap-align: start;
   }
 
@@ -273,10 +273,28 @@
   }
 }
 
-/* ── Desktop: bottom-aligned ─── */
+/* ── Desktop: equal height, labels top + values bottom ─── */
 @media (min-width: 768px) {
   .carousel {
-    align-items: flex-end;
+    align-items: stretch;
+  }
+
+  .panel {
+    display: flex;
+  }
+
+  /* Card fills panel */
+  .panel > * {
+    flex: 1;
+  }
+
+  /* Card content fills card height */
+  .selectorRow {
+    height: 100%;
+  }
+
+  .selectorItem {
+    height: 100%;
   }
 }
 

@@ -58,8 +58,8 @@ export function ControlPanel() {
   const scrollToPanel = useCallback((index: number) => {
     const el = carouselRef.current;
     if (!el) return;
-    const panelWidth = el.children[0]?.clientWidth ?? 0;
-    el.scrollTo({ left: index * (panelWidth + 10), behavior: 'smooth' });
+    const panelWidth = el.clientWidth;
+    el.scrollTo({ left: index * panelWidth, behavior: 'smooth' });
   }, []);
 
   useEffect(() => {
