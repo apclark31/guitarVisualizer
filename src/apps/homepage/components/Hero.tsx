@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -6,9 +6,18 @@ import { hero } from '../config/content';
 import { useRotatingText } from '../hooks/useRotatingText';
 import styles from './Hero.module.css';
 
+const BASE = import.meta.env.BASE_URL;
+const MOBILE_SRC = `${BASE}images/homepage/fret-atlas-hp-hero-mobile.mp4`;
+const DESKTOP_SRC = `${BASE}images/homepage/fret-atlas-hp-hero-desktop.mp4`;
+
 export function Hero() {
   const rotatingRef = useRotatingText({ words: hero.rotatingWords });
   const sectionRef = useRef<HTMLElement>(null);
+
+  const videoSrc = useMemo(
+    () => (window.innerWidth < 768 ? MOBILE_SRC : DESKTOP_SRC),
+    []
+  );
 
   useGSAP(() => {
     const el = sectionRef.current;
@@ -31,11 +40,9 @@ export function Hero() {
         muted
         loop
         playsInline
-        poster={`${import.meta.env.BASE_URL}images/homepage/chords_image.png`}
-      >
-        <source src={`${import.meta.env.BASE_URL}images/homepage/fret-atlas-hp-hero-mobile.mp4`} media="(max-width: 767px)" type="video/mp4" />
-        <source src={`${import.meta.env.BASE_URL}images/homepage/fret-atlas-hp-hero-desktop.mp4`} media="(min-width: 768px)" type="video/mp4" />
-      </video>
+        poster={`${BASE}images/homepage/chords_image.png`}
+        src={videoSrc}
+      />
       <div className={styles.overlay} />
       <div className={styles.content}>
         <h1 className={styles.headline}>
