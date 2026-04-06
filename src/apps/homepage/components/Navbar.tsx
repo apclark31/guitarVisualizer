@@ -6,16 +6,13 @@ import styles from './Navbar.module.css';
 interface NavbarProps {
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
-  transparent?: boolean;
 }
 
-export function Navbar({ theme, onToggleTheme, transparent = false }: NavbarProps) {
+export function Navbar({ theme, onToggleTheme }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const navClass = `${styles.nav} ${transparent && !menuOpen ? styles.transparent : ''}`;
-
   return (
-    <nav className={navClass} aria-label="Main navigation">
+    <nav className={styles.nav} aria-label="Main navigation">
       <div className={styles.inner}>
         <Link to="/" className={styles.brand}>
           <img
