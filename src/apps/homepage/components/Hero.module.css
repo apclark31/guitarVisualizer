@@ -99,6 +99,22 @@
   transform: translateY(-1px);
 }
 
+/* Scroll cue — bouncing chevron at bottom center */
+.scrollCue {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  color: rgba(255, 255, 255, 0.5);
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+
 /* Tablet */
 @media (max-width: 960px) {
   .content {
@@ -116,6 +132,10 @@
 
 /* Mobile — center bottom */
 @media (max-width: 767px) {
+  .scrollCue {
+    display: none;
+  }
+
   .hero {
     align-items: flex-end;
     justify-content: center;

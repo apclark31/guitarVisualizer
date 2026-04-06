@@ -1,0 +1,90 @@
+/* Stats Ticker — animated count-up strip between intro and tool sections */
+
+.ticker {
+  padding: 40px 24px;
+  background: #0a0a0a;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.track {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.number {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Tablet ──────────────────────────────────────────────── */
+
+@media (max-width: 960px) {
+  .track {
+    gap: 32px;
+  }
+
+  .number {
+    font-size: 1.875rem;
+  }
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .ticker {
+    padding: 32px 20px;
+  }
+
+  .track {
+    gap: 16px;
+  }
+
+  .number {
+    font-size: 1.5rem;
+  }
+
+  .label {
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+  }
+}
+
+/* ── Small mobile ────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .ticker {
+    padding: 28px 16px;
+  }
+
+  .number {
+    font-size: 1.375rem;
+  }
+}

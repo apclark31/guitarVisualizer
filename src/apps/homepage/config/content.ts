@@ -11,38 +11,94 @@ export const toolShowcase = {
   heading: 'Your Guitar Theory Toolkit',
 } as const;
 
+export interface ToolFeature {
+  headline: string;
+  detail: string;
+}
+
 export interface ToolCard {
   name: string;
+  tagline: string;
   description: string;
   href: string;
   color: string;
+  colorDim: string;
   image: string;
+  features: ToolFeature[];
 }
 
 export const tools: ToolCard[] = [
   {
     name: 'Chords',
+    tagline: 'Every voicing, visualized.',
     description:
       'Navigate voicings and inversions across the entire neck. Detect chords from any fingering, explore suggestions, and hear every voicing.',
     href: '/chords/',
     color: '#3b82f6',
+    colorDim: '#1e3a5f',
     image: '/images/homepage/chords_image.png',
+    features: [
+      {
+        headline: 'Tap any fret to detect the chord',
+        detail: 'Place notes freely and get instant chord detection with ranked suggestions.',
+      },
+      {
+        headline: 'Browse voicings across the neck',
+        detail: 'Rotate through positions and inversions for any chord in any key.',
+      },
+      {
+        headline: 'Hear every voicing played back',
+        detail: 'Studio-sampled guitar audio with block and strum playback modes.',
+      },
+    ],
   },
   {
     name: 'Scales',
+    tagline: 'The full fretboard, mapped.',
     description:
       'Visualize any scale or mode in every key. Navigate CAGED boxes and 3NPS positions with interval color coding.',
     href: '/scales/',
     color: '#22c55e',
+    colorDim: '#14532d',
     image: '/images/homepage/scales_image.png',
+    features: [
+      {
+        headline: 'Navigate CAGED and 3NPS positions',
+        detail: 'Step through box shapes or see the full scale laid out across every fret.',
+      },
+      {
+        headline: 'Intervals color-coded on every note',
+        detail: 'Roots, thirds, fifths, and sevenths are instantly visible by color.',
+      },
+      {
+        headline: 'Switch scales and modes in any key',
+        detail: 'Major, minor, pentatonic, blues, modes, and more with one tap.',
+      },
+    ],
   },
   {
     name: 'Harmony',
+    tagline: 'Progressions, assembled.',
     description:
       'Build chord progressions, explore harmonic relationships, and hear them played back with adjustable tempo.',
     href: '/harmony/',
     color: '#eab308',
+    colorDim: '#713f12',
     image: '/images/homepage/harmony_image.png',
+    features: [
+      {
+        headline: 'Build progressions from diatonic chords',
+        detail: 'Tap Roman numerals to assemble I-IV-V-I, ii-V-I, or any custom sequence.',
+      },
+      {
+        headline: 'Preview any chord voicing instantly',
+        detail: 'Tap a chord in your progression to see and hear it on the fretboard.',
+      },
+      {
+        headline: 'Share progressions with a link',
+        detail: 'Copy a URL that restores your key, chords, and tempo for anyone.',
+      },
+    ],
   },
 ];
 

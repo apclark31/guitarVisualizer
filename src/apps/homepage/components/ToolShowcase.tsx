@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { tools, toolShowcase } from '../config/content';
+import { StatsTicker } from './StatsTicker';
 import styles from './ToolShowcase.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -17,13 +18,14 @@ export function ToolShowcase() {
 
     const mm = gsap.matchMedia();
 
-    // Desktop: pin each section and animate content in
+    // Desktop: pin each section and stagger feature callouts in
     mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
       const sections = el.querySelectorAll<HTMLElement>(`.${styles.toolSection}`);
 
       sections.forEach((section) => {
-        const content = section.querySelector(`.${styles.content}`);
-        const image = section.querySelector(`.${styles.screenshot}`);
+        const mockup = section.querySelector(`.${styles.mockup}`);
+        const features = section.querySelectorAll(`.${styles.featureItem}`);
+        const cta = section.querySelector(`.${styles.toolCta}`);
 
         ScrollTrigger.create({
           trigger: section,
@@ -33,29 +35,45 @@ export function ToolShowcase() {
           pinSpacing: true,
         });
 
-        if (content) {
-          gsap.from(content, {
-            y: 40,
+        if (mockup) {
+          gsap.from(mockup, {
+            y: 30,
             opacity: 0,
-            duration: 0.8,
+            duration: 0.7,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: section,
-              start: 'top 60%',
+              start: 'top 70%',
               toggleActions: 'play none none none',
             },
           });
         }
 
-        if (image) {
-          gsap.from(image, {
-            scale: 1.05,
+        if (features.length > 0) {
+          gsap.from(features, {
+            y: 24,
             opacity: 0,
-            duration: 1,
+            duration: 0.5,
+            stagger: 0.15,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: section,
-              start: 'top 80%',
+              start: 'top 50%',
+              toggleActions: 'play none none none',
+            },
+          });
+        }
+
+        if (cta) {
+          gsap.from(cta, {
+            y: 16,
+            opacity: 0,
+            duration: 0.5,
+            delay: 0.5,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: section,
+              start: 'top 50%',
               toggleActions: 'play none none none',
             },
           });
@@ -63,16 +81,16 @@ export function ToolShowcase() {
       });
     });
 
-    // Mobile: simple scroll reveal, no pinning
+    // Mobile: scroll reveal without pinning
     mm.add('(max-width: 767px) and (prefers-reduced-motion: no-preference)', () => {
       const sections = el.querySelectorAll<HTMLElement>(`.${styles.toolSection}`);
 
       sections.forEach((section) => {
-        const content = section.querySelector(`.${styles.content}`);
-        const image = section.querySelector(`.${styles.screenshot}`);
+        const mockup = section.querySelector(`.${styles.mockup}`);
+        const features = section.querySelectorAll(`.${styles.featureItem}`);
 
-        if (image) {
-          gsap.from(image, {
+        if (mockup) {
+          gsap.from(mockup, {
             y: 20,
             opacity: 0,
             duration: 0.6,
@@ -85,16 +103,16 @@ export function ToolShowcase() {
           });
         }
 
-        if (content) {
-          gsap.from(content, {
-            y: 20,
+        if (features.length > 0) {
+          gsap.from(features, {
+            y: 16,
             opacity: 0,
-            duration: 0.6,
-            delay: 0.15,
+            duration: 0.5,
+            stagger: 0.1,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: section,
-              start: 'top 75%',
+              start: 'top 70%',
               toggleActions: 'play none none none',
             },
           });
@@ -109,25 +127,58 @@ export function ToolShowcase() {
         <h2 className={styles.heading}>{toolShowcase.heading}</h2>
       </div>
 
-      {tools.map((tool) => (
-        <section key={tool.name} className={styles.toolSection}>
-          <div className={styles.screenshotWrap}>
-            <img
-              src={tool.image}
-              alt={`${tool.name} screenshot`}
-              className={styles.screenshot}
-              loading="lazy"
-            />
-          </div>
-          <div className={styles.overlay} />
-          <div className={styles.content}>
-            <span className={styles.toolLabel} style={{ color: tool.color }}>
-              {tool.name}
-            </span>
-            <p className={styles.toolDesc}>{tool.description}</p>
-            <Link to={tool.href} className={styles.toolCta} style={{ background: tool.color }}>
-              Explore {tool.name} &rarr;
-            </Link>
+      <StatsTicker />
+
+      {tools.map((tool, index) => (
+        <section
+          key={tool.name}
+          className={`${styles.toolSection} ${index % 2 !== 0 ? styles.reversed : ''}`}
+          style={{
+            '--tool-color': tool.color,
+            '--tool-color-dim': tool.colorDim,
+          } as React.CSSProperties}
+        >
+          <div className={styles.splitLayout}>
+            {/* Device mockup with screenshot */}
+            <div className={styles.visualSide}>
+              <div className={styles.mockup}>
+                <div className={styles.mockupChrome}>
+                  <span className={styles.mockupDot} />
+                  <span className={styles.mockupDot} />
+                  <span className={styles.mockupDot} />
+                </div>
+                <div className={styles.mockupScreen}>
+                  <img
+                    src={tool.image}
+                    alt={`${tool.name} screenshot`}
+                    className={styles.mockupImage}
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Text + feature callouts */}
+            <div className={styles.contentSide}>
+              <span className={styles.toolLabel} style={{ color: tool.color }}>
+                {tool.name}
+              </span>
+              <p className={styles.tagline}>{tool.tagline}</p>
+              <ul className={styles.featureList}>
+                {tool.features.map((feature) => (
+                  <li key={feature.headline} className={styles.featureItem}>
+                    <span className={styles.featureDot} style={{ background: tool.color }} />
+                    <div>
+                      <span className={styles.featureHeadline}>{feature.headline}</span>
+                      <span className={styles.featureDetail}>{feature.detail}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <Link to={tool.href} className={styles.toolCta}>
+                Explore {tool.name} &rarr;
+              </Link>
+            </div>
           </div>
         </section>
       ))}

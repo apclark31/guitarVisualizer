@@ -2,7 +2,10 @@ import { useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { hero } from '../config/content';
+
+gsap.registerPlugin(ScrollTrigger);
 import { useRotatingText } from '../hooks/useRotatingText';
 import styles from './Hero.module.css';
 
@@ -28,7 +31,19 @@ export function Hero() {
       const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
       tl.from(el.querySelector(`.${styles.headline}`), { opacity: 0, y: 20, duration: 0.6 })
         .from(el.querySelector(`.${styles.subtitle}`), { opacity: 0, y: 20, duration: 0.5 }, '-=0.3')
-        .from(el.querySelector(`.${styles.ctas}`), { opacity: 0, y: 20, duration: 0.5 }, '-=0.3');
+        .from(el.querySelector(`.${styles.ctas}`), { opacity: 0, y: 20, duration: 0.5 }, '-=0.3')
+        .from(el.querySelector(`.${styles.scrollCue}`), { opacity: 0, duration: 0.6 }, '-=0.1');
+
+      // Fade out scroll cue when user scrolls
+      gsap.to(el.querySelector(`.${styles.scrollCue}`), {
+        opacity: 0,
+        scrollTrigger: {
+          trigger: el,
+          start: 'top top',
+          end: '20% top',
+          scrub: true,
+        },
+      });
     });
   }, { scope: sectionRef });
 
@@ -55,6 +70,11 @@ export function Hero() {
             {hero.primaryCta}
           </Link>
         </div>
+      </div>
+      <div className={styles.scrollCue}>
+        <svg width="20" height="12" viewBox="0 0 20 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="2,2 10,10 18,2" />
+        </svg>
       </div>
     </section>
   );
