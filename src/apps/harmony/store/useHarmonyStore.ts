@@ -7,6 +7,14 @@ import { getDiatonicChords } from '../../chords/config/constants';
 import { getVoicingsForChord } from '../../chords/lib/chord-data';
 import { getPresetById } from '../config/presets';
 
+/** Generate a unique ID (fallback for browsers without crypto.randomUUID) */
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return generateId();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
 /** Default empty guitar state */
 const EMPTY_GUITAR_STATE: GuitarStringState = {
   0: null, 1: null, 2: null, 3: null, 4: null, 5: null,
@@ -33,7 +41,7 @@ function buildChordFromDegree(degree: number): ProgressionChord | null {
   if (!chord) return null;
 
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     root: chord.root,
     quality: familyToQuality(chord.family),
     numeral: chord.numeral,
@@ -108,7 +116,7 @@ export const useHarmonyStore = create<HarmonyState>((set, get) => ({
     }
 
     const chord: ProgressionChord = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       root,
       quality,
       numeral,
