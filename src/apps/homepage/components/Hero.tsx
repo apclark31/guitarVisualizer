@@ -33,8 +33,8 @@ export function Hero() {
         playsInline
         poster={`${import.meta.env.BASE_URL}images/homepage/chords_image.png`}
       >
-        <source src={`${import.meta.env.BASE_URL}images/homepage/chords_video_mobile.mp4`} media="(max-width: 767px)" type="video/mp4" />
-        <source src={`${import.meta.env.BASE_URL}images/homepage/chords_video_desktop.mp4`} type="video/mp4" />
+        <source src={`${import.meta.env.BASE_URL}images/homepage/fret-atlas-hp-hero-mobile.mp4`} media="(max-width: 767px)" type="video/mp4" />
+        <source src={`${import.meta.env.BASE_URL}images/homepage/fret-atlas-hp-hero-desktop.mp4`} media="(min-width: 768px)" type="video/mp4" />
       </video>
       <div className={styles.overlay} />
       <div className={styles.content}>
