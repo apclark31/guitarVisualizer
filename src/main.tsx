@@ -1,9 +1,23 @@
-import { StrictMode, Suspense, lazy } from 'react';
+import { StrictMode, Suspense, lazy, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { TourProvider } from './shared/tour';
 import { AppShell } from './shared/components/layout/AppShell';
 import './index.css';
+
+/** Keeps the canonical link tag in sync with the current route */
+function CanonicalURL() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (link) {
+      link.href = `https://fretatlas.com${pathname}`;
+    }
+  }, [pathname]);
+
+  return null;
+}
 
 // Lazy load mode content for code splitting
 const HomepageApp = lazy(() =>
@@ -42,6 +56,7 @@ function AppLoading() {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
+      <CanonicalURL />
       <TourProvider>
         <Suspense fallback={<AppLoading />}>
           <Routes>
