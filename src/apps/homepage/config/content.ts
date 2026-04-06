@@ -2,7 +2,7 @@ export const hero = {
   headlinePrefix: 'Built for',
   rotatingWords: ['beginners', 'musicians', 'exploration', 'learning', 'fun'] as const,
   subtitle:
-    'A free, interactive toolkit to visualize chords, master scales, and unlock music theory on the guitar fretboard.',
+    'An interactive toolkit to visualize chords, master scales, and unlock music theory on the guitar fretboard.',
   primaryCta: 'Start Playing',
   primaryHref: '/chords/',
 } as const;
@@ -150,14 +150,14 @@ export const techStack: TechItem[] = [
 export const cta = {
   headline: 'Ready to Explore?',
   subtitle:
-    'Fret Atlas is completely free. No sign-ups, no paywalls. Open it and start playing.',
+    'No sign-ups, no downloads. Open it and start playing.',
   primaryCta: 'Explore Chords',
   primaryHref: '/chords/',
   secondaryText: 'Explore Scales',
   secondaryHref: '/scales/',
   tertiaryCta: 'Try Harmony',
   tertiaryHref: '/harmony/',
-  badges: ['100% Free', 'No Account Required'],
+  badges: ['No Account Required'],
 } as const;
 
 export const footer = {
