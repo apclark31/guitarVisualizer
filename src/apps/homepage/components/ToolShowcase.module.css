@@ -1,93 +1,188 @@
+/* Immersive tool showcase — full-viewport pinned sections */
+
+.showcase {
+  width: 100%;
+}
+
+/* Intro heading section */
+.introSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px 40px;
+  background: var(--hp-bg-alt);
+}
+
 .heading {
   font-size: 2rem;
   font-weight: 800;
   text-align: center;
-  margin: 0 0 48px;
+  margin: 0;
   letter-spacing: -0.02em;
   color: var(--hp-text);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  background: var(--hp-surface);
-  border: 1px solid var(--hp-border);
-  border-radius: 16px;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-}
-
-.card:hover {
-  border-color: var(--hp-primary);
-  box-shadow: var(--hp-card-shadow-hover);
-  transform: translateY(-2px);
-}
-
-.cardImageWrap {
-  height: 180px;
+/* Each tool — full viewport section */
+.toolSection {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
   overflow: hidden;
   display: flex;
   align-items: flex-end;
+  background: #000000;
+}
+
+/* Screenshot fills the section */
+.screenshotWrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.cardImage {
+.screenshot {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: bottom;
+  object-fit: contain;
+  pointer-events: none;
 }
 
-.cardBody {
-  padding: 24px;
+/* Gradient overlay for text readability */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    transparent 30%,
+    rgba(0, 0, 0, 0.25) 50%,
+    rgba(0, 0, 0, 0.8) 75%,
+    #000000 100%
+  );
+  pointer-events: none;
 }
 
-.cardTitle {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin: 0 0 8px;
+/* Text content — bottom-left */
+.content {
+  position: relative;
+  z-index: 2;
+  padding: 0 48px 56px;
+  max-width: 560px;
 }
 
-.cardDesc {
-  font-size: 0.9rem;
+.toolLabel {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+}
+
+.toolDesc {
+  font-size: 1.05rem;
   line-height: 1.6;
-  color: var(--hp-text-muted);
-  margin: 0 0 16px;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 24px;
 }
 
-.arrow {
-  font-size: 0.85rem;
+.toolCta {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 24px;
+  color: #ffffff;
   font-weight: 600;
-  color: var(--hp-primary);
+  font-size: 0.9rem;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.15s;
 }
 
+.toolCta:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Tablet */
+@media (max-width: 960px) {
+  .content {
+    padding: 0 32px 48px;
+  }
+
+  .toolLabel {
+    font-size: 2rem;
+  }
+}
+
+/* Mobile — centered, shorter sections, no pinning */
 @media (max-width: 767px) {
+  .introSection {
+    padding: 56px 20px 24px;
+  }
+
   .heading {
     font-size: 1.5rem;
-    margin: 0 0 32px;
   }
 
-  .grid {
-    grid-template-columns: 1fr;
-    max-width: 440px;
-    margin: 0 auto;
+  .toolSection {
+    height: 70vh;
+    height: 70svh;
+    align-items: flex-end;
+    justify-content: center;
   }
 
-  .cardImageWrap {
-    height: 140px;
+  .content {
+    padding: 0 20px 32px;
+    max-width: none;
+    text-align: center;
+  }
+
+  .toolLabel {
+    font-size: 1.75rem;
+  }
+
+  .toolDesc {
+    font-size: 0.95rem;
+    margin: 0 0 20px;
+  }
+
+  .toolCta {
+    padding: 12px 20px;
+    font-size: 0.85rem;
   }
 }
 
+/* Small mobile */
 @media (max-width: 480px) {
-  .cardBody {
-    padding: 16px;
+  .introSection {
+    padding: 40px 16px 20px;
+  }
+
+  .toolSection {
+    height: 60vh;
+    height: 60svh;
+  }
+
+  .content {
+    padding: 0 16px 24px;
+  }
+
+  .toolLabel {
+    font-size: 1.5rem;
+  }
+
+  .toolDesc {
+    font-size: 0.9rem;
+  }
+}
+
+/* Reduced motion — static stacked layout, no pinning */
+@media (prefers-reduced-motion: reduce) {
+  .toolSection {
+    height: auto;
+    min-height: 60vh;
   }
 }
