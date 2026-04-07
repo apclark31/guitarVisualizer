@@ -1,7 +1,7 @@
 {
   "name": "Fret Atlas",
   "short_name": "Fret Atlas",
-  "description": "Demystifying the guitar fretboard and music theory in an intuitive and approachable way.",
+  "description": "An interactive toolkit to visualize chords, master scales, and build progressions on the guitar fretboard.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",
@@ -9,30 +9,36 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "/chordcompass/icon-192.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/chordcompass/icon-512.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
   "shortcuts": [
     {
-      "name": "Chord Compass",
+      "name": "Chords",
       "short_name": "Chords",
       "description": "Explore chord voicings on the fretboard",
-      "url": "/chordcompass/",
-      "icons": [{ "src": "/chordcompass/compass-icon.png", "sizes": "96x96" }]
+      "url": "/chords/",
+      "icons": [{ "src": "/compass-icon.png", "sizes": "96x96" }]
     },
     {
-      "name": "Scale Sage",
+      "name": "Scales",
       "short_name": "Scales",
       "description": "Visualize scale patterns and positions",
-      "url": "/scalesage/",
-      "icons": [{ "src": "/chordcompass/scale-sage-icon.png", "sizes": "96x96" }]
+      "url": "/scales/",
+      "icons": [{ "src": "/scale-sage-icon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Harmony",
+      "short_name": "Harmony",
+      "description": "Build and play chord progressions",
+      "url": "/harmony/"
     }
   ]
 }

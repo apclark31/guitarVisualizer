@@ -7,12 +7,10 @@ import { getDiatonicChords } from '../../chords/config/constants';
 import { getVoicingsForChord } from '../../chords/lib/chord-data';
 import { getPresetById } from '../config/presets';
 
-/** Generate a unique ID (fallback for browsers without crypto.randomUUID) */
-function generateId(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return generateId();
-  }
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+/** Session-scoped unique ID from session start, degree, and position in progression */
+const SESSION_ID = Date.now();
+function generateChordId(degree: number, position: number): string {
+  return `${SESSION_ID}-${degree}-${position}`;
 }
 
 /** Default empty guitar state */
@@ -32,7 +30,7 @@ function familyToQuality(family: string): string {
 }
 
 /** Build a ProgressionChord from a scale degree in the current key */
-function buildChordFromDegree(degree: number): ProgressionChord | null {
+function buildChordFromDegree(degree: number, position: number): ProgressionChord | null {
   const { keyContext } = useSharedStore.getState();
   if (!keyContext) return null;
 
@@ -41,7 +39,7 @@ function buildChordFromDegree(degree: number): ProgressionChord | null {
   if (!chord) return null;
 
   return {
-    id: generateId(),
+    id: generateChordId(degree, position),
     root: chord.root,
     quality: familyToQuality(chord.family),
     numeral: chord.numeral,
@@ -88,7 +86,8 @@ export const useHarmonyStore = create<HarmonyState>((set, get) => ({
 
   // Actions
   addChord: (degree: number) => {
-    const chord = buildChordFromDegree(degree);
+    const position = get().progression.length;
+    const chord = buildChordFromDegree(degree, position);
     if (!chord) return;
 
     const progression = [...get().progression, chord];
@@ -115,8 +114,9 @@ export const useHarmonyStore = create<HarmonyState>((set, get) => ({
       }
     }
 
+    const position = get().progression.length;
     const chord: ProgressionChord = {
-      id: generateId(),
+      id: generateChordId(degree, position),
       root,
       quality,
       numeral,
@@ -222,7 +222,7 @@ export const useHarmonyStore = create<HarmonyState>((set, get) => ({
     if (!keyContext) return;
 
     const chords = preset.degrees
-      .map(d => buildChordFromDegree(d))
+      .map((d, i) => buildChordFromDegree(d, i))
       .filter((c): c is ProgressionChord => c !== null);
 
     set({
@@ -270,7 +270,7 @@ export const useHarmonyStore = create<HarmonyState>((set, get) => ({
     if (!keyContext || degrees.length === 0) return;
 
     const chords = degrees
-      .map(d => buildChordFromDegree(d))
+      .map((d, i) => buildChordFromDegree(d, i))
       .filter((c): c is ProgressionChord => c !== null);
 
     set({
