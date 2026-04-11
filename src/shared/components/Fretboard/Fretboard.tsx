@@ -162,18 +162,16 @@ export function Fretboard({
     }
   }, [guitarStringState, highlightedNotes]);
 
-  // Manual touch scroll — SVG click areas prevent native touch scroll on mobile
+  // Suppress click when touch was a scroll drag (click fires after touchend on mobile)
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     let startX = 0;
-    let startScrollLeft = 0;
     let wasDragged = false;
 
     const onTouchStart = (e: TouchEvent) => {
       startX = e.touches[0].clientX;
-      startScrollLeft = container.scrollLeft;
       wasDragged = false;
     };
 
@@ -181,11 +179,9 @@ export function Fretboard({
       const dx = e.touches[0].clientX - startX;
       if (Math.abs(dx) > 5) {
         wasDragged = true;
-        container.scrollLeft = startScrollLeft - dx;
       }
     };
 
-    // Suppress click if the touch was a drag (click fires after touchend)
     const onClick = (e: MouseEvent) => {
       if (wasDragged) {
         e.stopPropagation();

@@ -29,6 +29,7 @@
   cursor: pointer;
   transition: fill 0.1s ease;
   fill: transparent;
+  touch-action: pan-x pan-y;
 }
 
 .clickArea:hover {
