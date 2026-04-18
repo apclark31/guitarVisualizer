@@ -2,6 +2,21 @@
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/sitemap.xml" },
     { "source": "/robots.txt", "destination": "/robots.txt" },
+    {
+      "source": "/scales/",
+      "has": [{ "type": "query", "key": "r" }],
+      "destination": "/api/og?_app=scales"
+    },
+    {
+      "source": "/chords/",
+      "has": [{ "type": "query", "key": "r" }],
+      "destination": "/api/og?_app=chords"
+    },
+    {
+      "source": "/harmony/",
+      "has": [{ "type": "query", "key": "k" }],
+      "destination": "/api/og?_app=harmony"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "redirects": [
