@@ -48,6 +48,15 @@ function buildCanonicalUrl(pathname: string, params: URLSearchParams): string {
   return `https://fretatlas.com${pathname}?${clean.toString()}`;
 }
 
+function buildOgImageUrl(params: URLSearchParams): string {
+  const clean = new URLSearchParams();
+  for (const key of ['r', 's', 'q', 'k']) {
+    const val = params.get(key);
+    if (val) clean.set(key, val);
+  }
+  return `https://fretatlas.com/api/og-image?${clean.toString()}`;
+}
+
 function buildMeta(params: URLSearchParams, pathname: string) {
   const root = params.get('r');
 
@@ -131,6 +140,22 @@ export default async function handler(request: Request) {
     .replace(
       /<meta property="og:url" content="[^"]*"/,
       `<meta property="og:url" content="${buildCanonicalUrl(pathname, url.searchParams)}"`
+    )
+    .replace(
+      /<meta property="og:image" content="[^"]*"/,
+      `<meta property="og:image" content="${buildOgImageUrl(url.searchParams)}"`
+    )
+    .replace(
+      /<meta property="og:image:width" content="[^"]*"/,
+      `<meta property="og:image:width" content="1200"`
+    )
+    .replace(
+      /<meta property="og:image:height" content="[^"]*"/,
+      `<meta property="og:image:height" content="630"`
+    )
+    .replace(
+      /<meta name="twitter:image" content="[^"]*"/,
+      `<meta name="twitter:image" content="${buildOgImageUrl(url.searchParams)}"`
     );
 
   return new Response(html, {
