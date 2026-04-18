@@ -17,7 +17,7 @@ import { LibrarySheet, LibrarySheetProvider } from '../../shared/components/Libr
 import { useScaleLibraryTabs } from './components/library/useScaleLibraryTabs';
 import { getScaleIntervalEntries } from '../../shared/lib/interval-map-utils';
 import type { GuitarStringState, HighlightedNote, StringIndex } from '../../shared/types';
-import { getScale } from './lib/scale-data';
+import { getScale, SCALE_TYPE_DISPLAY } from './lib/scale-data';
 import { getPositionNotes, getPlaybackNotesWithPositions, type PlaybackNoteWithPosition } from './lib/scale-positions';
 import { decodeTuningFromUrl, encodeTuningForUrl } from '../../shared/config/constants';
 import { getNoteAtPosition } from '../../shared/lib';
@@ -30,8 +30,7 @@ const emptyGuitarState: GuitarStringState = {
   0: null, 1: null, 2: null, 3: null, 4: null, 5: null
 };
 
-/** Valid scale types for URL parsing */
-const VALID_SCALE_TYPES: ScaleType[] = ['major', 'minor', 'major-pentatonic', 'minor-pentatonic', 'blues'];
+const VALID_SCALE_TYPES = Object.keys(SCALE_TYPE_DISPLAY) as ScaleType[];
 
 export function ScalesContent() {
   const {
@@ -61,12 +60,15 @@ export function ScalesContent() {
   const hasScale = scaleRoot && scaleType;
   const isFreePlayMode = !hasScale;
 
-  // Position navigation
+  // Position navigation: count depends on note count in the scale
   const positionCount = useMemo(() => {
-    if (!scaleType) return 0;
-    if (scaleType === 'major-pentatonic' || scaleType === 'minor-pentatonic' || scaleType === 'blues') return 5;
-    return 7;
-  }, [scaleType]);
+    if (!scaleRoot || !scaleType) return 0;
+    const info = getScale(scaleRoot, scaleType);
+    if (!info) return 0;
+    if (info.noteCount === 5) return 5;
+    if (info.type === 'blues') return 5;
+    return Math.min(7, info.noteCount);
+  }, [scaleRoot, scaleType]);
 
   const noteCount = useMemo(
     () => Object.values(guitarStringState).reduce((sum, frets) => sum + frets.length, 0),
