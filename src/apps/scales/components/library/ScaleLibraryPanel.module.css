@@ -1,4 +1,4 @@
-/* ScaleLibraryPanel - Two-column scale picker */
+/* ScaleLibraryPanel - Three-column scale picker (Root/Category/Type) */
 
 .libraryContent {
   display: flex;
@@ -9,7 +9,7 @@
 
 .headers {
   display: grid;
-  grid-template-columns: 90px 1fr;
+  grid-template-columns: 80px minmax(130px, auto) 1fr;
   border-bottom: 1px solid var(--outline);
   background: var(--surface);
   flex-shrink: 0;
@@ -27,7 +27,7 @@
 
 .columns {
   display: grid;
-  grid-template-columns: 90px 1fr;
+  grid-template-columns: 80px minmax(130px, auto) 1fr;
   flex: 1;
   min-height: 0;
 }
@@ -55,19 +55,6 @@
 .column::-webkit-scrollbar-thumb {
   background: var(--outline);
   border-radius: 3px;
-}
-
-.categoryHeader {
-  padding: 0.5rem 0.75rem 0.25rem;
-  font-size: 0.625rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--on-surface-subtle);
-  background: var(--surface);
-  position: sticky;
-  top: 0;
-  z-index: 1;
 }
 
 .option {
@@ -138,6 +125,10 @@
 }
 
 @media (max-width: 767px) {
+  .headers {
+    grid-template-columns: 80px minmax(130px, auto) 1fr;
+  }
+
   .header {
     padding: 0.875rem 0.75rem;
     font-size: 0.75rem;
@@ -146,6 +137,7 @@
   }
 
   .columns {
+    grid-template-columns: 80px minmax(130px, auto) 1fr;
     overflow: hidden;
   }
 

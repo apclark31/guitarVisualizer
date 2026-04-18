@@ -630,12 +630,12 @@ export function getScalePositions(
     return getBluesPositions(scaleInfo, tuning);
   }
 
-  // 5-note scales (pentatonic) use box patterns (2 notes per string)
+  // 5-note scales use box patterns (2 notes per string)
   if (scaleInfo.noteCount === 5) {
     return getPentatonicPositions(scaleInfo, tuning);
   }
 
-  // 7-note scales use 3NPS patterns (3 notes per string)
+  // 6, 7, and 8-note scales use 3NPS patterns
   return get3NPSPositions(scaleInfo, tuning);
 }
 

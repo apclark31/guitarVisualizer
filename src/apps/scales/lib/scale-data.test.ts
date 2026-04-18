@@ -172,28 +172,30 @@ describe('scale-data', () => {
 
   describe('constants', () => {
     it('has display names for all scale types', () => {
-      expect(SCALE_TYPE_DISPLAY['major']).toBe('Major (Ionian)');
-      expect(SCALE_TYPE_DISPLAY['minor']).toBe('Natural Minor (Aeolian)');
+      expect(SCALE_TYPE_DISPLAY['major']).toBe('Ionian (Major)');
+      expect(SCALE_TYPE_DISPLAY['minor']).toBe('Aeolian (Natural Minor)');
       expect(SCALE_TYPE_DISPLAY['dorian']).toBe('Dorian');
-      expect(SCALE_TYPE_DISPLAY['phrygian']).toBe('Phrygian');
-      expect(SCALE_TYPE_DISPLAY['lydian']).toBe('Lydian');
-      expect(SCALE_TYPE_DISPLAY['mixolydian']).toBe('Mixolydian');
-      expect(SCALE_TYPE_DISPLAY['locrian']).toBe('Locrian');
+      expect(SCALE_TYPE_DISPLAY['melodic-minor']).toBe('Melodic Minor');
+      expect(SCALE_TYPE_DISPLAY['harmonic-minor']).toBe('Harmonic Minor');
       expect(SCALE_TYPE_DISPLAY['major-pentatonic']).toBe('Major Pentatonic');
-      expect(SCALE_TYPE_DISPLAY['minor-pentatonic']).toBe('Minor Pentatonic');
-      expect(SCALE_TYPE_DISPLAY['blues']).toBe('Blues');
+      expect(SCALE_TYPE_DISPLAY['whole-tone']).toBe('Whole Tone');
+      expect(SCALE_TYPE_DISPLAY['bebop']).toBe('Bebop Dominant');
+      expect(SCALE_TYPE_DISPLAY['double-harmonic-major']).toBe('Double Harmonic Major');
     });
 
-    it('has scale categories', () => {
-      expect(SCALE_CATEGORIES.diatonic).toContain('major');
-      expect(SCALE_CATEGORIES.diatonic).toContain('minor');
-      expect(SCALE_CATEGORIES.modes).toContain('dorian');
-      expect(SCALE_CATEGORIES.modes).toContain('phrygian');
-      expect(SCALE_CATEGORIES.modes).toContain('lydian');
-      expect(SCALE_CATEGORIES.modes).toContain('mixolydian');
-      expect(SCALE_CATEGORIES.modes).toContain('locrian');
+    it('has scale categories covering all types', () => {
+      expect(SCALE_CATEGORIES['diatonic-modes']).toContain('major');
+      expect(SCALE_CATEGORIES['diatonic-modes']).toContain('minor');
+      expect(SCALE_CATEGORIES['diatonic-modes']).toContain('dorian');
+      expect(SCALE_CATEGORIES['melodic-minor']).toContain('melodic-minor');
+      expect(SCALE_CATEGORIES['melodic-minor']).toContain('altered');
+      expect(SCALE_CATEGORIES['harmonic-minor']).toContain('harmonic-minor');
+      expect(SCALE_CATEGORIES['harmonic-minor']).toContain('phrygian-dominant');
       expect(SCALE_CATEGORIES.pentatonic).toContain('minor-pentatonic');
       expect(SCALE_CATEGORIES.pentatonic).toContain('blues');
+      expect(SCALE_CATEGORIES.symmetric).toContain('whole-tone');
+      expect(SCALE_CATEGORIES.bebop).toContain('bebop');
+      expect(SCALE_CATEGORIES.exotic).toContain('double-harmonic-major');
     });
 
     it('has all 12 root notes', () => {
@@ -287,6 +289,28 @@ describe('scale-data', () => {
       const parent = getParentScale('F#', 'dorian');
       expect(parent?.parentRoot).toBe('E');
       expect(parent?.parentDisplay).toBe('E Major');
+    });
+
+    it('returns C Melodic Minor as parent of D Dorian b2', () => {
+      const parent = getParentScale('D', 'dorian-b2');
+      expect(parent?.parentRoot).toBe('C');
+      expect(parent?.parentDisplay).toBe('C Melodic Minor');
+      expect(parent?.modeLabel).toBe('2nd mode');
+    });
+
+    it('returns null for melodic minor root mode', () => {
+      expect(getParentScale('C', 'melodic-minor')).toBeNull();
+    });
+
+    it('returns C Harmonic Minor as parent of G Phrygian Dominant', () => {
+      const parent = getParentScale('G', 'phrygian-dominant');
+      expect(parent?.parentRoot).toBe('C');
+      expect(parent?.parentDisplay).toBe('C Harmonic Minor');
+      expect(parent?.modeLabel).toBe('5th mode');
+    });
+
+    it('returns null for harmonic minor root mode', () => {
+      expect(getParentScale('C', 'harmonic-minor')).toBeNull();
     });
   });
 });

@@ -39,16 +39,24 @@ export interface ScaleSuggestion {
 
 /** All supported scale types for detection */
 const SCALE_TYPES: ScaleType[] = [
-  'major',
-  'minor',
-  'dorian',
-  'phrygian',
-  'lydian',
-  'mixolydian',
-  'locrian',
-  'major-pentatonic',
-  'minor-pentatonic',
-  'blues',
+  // Diatonic Modes
+  'major', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'minor', 'locrian',
+  // Melodic Minor Modes
+  'melodic-minor', 'dorian-b2', 'lydian-augmented', 'lydian-dominant',
+  'mixolydian-b6', 'locrian-nat2', 'altered',
+  // Harmonic Minor Modes
+  'harmonic-minor', 'locrian-nat6', 'ionian-augmented', 'dorian-sharp4',
+  'phrygian-dominant', 'lydian-sharp9', 'ultralocrian',
+  // Pentatonic
+  'major-pentatonic', 'minor-pentatonic', 'blues', 'major-blues',
+  // Symmetric
+  'whole-tone', 'diminished-hw', 'diminished-wh', 'augmented',
+  // Bebop
+  'bebop', 'bebop-major', 'bebop-minor', 'bebop-locrian',
+  // Exotic
+  'double-harmonic-major', 'hungarian-minor', 'hungarian-major', 'persian',
+  'enigmatic', 'flamenco', 'harmonic-major', 'oriental',
+  'hirajoshi', 'in-sen', 'iwato', 'kumoi', 'pelog', 'chinese', 'egyptian',
 ];
 
 /**
@@ -155,8 +163,7 @@ export function detectScales(
   // Sort by score descending
   matches.sort((a, b) => b.score - a.score);
 
-  // Limit to top 12 results (10 scale types need more room than the original 5)
-  return matches.slice(0, 12);
+  return matches.slice(0, 20);
 }
 
 /**

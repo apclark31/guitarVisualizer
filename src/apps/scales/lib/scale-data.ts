@@ -28,37 +28,131 @@ export interface ScaleInfo {
 
 /** Map our scale types to Tonal.js scale names */
 const SCALE_TYPE_TO_TONAL: Record<ScaleType, string> = {
+  // Diatonic Modes
   major: 'major',
-  minor: 'minor',
   dorian: 'dorian',
   phrygian: 'phrygian',
   lydian: 'lydian',
   mixolydian: 'mixolydian',
+  minor: 'minor',
   locrian: 'locrian',
+  // Melodic Minor Modes
+  'melodic-minor': 'melodic minor',
+  'dorian-b2': 'dorian b2',
+  'lydian-augmented': 'lydian augmented',
+  'lydian-dominant': 'lydian dominant',
+  'mixolydian-b6': 'mixolydian b6',
+  'locrian-nat2': 'locrian #2',
+  'altered': 'altered',
+  // Harmonic Minor Modes
+  'harmonic-minor': 'harmonic minor',
+  'locrian-nat6': 'locrian 6',
+  'ionian-augmented': 'ionian augmented',
+  'dorian-sharp4': 'dorian #4',
+  'phrygian-dominant': 'phrygian dominant',
+  'lydian-sharp9': 'lydian #9',
+  'ultralocrian': 'ultralocrian',
+  // Pentatonic
   'major-pentatonic': 'major pentatonic',
   'minor-pentatonic': 'minor pentatonic',
   blues: 'blues',
+  'major-blues': 'major blues',
+  // Symmetric
+  'whole-tone': 'whole tone',
+  'diminished-hw': 'half-whole diminished',
+  'diminished-wh': 'whole-half diminished',
+  augmented: 'augmented',
+  // Bebop
+  bebop: 'bebop',
+  'bebop-major': 'bebop major',
+  'bebop-minor': 'bebop minor',
+  'bebop-locrian': 'bebop locrian',
+  // Exotic
+  'double-harmonic-major': 'double harmonic major',
+  'hungarian-minor': 'hungarian minor',
+  'hungarian-major': 'hungarian major',
+  persian: 'persian',
+  enigmatic: 'enigmatic',
+  flamenco: 'flamenco',
+  'harmonic-major': 'harmonic major',
+  oriental: 'oriental',
+  hirajoshi: 'hirajoshi',
+  'in-sen': 'in-sen',
+  iwato: 'iwato',
+  kumoi: 'kumoi',
+  pelog: 'pelog',
+  chinese: 'chinese',
+  egyptian: 'egyptian',
 };
 
 /** Display names for scale types */
 export const SCALE_TYPE_DISPLAY: Record<ScaleType, string> = {
-  major: 'Major (Ionian)',
-  minor: 'Natural Minor (Aeolian)',
+  // Diatonic Modes
+  major: 'Ionian (Major)',
   dorian: 'Dorian',
   phrygian: 'Phrygian',
   lydian: 'Lydian',
   mixolydian: 'Mixolydian',
+  minor: 'Aeolian (Natural Minor)',
   locrian: 'Locrian',
+  // Melodic Minor Modes
+  'melodic-minor': 'Melodic Minor',
+  'dorian-b2': 'Dorian b2',
+  'lydian-augmented': 'Lydian Augmented',
+  'lydian-dominant': 'Lydian Dominant',
+  'mixolydian-b6': 'Mixolydian b6',
+  'locrian-nat2': 'Locrian #2',
+  altered: 'Altered',
+  // Harmonic Minor Modes
+  'harmonic-minor': 'Harmonic Minor',
+  'locrian-nat6': 'Locrian #6',
+  'ionian-augmented': 'Ionian #5',
+  'dorian-sharp4': 'Dorian #4',
+  'phrygian-dominant': 'Phrygian Dominant',
+  'lydian-sharp9': 'Lydian #2',
+  ultralocrian: 'Ultralocrian',
+  // Pentatonic
   'major-pentatonic': 'Major Pentatonic',
   'minor-pentatonic': 'Minor Pentatonic',
   blues: 'Blues',
+  'major-blues': 'Major Blues',
+  // Symmetric
+  'whole-tone': 'Whole Tone',
+  'diminished-hw': 'Diminished (H-W)',
+  'diminished-wh': 'Diminished (W-H)',
+  augmented: 'Augmented',
+  // Bebop
+  bebop: 'Bebop Dominant',
+  'bebop-major': 'Bebop Major',
+  'bebop-minor': 'Bebop Minor',
+  'bebop-locrian': 'Bebop Locrian',
+  // Exotic
+  'double-harmonic-major': 'Double Harmonic Major',
+  'hungarian-minor': 'Hungarian Minor',
+  'hungarian-major': 'Hungarian Major',
+  persian: 'Persian',
+  enigmatic: 'Enigmatic',
+  flamenco: 'Flamenco',
+  'harmonic-major': 'Harmonic Major',
+  oriental: 'Oriental',
+  hirajoshi: 'Hirajoshi',
+  'in-sen': 'In-Sen',
+  iwato: 'Iwato',
+  kumoi: 'Kumoi',
+  pelog: 'Pelog',
+  chinese: 'Chinese',
+  egyptian: 'Egyptian',
 };
 
 /** Scale categories for grouping in picker */
 export const SCALE_CATEGORIES = {
-  diatonic: ['major', 'minor'] as ScaleType[],
-  modes: ['dorian', 'phrygian', 'lydian', 'mixolydian', 'locrian'] as ScaleType[],
-  pentatonic: ['major-pentatonic', 'minor-pentatonic', 'blues'] as ScaleType[],
+  'diatonic-modes': ['major', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'minor', 'locrian'] as ScaleType[],
+  'melodic-minor': ['melodic-minor', 'dorian-b2', 'lydian-augmented', 'lydian-dominant', 'mixolydian-b6', 'locrian-nat2', 'altered'] as ScaleType[],
+  'harmonic-minor': ['harmonic-minor', 'locrian-nat6', 'ionian-augmented', 'dorian-sharp4', 'phrygian-dominant', 'lydian-sharp9', 'ultralocrian'] as ScaleType[],
+  pentatonic: ['major-pentatonic', 'minor-pentatonic', 'blues', 'major-blues'] as ScaleType[],
+  symmetric: ['whole-tone', 'diminished-hw', 'diminished-wh', 'augmented'] as ScaleType[],
+  bebop: ['bebop', 'bebop-major', 'bebop-minor', 'bebop-locrian'] as ScaleType[],
+  exotic: ['double-harmonic-major', 'hungarian-minor', 'hungarian-major', 'persian', 'enigmatic', 'flamenco', 'harmonic-major', 'oriental', 'hirajoshi', 'in-sen', 'iwato', 'kumoi', 'pelog', 'chinese', 'egyptian'] as ScaleType[],
 };
 
 /** All available root notes */
@@ -179,16 +273,41 @@ export function isNoteInScale(note: string, scaleNotes: string[]): boolean {
   });
 }
 
-/** Mode metadata: degree within parent major scale and semitone offset from parent root */
-const MODE_INFO: Partial<Record<ScaleType, { degree: number; semitones: number; label: string }>> = {
-  major:      { degree: 1, semitones: 0,  label: '1st mode' },
-  dorian:     { degree: 2, semitones: 2,  label: '2nd mode' },
-  phrygian:   { degree: 3, semitones: 4,  label: '3rd mode' },
-  lydian:     { degree: 4, semitones: 5,  label: '4th mode' },
-  mixolydian: { degree: 5, semitones: 7,  label: '5th mode' },
-  minor:      { degree: 6, semitones: 9,  label: '6th mode' },
-  locrian:    { degree: 7, semitones: 11, label: '7th mode' },
+interface ModeEntry {
+  degree: number;
+  semitones: number;
+  parentFamily: 'Major' | 'Melodic Minor' | 'Harmonic Minor';
+  isRoot: boolean;
+}
+
+const MODE_INFO: Partial<Record<ScaleType, ModeEntry>> = {
+  // Diatonic modes (parent: Major)
+  major:          { degree: 1, semitones: 0,  parentFamily: 'Major', isRoot: true },
+  dorian:         { degree: 2, semitones: 2,  parentFamily: 'Major', isRoot: false },
+  phrygian:       { degree: 3, semitones: 4,  parentFamily: 'Major', isRoot: false },
+  lydian:         { degree: 4, semitones: 5,  parentFamily: 'Major', isRoot: false },
+  mixolydian:     { degree: 5, semitones: 7,  parentFamily: 'Major', isRoot: false },
+  minor:          { degree: 6, semitones: 9,  parentFamily: 'Major', isRoot: false },
+  locrian:        { degree: 7, semitones: 11, parentFamily: 'Major', isRoot: false },
+  // Melodic minor modes
+  'melodic-minor':    { degree: 1, semitones: 0,  parentFamily: 'Melodic Minor', isRoot: true },
+  'dorian-b2':        { degree: 2, semitones: 2,  parentFamily: 'Melodic Minor', isRoot: false },
+  'lydian-augmented': { degree: 3, semitones: 3,  parentFamily: 'Melodic Minor', isRoot: false },
+  'lydian-dominant':  { degree: 4, semitones: 5,  parentFamily: 'Melodic Minor', isRoot: false },
+  'mixolydian-b6':    { degree: 5, semitones: 7,  parentFamily: 'Melodic Minor', isRoot: false },
+  'locrian-nat2':     { degree: 6, semitones: 9,  parentFamily: 'Melodic Minor', isRoot: false },
+  altered:            { degree: 7, semitones: 11, parentFamily: 'Melodic Minor', isRoot: false },
+  // Harmonic minor modes
+  'harmonic-minor':    { degree: 1, semitones: 0,  parentFamily: 'Harmonic Minor', isRoot: true },
+  'locrian-nat6':      { degree: 2, semitones: 2,  parentFamily: 'Harmonic Minor', isRoot: false },
+  'ionian-augmented':  { degree: 3, semitones: 3,  parentFamily: 'Harmonic Minor', isRoot: false },
+  'dorian-sharp4':     { degree: 4, semitones: 5,  parentFamily: 'Harmonic Minor', isRoot: false },
+  'phrygian-dominant': { degree: 5, semitones: 7,  parentFamily: 'Harmonic Minor', isRoot: false },
+  'lydian-sharp9':     { degree: 6, semitones: 8,  parentFamily: 'Harmonic Minor', isRoot: false },
+  ultralocrian:        { degree: 7, semitones: 11, parentFamily: 'Harmonic Minor', isRoot: false },
 };
+
+const ORDINAL = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th'];
 
 export interface ParentScaleInfo {
   parentRoot: string;
@@ -198,14 +317,14 @@ export interface ParentScaleInfo {
 }
 
 /**
- * Get the parent major scale for a mode.
+ * Get the parent scale for a mode.
  * E.g., D Dorian -> { parentRoot: 'C', parentDisplay: 'C Major', modeLabel: '2nd mode', modeDegree: 2 }
- * Returns null for non-modal scale types (pentatonic, blues).
+ * Works for diatonic, melodic minor, and harmonic minor mode families.
+ * Returns null for root modes (Major, Melodic Minor, Harmonic Minor) and non-modal types.
  */
 export function getParentScale(root: string, scaleType: ScaleType): ParentScaleInfo | null {
   const info = MODE_INFO[scaleType];
-  if (!info) return null;
-  if (scaleType === 'major') return null;
+  if (!info || info.isRoot) return null;
 
   const rootChroma = Note.chroma(root);
   if (rootChroma === undefined) return null;
@@ -215,8 +334,8 @@ export function getParentScale(root: string, scaleType: ScaleType): ParentScaleI
 
   return {
     parentRoot,
-    parentDisplay: `${parentRoot} Major`,
-    modeLabel: info.label,
+    parentDisplay: `${parentRoot} ${info.parentFamily}`,
+    modeLabel: `${ORDINAL[info.degree - 1]} mode`,
     modeDegree: info.degree,
   };
 }

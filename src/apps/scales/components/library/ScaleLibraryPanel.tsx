@@ -1,39 +1,76 @@
 /**
- * ScaleLibraryPanel - Two-column scale picker (Root/Scale Type)
+ * ScaleLibraryPanel - Three-column scale picker (Root/Category/Type)
  *
- * Extracted from ScalePicker Library tab. Handles pending state,
- * scroll-to-active, categorized scale types, apply and clear.
+ * Mirrors the ChordLibraryPanel layout. Category column filters the
+ * type column to show only scales in the selected group.
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useScaleStore, type ScaleType } from '../../store/useScaleStore';
 import { useSharedStore } from '../../../../shared/store';
 import { ROOT_OPTIONS, SCALE_TYPE_DISPLAY, SCALE_CATEGORIES } from '../../lib/scale-data';
 import styles from './ScaleLibraryPanel.module.css';
+
+type ScaleCategory = keyof typeof SCALE_CATEGORIES;
+
+const CATEGORY_DISPLAY: Record<ScaleCategory, string> = {
+  'diatonic-modes': 'Diatonic Modes',
+  'melodic-minor': 'Melodic Minor',
+  'harmonic-minor': 'Harmonic Minor',
+  pentatonic: 'Pentatonic',
+  symmetric: 'Symmetric',
+  bebop: 'Bebop',
+  exotic: 'Exotic',
+};
+
+const CATEGORY_ORDER: ScaleCategory[] = [
+  'diatonic-modes', 'melodic-minor', 'harmonic-minor',
+  'pentatonic', 'symmetric', 'bebop', 'exotic',
+];
+
+function getCategoryForType(type: ScaleType): ScaleCategory {
+  for (const cat of CATEGORY_ORDER) {
+    if ((SCALE_CATEGORIES[cat] as readonly ScaleType[]).includes(type)) return cat;
+  }
+  return 'diatonic-modes';
+}
 
 export function ScaleLibraryPanel() {
   const { scaleRoot, scaleType, setScaleRoot, setScaleType, setPosition } = useScaleStore();
   const { closeLibrary } = useSharedStore();
 
   const [pendingRoot, setPendingRoot] = useState(scaleRoot || 'C');
+  const [pendingCategory, setPendingCategory] = useState<ScaleCategory>(
+    scaleType ? getCategoryForType(scaleType) : 'diatonic-modes'
+  );
   const [pendingType, setPendingType] = useState<ScaleType>(scaleType || 'major');
 
   const rootColumnRef = useRef<HTMLDivElement>(null);
+  const categoryColumnRef = useRef<HTMLDivElement>(null);
   const typeColumnRef = useRef<HTMLDivElement>(null);
 
-  // Sync pending state when store changes
+  const typeOptions = useMemo(() => SCALE_CATEGORIES[pendingCategory], [pendingCategory]);
+
   useEffect(() => {
     if (scaleRoot) setPendingRoot(scaleRoot);
-    if (scaleType) setPendingType(scaleType);
+    if (scaleType) {
+      setPendingType(scaleType);
+      setPendingCategory(getCategoryForType(scaleType));
+    }
   }, [scaleRoot, scaleType]);
 
-  // Scroll active items into view on mount
   useEffect(() => {
     requestAnimationFrame(() => {
       scrollActiveIntoView(rootColumnRef.current, pendingRoot);
+      scrollActiveIntoView(categoryColumnRef.current, pendingCategory);
       scrollActiveIntoView(typeColumnRef.current, pendingType);
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleCategoryChange = useCallback((category: ScaleCategory) => {
+    setPendingCategory(category);
+    setPendingType(SCALE_CATEGORIES[category][0]);
+  }, []);
 
   const handleApply = useCallback(() => {
     setScaleRoot(pendingRoot);
@@ -53,7 +90,8 @@ export function ScaleLibraryPanel() {
     <div className={styles.libraryContent}>
       <div className={styles.headers}>
         <div className={styles.header}>Root</div>
-        <div className={styles.header}>Scale Type</div>
+        <div className={styles.header}>Category</div>
+        <div className={styles.header}>Type</div>
       </div>
 
       <div className={styles.columns}>
@@ -70,33 +108,21 @@ export function ScaleLibraryPanel() {
           ))}
         </div>
 
+        <div ref={categoryColumnRef} className={styles.column}>
+          {CATEGORY_ORDER.map((cat) => (
+            <button
+              key={cat}
+              data-value={cat}
+              className={`${styles.option} ${pendingCategory === cat ? styles.active : ''}`}
+              onClick={() => handleCategoryChange(cat)}
+            >
+              {CATEGORY_DISPLAY[cat]}
+            </button>
+          ))}
+        </div>
+
         <div ref={typeColumnRef} className={styles.column}>
-          <div className={styles.categoryHeader}>Diatonic</div>
-          {SCALE_CATEGORIES.diatonic.map((type) => (
-            <button
-              key={type}
-              data-value={type}
-              className={`${styles.option} ${pendingType === type ? styles.active : ''}`}
-              onClick={() => setPendingType(type)}
-            >
-              {SCALE_TYPE_DISPLAY[type]}
-            </button>
-          ))}
-
-          <div className={styles.categoryHeader}>Modes</div>
-          {SCALE_CATEGORIES.modes.map((type) => (
-            <button
-              key={type}
-              data-value={type}
-              className={`${styles.option} ${pendingType === type ? styles.active : ''}`}
-              onClick={() => setPendingType(type)}
-            >
-              {SCALE_TYPE_DISPLAY[type]}
-            </button>
-          ))}
-
-          <div className={styles.categoryHeader}>Pentatonic</div>
-          {SCALE_CATEGORIES.pentatonic.map((type) => (
+          {typeOptions.map((type) => (
             <button
               key={type}
               data-value={type}

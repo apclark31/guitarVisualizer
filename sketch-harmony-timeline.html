@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harmony Timeline Merge Sketch</title>
+<style>
+  :root {
+    --surface: #1a1a2e;
+    --surface-container: #232340;
+    --surface-container-high: #2a2a4a;
+    --on-surface: #e8e8f0;
+    --on-surface-muted: #a0a0b8;
+    --on-surface-subtle: #6a6a80;
+    --primary: #6366f1;
+    --primary-bg: rgba(99, 102, 241, 0.12);
+    --outline-ghost: rgba(255, 255, 255, 0.08);
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-full: 9999px;
+    --font-display: 'Inter', system-ui, sans-serif;
+    --font-ui: 'Inter', system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--surface);
+    color: var(--on-surface);
+    font-family: var(--font-ui);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--on-surface-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .label {
+    font-size: 12px;
+    color: var(--on-surface-subtle);
+    margin-bottom: 8px;
+  }
+
+  /* ── Fretboard placeholder ─── */
+  .fretboard-placeholder {
+    height: 120px;
+    border: 2px dashed var(--outline-ghost);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--on-surface-subtle);
+    font-size: 14px;
+  }
+
+  /* ── Shared layout wrapper (mimics modeContent) ─── */
+  .mode-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 14px 24px;
+    max-width: 800px;
+    background: var(--surface);
+    border: 1px solid var(--outline-ghost);
+    border-radius: var(--radius-lg);
+  }
+
+  /* ── Height reference line ─── */
+  .height-ref {
+    position: relative;
+  }
+  .height-ref::after {
+    content: attr(data-height);
+    position: absolute;
+    right: -60px;
+    top: 0;
+    bottom: 0;
+    border-right: 2px dashed rgba(99, 102, 241, 0.3);
+    padding-right: 4px;
+    font-size: 10px;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+  }
+
+  /* ══════════════════════════════════════════════════
+     Centered header + cards below (stacked, fixed box)
+     ══════════════════════════════════════════════════ */
+
+  .harmony-header-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 0 2px;
+  }
+
+  /* Centered title line: "D Major  ·  '59s (I-vi-V)" */
+  .header-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+    justify-content: center;
+  }
+
+  .header-key {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--on-surface);
+  }
+
+  .header-dot {
+    margin: 0 10px;
+    color: var(--on-surface-subtle);
+    font-size: 1rem;
+  }
+
+  .header-preset {
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+    color: var(--primary);
+    font-weight: 500;
+  }
+
+  /* Cards scrollable row */
+  .cards-scroll {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--outline-ghost) transparent;
+  }
+
+  .cards-scroll::-webkit-scrollbar { height: 3px; }
+  .cards-scroll::-webkit-scrollbar-track { background: transparent; }
+  .cards-scroll::-webkit-scrollbar-thumb { background: var(--outline-ghost); border-radius: 2px; }
+
+  .cards-track {
+    display: flex;
+    gap: 8px;
+    min-width: min-content;
+    justify-content: center;
+    padding: 0;
+  }
+
+  /* ── Card variants ─── */
+
+  /* Current full-size card */
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 72px;
+    padding: 12px 16px;
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--outline-ghost);
+    background: var(--surface-container);
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .card.selected {
+    border-color: var(--primary);
+    background: var(--primary-bg);
+    box-shadow: 0 0 0 1px var(--primary);
+  }
+
+  .card .numeral {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+
+  .card .root {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .card .quality {
+    font-size: 0.6875rem;
+    color: var(--on-surface-muted);
+  }
+
+  /* Compact card - tighter padding, slightly smaller text */
+  .card-compact {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    min-width: 56px;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--outline-ghost);
+    background: var(--surface-container);
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .card-compact.selected {
+    border-color: var(--primary);
+    background: var(--primary-bg);
+    box-shadow: 0 0 0 1px var(--primary);
+  }
+
+  .card-compact .numeral {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .card-compact .root {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary);
+    line-height: 1.2;
+  }
+
+  .card-compact .quality {
+    font-size: 0.625rem;
+    color: var(--on-surface-muted);
+    line-height: 1.2;
+  }
+
+  /* ── Empty state ─── */
+  .empty-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    color: var(--on-surface-subtle);
+    font-size: 0.8125rem;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section>
+  <h2>Option A: Centered Header + Full Cards</h2>
+  <p class="label">Centered "D Major · '59s (I-vi-V)" header line, current full-size cards below. See if it fits 110px.</p>
+
+  <div class="mode-layout">
+    <div class="harmony-header-zone height-ref" data-height="~130px" style="height: auto; border: 1px dashed rgba(99,102,241,0.15);">
+      <div class="header-line">
+        <span class="header-key">D Major</span>
+        <span class="header-dot">&middot;</span>
+        <span class="header-preset">'59s (I-vi-IV-V)</span>
+      </div>
+      <div class="cards-scroll">
+        <div class="cards-track">
+          <div class="card selected">
+            <div class="numeral">I</div>
+            <div class="root">D</div>
+            <div class="quality">major</div>
+          </div>
+          <div class="card">
+            <div class="numeral">vi</div>
+            <div class="root">B</div>
+            <div class="quality">minor</div>
+          </div>
+          <div class="card">
+            <div class="numeral">IV</div>
+            <div class="root">G</div>
+            <div class="quality">major</div>
+          </div>
+          <div class="card">
+            <div class="numeral">V</div>
+            <div class="root">A</div>
+            <div class="quality">major</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fretboard-placeholder">Fretboard</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section>
+  <h2>Option B: Centered Header + Compact Cards (recommended)</h2>
+  <p class="label">Same centered header, compact cards with tighter padding. Fits comfortably in 110px.</p>
+
+  <div class="mode-layout">
+    <div class="harmony-header-zone height-ref" data-height="110px" style="height: 110px; overflow: hidden; border: 1px dashed rgba(99,102,241,0.15);">
+      <div class="header-line">
+        <span class="header-key">D Major</span>
+        <span class="header-dot">&middot;</span>
+        <span class="header-preset">'59s (I-vi-IV-V)</span>
+      </div>
+      <div class="cards-scroll">
+        <div class="cards-track">
+          <div class="card-compact selected">
+            <div class="numeral">I</div>
+            <div class="root">D</div>
+            <div class="quality">major</div>
+          </div>
+          <div class="card-compact">
+            <div class="numeral">vi</div>
+            <div class="root">B</div>
+            <div class="quality">minor</div>
+          </div>
+          <div class="card-compact">
+            <div class="numeral">IV</div>
+            <div class="root">G</div>
+            <div class="quality">major</div>
+          </div>
+          <div class="card-compact">
+            <div class="numeral">V</div>
+            <div class="root">A</div>
+            <div class="quality">major</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fretboard-placeholder">Fretboard (consistent Y position)</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section>
+  <h2>Option B - with many chords (scrolling)</h2>
+  <p class="label">Same 110px box, cards scroll horizontally when there are many.</p>
+
+  <div class="mode-layout">
+    <div class="harmony-header-zone height-ref" data-height="110px" style="height: 110px; overflow: hidden; border: 1px dashed rgba(99,102,241,0.15);">
+      <div class="header-line">
+        <span class="header-key">C Major</span>
+        <span class="header-dot">&middot;</span>
+        <span class="header-preset">Canon in D (I-V-vi-IV-I-V-vi-IV)</span>
+      </div>
+      <div class="cards-scroll">
+        <div class="cards-track" style="justify-content: flex-start;">
+          <div class="card-compact selected">
+            <div class="numeral">I</div>
+            <div class="root">C</div>
+            <div class="quality">major</div>
+          </div>
+          <div class="card-compact">
+            <div class="numeral">V</div>
+            <div class="root">G</div>
+            <div class="quality">major</div>
+          </div>
+          <div class="card-compact">
+            <div class="numeral">vi</div>
+            <div class="root">A</div>
+            <div class="quality">minor</div>
+          </div>
+          <div class="card-compact">
+            <div class="numeral">IV</div>
+            <div class="root">F</div>
+            <div class="quality">major</div>
+          </div>
+          <div class="card-compact">
+            <div class="numeral">I</div>
+            <div class="root">C</div>
+            <div class="quality">major</div>
+          </div>
+          <div class="card-compact">
+            <div class="numeral">V</div>
+            <div class="root">G</div>
+            <div class="quality">major</div>
+          </div>
+          <div class="card-compact">
+            <div class="numeral">vi</div>
+            <div class="root">A</div>
+            <div class="quality">minor</div>
+          </div>
+          <div class="card-compact">
+            <div class="numeral">IV</div>
+            <div class="root">F</div>
+            <div class="quality">major</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fretboard-placeholder">Fretboard (consistent Y position)</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section>
+  <h2>Option B - empty state</h2>
+  <p class="label">No chords yet, same fixed height.</p>
+
+  <div class="mode-layout">
+    <div class="harmony-header-zone height-ref" data-height="110px" style="height: 110px; overflow: hidden; border: 1px dashed rgba(99,102,241,0.15);">
+      <div class="header-line">
+        <span class="header-key">D Major</span>
+        <span class="header-dot">&middot;</span>
+        <span class="header-preset">Custom Progression</span>
+      </div>
+      <div class="empty-hint">Add chords below</div>
+    </div>
+    <div class="fretboard-placeholder">Fretboard (consistent Y position)</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section>
+  <h2>Option B - no key set</h2>
+  <p class="label">No key selected yet.</p>
+
+  <div class="mode-layout">
+    <div class="harmony-header-zone height-ref" data-height="110px" style="height: 110px; overflow: hidden; border: 1px dashed rgba(99,102,241,0.15);">
+      <div class="header-line">
+        <span class="header-key" style="color: var(--on-surface-muted);">No Key Selected</span>
+      </div>
+      <div class="empty-hint">Choose a key to get started</div>
+    </div>
+    <div class="fretboard-placeholder">Fretboard (consistent Y position)</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section>
+  <h2>For reference: Chord/Scale header (what we're matching)</h2>
+  <p class="label">This is roughly what the Chord/Scale header area looks like at 110px min-height.</p>
+
+  <div class="mode-layout">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 110px; border: 1px dashed rgba(99,102,241,0.15);" class="height-ref" data-height="110px">
+      <div style="font-family: var(--font-display); font-size: 28px; font-weight: 700;">Gb &middot; Bb &middot; Db</div>
+      <div style="font-size: 13px; color: var(--primary);">F# Major Pentatonic (and 7 others)</div>
+    </div>
+    <div class="fretboard-placeholder">Fretboard (consistent Y position)</div>
+  </div>
+</section>
+
+</body>
+</html>

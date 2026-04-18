@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control Panel Sketch — Fret Atlas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #171717;
+    --surface: #262626;
+    --surface-high: #303030;
+    --chip-bg: #2a2a2a;
+    --chip-border: #3a3a3a;
+    --chip-active-bg: rgba(59, 130, 246, 0.12);
+    --chip-active-border: rgba(59, 130, 246, 0.3);
+    --primary: #3b82f6;
+    --primary-dim: #2563eb;
+    --text: #e4e4e7;
+    --text-muted: #a1a1aa;
+    --text-subtle: #52525b;
+    --outline: #333;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-full: 999px;
+  }
+
+  body {
+    background: #0f0f0f;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    padding: 40px 20px 80px;
+  }
+
+  h2.sketch-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-subtle);
+    margin-bottom: -32px;
+  }
+
+  /* ── Phone frame ────────────────────────────── */
+  .phone {
+    width: 400px;
+    background: var(--bg);
+    border-radius: 24px;
+    border: 1px solid #2a2a2a;
+    padding: 24px 16px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.03),
+      0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  /* ── Card container ─────────────────────────── */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .card-header svg {
+    color: var(--text-subtle);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-subtle);
+  }
+
+  /* ── Chip strip ─────────────────────────────── */
+  .chip-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--chip-border);
+    background: var(--chip-bg);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .chip:hover {
+    border-color: #555;
+    background: var(--surface-high);
+  }
+
+  .chip .chip-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-subtle);
+    margin-right: 2px;
+  }
+
+  /* Active chip — value is set */
+  .chip.active {
+    background: var(--chip-active-bg);
+    border-color: var(--chip-active-border);
+    color: var(--primary);
+  }
+
+  .chip.active .chip-label {
+    color: rgba(59, 130, 246, 0.6);
+  }
+
+  /* Dimmed chip — no value set */
+  .chip.dimmed {
+    color: var(--text-subtle);
+    border-style: dashed;
+  }
+
+  /* ── Toggles row ────────────────────────────── */
+  .toggles-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .toggle-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .toggle-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* iOS-style toggle */
+  .toggle {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    background: var(--outline);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: var(--text);
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+  }
+
+  .toggle.on {
+    background: var(--primary);
+  }
+
+  .toggle.on::after {
+    transform: translateX(18px);
+  }
+
+  /* ── Clear button ───────────────────────────── */
+  .clear-btn {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-subtle);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: color 0.15s ease;
+    text-align: center;
+  }
+
+  .clear-btn:hover {
+    color: var(--text-muted);
+  }
+
+  /* ── Annotations ────────────────────────────── */
+  .annotation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: rgba(59, 130, 246, 0.06);
+    border: 1px solid rgba(59, 130, 246, 0.12);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .annotation code {
+    background: rgba(59, 130, 246, 0.12);
+    color: var(--primary);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  .vs-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-subtle);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin: 4px 0;
+    padding: 0 14px;
+  }
+
+  .vs-divider::before,
+  .vs-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #333;
+  }
+
+  /* ── Flat strip variant ─────────────────────── */
+  .flat-strip {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .flat-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 0;
+    cursor: pointer;
+    transition: color 0.15s ease;
+    flex: 1;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .flat-item:first-child {
+    justify-content: flex-start;
+  }
+
+  .flat-item:last-child {
+    justify-content: flex-end;
+  }
+
+  .flat-item .flat-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-subtle);
+  }
+
+  .flat-item .flat-value {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .flat-item.active .flat-value {
+    color: var(--primary);
+  }
+
+  .flat-item.active .flat-label {
+    color: rgba(59, 130, 246, 0.5);
+  }
+
+  .flat-item.dimmed .flat-value {
+    color: var(--text-subtle);
+  }
+
+  .flat-divider {
+    width: 1px;
+    height: 18px;
+    background: #3a3a3a;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- STATE 1: Key set, active selections        -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 class="sketch-label">State 1 — Key set, chord selected</h2>
+<div class="phone">
+
+  <!-- Setup Card -->
+  <div class="card">
+    <div class="card-header">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg>
+      <span class="card-title">Setup</span>
+    </div>
+    <div class="chip-strip">
+      <div class="chip active">
+        <span class="chip-label">Key</span> C Major
+      </div>
+      <div class="chip">
+        <span class="chip-label">Voicing</span> All
+      </div>
+      <div class="chip">
+        <span class="chip-label">Tuning</span> Standard
+      </div>
+    </div>
+  </div>
+
+  <!-- Display Card -->
+  <div class="card">
+    <div class="card-header">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span class="card-title">Display</span>
+    </div>
+    <div class="toggles-row">
+      <div class="toggle-group">
+        <span class="toggle-text">Intervals</span>
+        <div class="toggle on"></div>
+      </div>
+      <div class="toggle-group">
+        <span class="toggle-text">Playback</span>
+        <div class="toggle"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="clear-btn">Clear All</button>
+
+  <div class="annotation">
+    Tap <code>Key</code> chip → opens Library to Key tab. Tap <code>Tuning</code> → Tuning tab. <code>Voicing</code> cycles inline.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- STATE 2: Nothing set, blank state          -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 class="sketch-label">State 2 — No key, no chord (blank)</h2>
+<div class="phone">
+
+  <!-- Setup Card -->
+  <div class="card">
+    <div class="card-header">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg>
+      <span class="card-title">Setup</span>
+    </div>
+    <div class="chip-strip">
+      <div class="chip dimmed">
+        <span class="chip-label">Key</span> --
+      </div>
+      <div class="chip">
+        <span class="chip-label">Voicing</span> All
+      </div>
+      <div class="chip">
+        <span class="chip-label">Tuning</span> Standard
+      </div>
+    </div>
+  </div>
+
+  <!-- Display Card -->
+  <div class="card">
+    <div class="card-header">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span class="card-title">Display</span>
+    </div>
+    <div class="toggles-row">
+      <div class="toggle-group">
+        <span class="toggle-text">Intervals</span>
+        <div class="toggle"></div>
+      </div>
+      <div class="toggle-group">
+        <span class="toggle-text">Playback</span>
+        <div class="toggle"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="clear-btn">Clear All</button>
+
+  <div class="annotation">
+    <code>Key</code> chip dashed + dimmed when unset. Still tappable to open Library → Key tab.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- STATE 3: Drop tuning active                -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 class="sketch-label">State 3 — Drop tuning, shells filter, key set</h2>
+<div class="phone">
+
+  <div class="card">
+    <div class="card-header">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg>
+      <span class="card-title">Setup</span>
+    </div>
+    <div class="chip-strip">
+      <div class="chip active">
+        <span class="chip-label">Key</span> G Minor
+      </div>
+      <div class="chip active">
+        <span class="chip-label">Voicing</span> Shells
+      </div>
+      <div class="chip active">
+        <span class="chip-label">Tuning</span> Drop D
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span class="card-title">Display</span>
+    </div>
+    <div class="toggles-row">
+      <div class="toggle-group">
+        <span class="toggle-text">Intervals</span>
+        <div class="toggle on"></div>
+      </div>
+      <div class="toggle-group">
+        <span class="toggle-text">Playback</span>
+        <div class="toggle on"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="clear-btn">Clear All</button>
+
+  <div class="annotation">
+    Non-default values highlight in blue. At a glance you see what's customized.
+  </div>
+</div>
+
+</body>
+</html>

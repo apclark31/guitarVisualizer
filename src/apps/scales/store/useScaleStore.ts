@@ -6,16 +6,61 @@ import { detectKeys, getNotesFromMultiNoteState, type KeyMatch } from '../../../
 
 /** Scale types supported */
 export type ScaleType =
+  // Diatonic Modes
   | 'major'
-  | 'minor'
   | 'dorian'
   | 'phrygian'
   | 'lydian'
   | 'mixolydian'
+  | 'minor'
   | 'locrian'
+  // Melodic Minor Modes
+  | 'melodic-minor'
+  | 'dorian-b2'
+  | 'lydian-augmented'
+  | 'lydian-dominant'
+  | 'mixolydian-b6'
+  | 'locrian-nat2'
+  | 'altered'
+  // Harmonic Minor Modes
+  | 'harmonic-minor'
+  | 'locrian-nat6'
+  | 'ionian-augmented'
+  | 'dorian-sharp4'
+  | 'phrygian-dominant'
+  | 'lydian-sharp9'
+  | 'ultralocrian'
+  // Pentatonic
   | 'major-pentatonic'
   | 'minor-pentatonic'
-  | 'blues';
+  | 'blues'
+  | 'major-blues'
+  // Symmetric
+  | 'whole-tone'
+  | 'diminished-hw'
+  | 'diminished-wh'
+  | 'augmented'
+  // Bebop
+  | 'bebop'
+  | 'bebop-major'
+  | 'bebop-minor'
+  | 'bebop-locrian'
+  // Exotic
+  | 'double-harmonic-major'
+  | 'hungarian-minor'
+  | 'hungarian-major'
+  | 'persian'
+  | 'enigmatic'
+  | 'flamenco'
+  | 'harmonic-major'
+  | 'oriental'
+  | 'hirajoshi'
+  | 'in-sen'
+  | 'iwato'
+  | 'kumoi'
+  | 'pelog'
+  | 'chinese'
+  | 'egyptian';
 
 /** Position display type */
 export type PositionType = '3nps' | 'boxes' | 'full';

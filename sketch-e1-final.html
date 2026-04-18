@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E1 Final — No Headers, Dot Carousel, Position Above</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #171717;
+    --surface: #262626;
+    --surface-high: #303030;
+    --primary: #3b82f6;
+    --text: #e4e4e7;
+    --text-muted: #a1a1aa;
+    --text-subtle: #52525b;
+    --outline: #333;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+  }
+
+  body {
+    background: #0f0f0f;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    padding: 40px 20px 80px;
+  }
+
+  h2.sketch-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-subtle);
+    margin-bottom: -32px;
+  }
+  .annotation {
+    font-size: 12px;
+    color: var(--text-subtle);
+    padding: 12px 16px;
+    line-height: 1.5;
+    max-width: 420px;
+    margin-top: -32px;
+  }
+  .annotation strong { color: var(--text-muted); font-weight: 600; }
+
+  .divider {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    text-align: center;
+    padding: 48px 0 0;
+    opacity: 0.5;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .phone {
+    width: 400px;
+    background: var(--bg);
+    border-radius: 24px;
+    border: 1px solid #2a2a2a;
+    padding: 24px 16px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 20px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+
+  .desktop {
+    width: 820px;
+    background: var(--bg);
+    border-radius: 16px;
+    border: 1px solid #2a2a2a;
+    padding: 24px 20px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--outline);
+    padding: 12px 14px;
+  }
+
+  /* ── Position: lives OUTSIDE cards ─── */
+  .position-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+  .nav {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-subtle);
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+
+  /* ── E1 selectors ─── */
+  .e1-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .e1-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .e1-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-subtle);
+  }
+  .e1-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    padding-bottom: 2px;
+  }
+  .e1-item.active .e1-value {
+    color: var(--primary);
+    border-bottom-color: rgba(59,130,246,0.4);
+  }
+  .e1-item.active .e1-label { color: rgba(59,130,246,0.5); }
+  .e1-item.dimmed .e1-value {
+    color: var(--text-subtle);
+    border-bottom-color: rgba(255,255,255,0.06);
+  }
+
+  /* ── Pill groups ─── */
+  .e-pill-group {
+    display: flex;
+    background: var(--surface-high);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+    gap: 2px;
+    flex: 1;
+  }
+  .e-pill {
+    flex: 1;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-subtle);
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .e-pill.active {
+    background: var(--primary);
+    color: #fff;
+  }
+  .e-pill:hover:not(.active) { color: var(--text-muted); }
+
+  .pill-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-subtle);
+    margin-bottom: 4px;
+  }
+  .pill-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  /* ── Dots ─── */
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-subtle);
+    opacity: 0.3;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .dot.active {
+    opacity: 1;
+    background: var(--primary);
+  }
+
+  .clear-btn {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-subtle);
+    padding: 10px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════ -->
+<div class="divider">Chords — Mobile</div>
+
+<h2 class="sketch-label">Panel 1: Selectors (default view)</h2>
+<div class="phone">
+  <!-- Position: persistent, outside cards -->
+  <div class="position-row">
+    <span class="nav">&lt;</span>
+    <span class="label">Position</span>
+    <span class="nav">&gt;</span>
+  </div>
+  <!-- Carousel area -->
+  <div style="display: flex; gap: 10px; margin-right: -16px;">
+    <div class="card" style="flex-shrink: 0; width: calc(100% - 30px);">
+      <div class="e1-row">
+        <div class="e1-item active">
+          <span class="e1-label">Key</span>
+          <span class="e1-value">C Major</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Voicing</span>
+          <span class="e1-value">All</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Tuning</span>
+          <span class="e1-value">Standard</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="flex-shrink: 0; width: calc(100% - 30px); opacity: 0.5;">
+      <div style="display: flex; gap: 16px; padding: 6px 0;">
+        <div class="pill-col">
+          <span class="pill-label">Labels</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Notes</span>
+            <span class="e-pill">Intervals</span>
+          </div>
+        </div>
+        <div class="pill-col">
+          <span class="pill-label">Playback</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Strum</span>
+            <span class="e-pill">Block</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="carousel-dots">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+  </div>
+  <div class="clear-btn">Clear All</div>
+</div>
+
+<h2 class="sketch-label">Panel 2: Options (after swipe)</h2>
+<div class="phone">
+  <!-- Position: still there, same spot -->
+  <div class="position-row">
+    <span class="nav">&lt;</span>
+    <span class="label">Position</span>
+    <span class="nav">&gt;</span>
+  </div>
+  <!-- Carousel area, scrolled to panel 2 -->
+  <div style="display: flex; gap: 10px; margin-left: -16px; flex-direction: row-reverse;">
+    <div class="card" style="flex-shrink: 0; width: calc(100% - 30px);">
+      <div style="display: flex; gap: 16px; padding: 6px 0;">
+        <div class="pill-col">
+          <span class="pill-label">Labels</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Notes</span>
+            <span class="e-pill">Intervals</span>
+          </div>
+        </div>
+        <div class="pill-col">
+          <span class="pill-label">Playback</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Strum</span>
+            <span class="e-pill">Block</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="flex-shrink: 0; width: calc(100% - 30px); opacity: 0.5;">
+      <div class="e1-row" style="padding: 6px 0;">
+        <div class="e1-item active">
+          <span class="e1-label">Key</span>
+          <span class="e1-value">C Major</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Voicing</span>
+          <span class="e1-value">All</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Tuning</span>
+          <span class="e1-value">Standard</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="carousel-dots">
+    <div class="dot"></div>
+    <div class="dot active"></div>
+  </div>
+  <div class="clear-btn">Clear All</div>
+</div>
+
+<h2 class="sketch-label">Unset state (no key selected)</h2>
+<div class="phone">
+  <div class="position-row">
+    <span class="nav">&lt;</span>
+    <span class="label">Position</span>
+    <span class="nav">&gt;</span>
+  </div>
+  <div style="display: flex; gap: 10px; margin-right: -16px;">
+    <div class="card" style="flex-shrink: 0; width: calc(100% - 30px);">
+      <div class="e1-row">
+        <div class="e1-item dimmed">
+          <span class="e1-label">Key</span>
+          <span class="e1-value">--</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Voicing</span>
+          <span class="e1-value">All</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Tuning</span>
+          <span class="e1-value">Standard</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="flex-shrink: 0; width: calc(100% - 30px); opacity: 0.5;">
+      <div style="display: flex; gap: 16px; padding: 6px 0;">
+        <div class="pill-col">
+          <span class="pill-label">Labels</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Notes</span>
+            <span class="e-pill">Intervals</span>
+          </div>
+        </div>
+        <div class="pill-col">
+          <span class="pill-label">Playback</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Strum</span>
+            <span class="e-pill">Block</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="carousel-dots">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+  </div>
+  <div class="clear-btn">Clear All</div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<div class="divider">Scales — Mobile</div>
+
+<h2 class="sketch-label">Panel 1: Selectors</h2>
+<div class="phone">
+  <div class="position-row">
+    <span class="nav">&lt;</span>
+    <span class="label">Position 1 of 5</span>
+    <span class="nav">&gt;</span>
+  </div>
+  <div style="display: flex; gap: 10px; margin-right: -16px;">
+    <div class="card" style="flex-shrink: 0; width: calc(100% - 30px);">
+      <div class="e1-row">
+        <div class="e1-item active">
+          <span class="e1-label">Key</span>
+          <span class="e1-value">A Minor</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Tuning</span>
+          <span class="e1-value">Standard</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="flex-shrink: 0; width: calc(100% - 30px); opacity: 0.5;">
+      <div style="display: flex; gap: 16px; padding: 6px 0;">
+        <div class="pill-col">
+          <span class="pill-label">Labels</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Notes</span>
+            <span class="e-pill">Intervals</span>
+          </div>
+        </div>
+        <div class="pill-col">
+          <span class="pill-label">Pattern</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Boxes</span>
+            <span class="e-pill">3NPS</span>
+            <span class="e-pill">Full</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="carousel-dots">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+  </div>
+  <div class="clear-btn">Clear</div>
+</div>
+
+<h2 class="sketch-label">Panel 2: Options (after swipe)</h2>
+<div class="phone">
+  <div class="position-row">
+    <span class="nav">&lt;</span>
+    <span class="label">Position 1 of 5</span>
+    <span class="nav">&gt;</span>
+  </div>
+  <div style="display: flex; gap: 10px; margin-left: -16px; flex-direction: row-reverse;">
+    <div class="card" style="flex-shrink: 0; width: calc(100% - 30px);">
+      <div style="display: flex; gap: 16px; padding: 6px 0;">
+        <div class="pill-col">
+          <span class="pill-label">Labels</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Notes</span>
+            <span class="e-pill">Intervals</span>
+          </div>
+        </div>
+        <div class="pill-col">
+          <span class="pill-label">Pattern</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Boxes</span>
+            <span class="e-pill">3NPS</span>
+            <span class="e-pill">Full</span>
+          </div>
+        </div>
+        <div class="pill-col">
+          <span class="pill-label">Direction</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Asc</span>
+            <span class="e-pill">Desc</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="flex-shrink: 0; width: calc(100% - 30px); opacity: 0.5;">
+      <div class="e1-row" style="padding: 6px 0;">
+        <div class="e1-item active">
+          <span class="e1-label">Key</span>
+          <span class="e1-value">A Minor</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Tuning</span>
+          <span class="e1-value">Standard</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="carousel-dots">
+    <div class="dot"></div>
+    <div class="dot active"></div>
+  </div>
+  <div class="clear-btn">Clear</div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<div class="divider">Chords — Desktop</div>
+
+<h2 class="sketch-label">Position centered above both panels</h2>
+<div class="desktop">
+  <div class="position-row">
+    <span class="nav">&lt;</span>
+    <span class="label">Position</span>
+    <span class="nav">&gt;</span>
+  </div>
+  <div style="display: flex; gap: 12px;">
+    <div class="card" style="flex: 1;">
+      <div class="e1-row">
+        <div class="e1-item active">
+          <span class="e1-label">Key</span>
+          <span class="e1-value">C Major</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Voicing</span>
+          <span class="e1-value">All</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Tuning</span>
+          <span class="e1-value">Standard</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="flex: 1;">
+      <div style="display: flex; gap: 16px; padding: 6px 0;">
+        <div class="pill-col">
+          <span class="pill-label">Labels</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Notes</span>
+            <span class="e-pill">Intervals</span>
+          </div>
+        </div>
+        <div class="pill-col">
+          <span class="pill-label">Playback</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Strum</span>
+            <span class="e-pill">Block</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clear-btn">Clear All</div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<div class="divider">Scales — Desktop</div>
+
+<h2 class="sketch-label">Position centered above both panels</h2>
+<div class="desktop">
+  <div class="position-row">
+    <span class="nav">&lt;</span>
+    <span class="label">Position 1 of 5</span>
+    <span class="nav">&gt;</span>
+  </div>
+  <div style="display: flex; gap: 12px;">
+    <div class="card" style="flex: 1;">
+      <div class="e1-row">
+        <div class="e1-item active">
+          <span class="e1-label">Key</span>
+          <span class="e1-value">A Minor</span>
+        </div>
+        <div class="e1-item">
+          <span class="e1-label">Tuning</span>
+          <span class="e1-value">Standard</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="flex: 1;">
+      <div style="display: flex; gap: 16px; padding: 6px 0;">
+        <div class="pill-col">
+          <span class="pill-label">Labels</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Notes</span>
+            <span class="e-pill">Intervals</span>
+          </div>
+        </div>
+        <div class="pill-col">
+          <span class="pill-label">Pattern</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Boxes</span>
+            <span class="e-pill">3NPS</span>
+            <span class="e-pill">Full</span>
+          </div>
+        </div>
+        <div class="pill-col">
+          <span class="pill-label">Direction</span>
+          <div class="e-pill-group">
+            <span class="e-pill active">Asc</span>
+            <span class="e-pill">Desc</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="clear-btn">Clear</div>
+</div>
+
+</body>
+</html>
