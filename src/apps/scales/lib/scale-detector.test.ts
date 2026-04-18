@@ -149,10 +149,10 @@ describe('detectScales', () => {
   });
 
   describe('result limits', () => {
-    it('returns at most 8 suggestions', () => {
+    it('returns at most 12 suggestions', () => {
       // Many notes that could match multiple scales
       const result = detectScales(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
-      expect(result.length).toBeLessThanOrEqual(8);
+      expect(result.length).toBeLessThanOrEqual(12);
     });
 
     it('returns results sorted by score descending', () => {

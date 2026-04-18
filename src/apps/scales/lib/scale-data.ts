@@ -30,6 +30,11 @@ export interface ScaleInfo {
 const SCALE_TYPE_TO_TONAL: Record<ScaleType, string> = {
   major: 'major',
   minor: 'minor',
+  dorian: 'dorian',
+  phrygian: 'phrygian',
+  lydian: 'lydian',
+  mixolydian: 'mixolydian',
+  locrian: 'locrian',
   'major-pentatonic': 'major pentatonic',
   'minor-pentatonic': 'minor pentatonic',
   blues: 'blues',
@@ -37,8 +42,13 @@ const SCALE_TYPE_TO_TONAL: Record<ScaleType, string> = {
 
 /** Display names for scale types */
 export const SCALE_TYPE_DISPLAY: Record<ScaleType, string> = {
-  major: 'Major',
-  minor: 'Natural Minor',
+  major: 'Major (Ionian)',
+  minor: 'Natural Minor (Aeolian)',
+  dorian: 'Dorian',
+  phrygian: 'Phrygian',
+  lydian: 'Lydian',
+  mixolydian: 'Mixolydian',
+  locrian: 'Locrian',
   'major-pentatonic': 'Major Pentatonic',
   'minor-pentatonic': 'Minor Pentatonic',
   blues: 'Blues',
@@ -47,6 +57,7 @@ export const SCALE_TYPE_DISPLAY: Record<ScaleType, string> = {
 /** Scale categories for grouping in picker */
 export const SCALE_CATEGORIES = {
   diatonic: ['major', 'minor'] as ScaleType[],
+  modes: ['dorian', 'phrygian', 'lydian', 'mixolydian', 'locrian'] as ScaleType[],
   pentatonic: ['major-pentatonic', 'minor-pentatonic', 'blues'] as ScaleType[],
 };
 
@@ -166,6 +177,48 @@ export function isNoteInScale(note: string, scaleNotes: string[]): boolean {
     const scaleChroma = Note.chroma(Note.pitchClass(scaleNote));
     return noteChroma === scaleChroma;
   });
+}
+
+/** Mode metadata: degree within parent major scale and semitone offset from parent root */
+const MODE_INFO: Partial<Record<ScaleType, { degree: number; semitones: number; label: string }>> = {
+  major:      { degree: 1, semitones: 0,  label: '1st mode' },
+  dorian:     { degree: 2, semitones: 2,  label: '2nd mode' },
+  phrygian:   { degree: 3, semitones: 4,  label: '3rd mode' },
+  lydian:     { degree: 4, semitones: 5,  label: '4th mode' },
+  mixolydian: { degree: 5, semitones: 7,  label: '5th mode' },
+  minor:      { degree: 6, semitones: 9,  label: '6th mode' },
+  locrian:    { degree: 7, semitones: 11, label: '7th mode' },
+};
+
+export interface ParentScaleInfo {
+  parentRoot: string;
+  parentDisplay: string;
+  modeLabel: string;
+  modeDegree: number;
+}
+
+/**
+ * Get the parent major scale for a mode.
+ * E.g., D Dorian -> { parentRoot: 'C', parentDisplay: 'C Major', modeLabel: '2nd mode', modeDegree: 2 }
+ * Returns null for non-modal scale types (pentatonic, blues).
+ */
+export function getParentScale(root: string, scaleType: ScaleType): ParentScaleInfo | null {
+  const info = MODE_INFO[scaleType];
+  if (!info) return null;
+  if (scaleType === 'major') return null;
+
+  const rootChroma = Note.chroma(root);
+  if (rootChroma === undefined) return null;
+
+  const parentChroma = (rootChroma - info.semitones + 12) % 12;
+  const parentRoot = Note.pitchClass(Note.fromMidi(parentChroma + 60));
+
+  return {
+    parentRoot,
+    parentDisplay: `${parentRoot} Major`,
+    modeLabel: info.label,
+    modeDegree: info.degree,
+  };
 }
 
 /**

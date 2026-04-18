@@ -83,6 +83,18 @@ export function ScaleLibraryPanel() {
             </button>
           ))}
 
+          <div className={styles.categoryHeader}>Modes</div>
+          {SCALE_CATEGORIES.modes.map((type) => (
+            <button
+              key={type}
+              data-value={type}
+              className={`${styles.option} ${pendingType === type ? styles.active : ''}`}
+              onClick={() => setPendingType(type)}
+            >
+              {SCALE_TYPE_DISPLAY[type]}
+            </button>
+          ))}
+
           <div className={styles.categoryHeader}>Pentatonic</div>
           {SCALE_CATEGORIES.pentatonic.map((type) => (
             <button

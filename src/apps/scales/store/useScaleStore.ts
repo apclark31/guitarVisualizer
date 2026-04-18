@@ -8,6 +8,11 @@ import { detectKeys, getNotesFromMultiNoteState, type KeyMatch } from '../../../
 export type ScaleType =
   | 'major'
   | 'minor'
+  | 'dorian'
+  | 'phrygian'
+  | 'lydian'
+  | 'mixolydian'
+  | 'locrian'
   | 'major-pentatonic'
   | 'minor-pentatonic'
   | 'blues';

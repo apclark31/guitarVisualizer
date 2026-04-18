@@ -41,6 +41,11 @@ export interface ScaleSuggestion {
 const SCALE_TYPES: ScaleType[] = [
   'major',
   'minor',
+  'dorian',
+  'phrygian',
+  'lydian',
+  'mixolydian',
+  'locrian',
   'major-pentatonic',
   'minor-pentatonic',
   'blues',
@@ -150,8 +155,8 @@ export function detectScales(
   // Sort by score descending
   matches.sort((a, b) => b.score - a.score);
 
-  // Limit to top 8 results
-  return matches.slice(0, 8);
+  // Limit to top 12 results (10 scale types need more room than the original 5)
+  return matches.slice(0, 12);
 }
 
 /**

@@ -12,7 +12,7 @@ import { useMemo, useEffect } from 'react';
 import { useScaleStore, useSharedStore } from '../../store/useScaleStore';
 import { useSharedStore as useGlobalSharedStore } from '../../../../shared/store';
 import { IntervalMap, type IntervalEntry } from '../../../../shared/components/IntervalMap/IntervalMap';
-import { SCALE_TYPE_DISPLAY } from '../../lib/scale-data';
+import { SCALE_TYPE_DISPLAY, getParentScale } from '../../lib/scale-data';
 import { getNotesFromMultiNoteState } from '../../../../shared/lib';
 import styles from './ScaleHeader.module.css';
 
@@ -60,11 +60,15 @@ export function ScaleHeader({ intervalEntries = [] }: ScaleHeaderProps) {
     // State 3: Scale selected — chips with interval labels
     if (hasScale && scaleType) {
       const scaleName = `${scaleRoot} ${SCALE_TYPE_DISPLAY[scaleType]}`;
+      const parentScale = getParentScale(scaleRoot, scaleType);
+      const modeText = parentScale
+        ? `${parentScale.modeLabel} of ${parentScale.parentDisplay}`
+        : null;
 
       return {
         state: 'selected' as const,
         primaryText: scaleName,
-        secondaryText: null as string | null,
+        secondaryText: modeText,
         chipEntries: intervalEntries,
       };
     }

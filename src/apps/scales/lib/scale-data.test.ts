@@ -5,6 +5,7 @@ import {
   getScaleDegreeLabels,
   isNoteInScale,
   getNoteInterval,
+  getParentScale,
   SCALE_TYPE_DISPLAY,
   SCALE_CATEGORIES,
   ROOT_NOTES,
@@ -171,8 +172,13 @@ describe('scale-data', () => {
 
   describe('constants', () => {
     it('has display names for all scale types', () => {
-      expect(SCALE_TYPE_DISPLAY['major']).toBe('Major');
-      expect(SCALE_TYPE_DISPLAY['minor']).toBe('Natural Minor');
+      expect(SCALE_TYPE_DISPLAY['major']).toBe('Major (Ionian)');
+      expect(SCALE_TYPE_DISPLAY['minor']).toBe('Natural Minor (Aeolian)');
+      expect(SCALE_TYPE_DISPLAY['dorian']).toBe('Dorian');
+      expect(SCALE_TYPE_DISPLAY['phrygian']).toBe('Phrygian');
+      expect(SCALE_TYPE_DISPLAY['lydian']).toBe('Lydian');
+      expect(SCALE_TYPE_DISPLAY['mixolydian']).toBe('Mixolydian');
+      expect(SCALE_TYPE_DISPLAY['locrian']).toBe('Locrian');
       expect(SCALE_TYPE_DISPLAY['major-pentatonic']).toBe('Major Pentatonic');
       expect(SCALE_TYPE_DISPLAY['minor-pentatonic']).toBe('Minor Pentatonic');
       expect(SCALE_TYPE_DISPLAY['blues']).toBe('Blues');
@@ -181,6 +187,11 @@ describe('scale-data', () => {
     it('has scale categories', () => {
       expect(SCALE_CATEGORIES.diatonic).toContain('major');
       expect(SCALE_CATEGORIES.diatonic).toContain('minor');
+      expect(SCALE_CATEGORIES.modes).toContain('dorian');
+      expect(SCALE_CATEGORIES.modes).toContain('phrygian');
+      expect(SCALE_CATEGORIES.modes).toContain('lydian');
+      expect(SCALE_CATEGORIES.modes).toContain('mixolydian');
+      expect(SCALE_CATEGORIES.modes).toContain('locrian');
       expect(SCALE_CATEGORIES.pentatonic).toContain('minor-pentatonic');
       expect(SCALE_CATEGORIES.pentatonic).toContain('blues');
     });
@@ -189,6 +200,93 @@ describe('scale-data', () => {
       expect(ROOT_NOTES).toHaveLength(12);
       expect(ROOT_NOTES).toContain('C');
       expect(ROOT_NOTES).toContain('F#');
+    });
+  });
+
+  describe('modes', () => {
+    it('returns correct notes for D Dorian', () => {
+      const scale = getScale('D', 'dorian');
+      expect(scale).not.toBeNull();
+      expect(scale?.notes).toEqual(['D', 'E', 'F', 'G', 'A', 'B', 'C']);
+      expect(scale?.noteCount).toBe(7);
+    });
+
+    it('returns correct notes for E Phrygian', () => {
+      const scale = getScale('E', 'phrygian');
+      expect(scale?.notes).toEqual(['E', 'F', 'G', 'A', 'B', 'C', 'D']);
+    });
+
+    it('returns correct notes for F Lydian', () => {
+      const scale = getScale('F', 'lydian');
+      expect(scale?.notes).toEqual(['F', 'G', 'A', 'B', 'C', 'D', 'E']);
+    });
+
+    it('returns correct notes for G Mixolydian', () => {
+      const scale = getScale('G', 'mixolydian');
+      expect(scale?.notes).toEqual(['G', 'A', 'B', 'C', 'D', 'E', 'F']);
+    });
+
+    it('returns correct notes for B Locrian', () => {
+      const scale = getScale('B', 'locrian');
+      expect(scale?.notes).toEqual(['B', 'C', 'D', 'E', 'F', 'G', 'A']);
+    });
+
+    it('all modes of C Major share the same notes', () => {
+      const cMajor = getScale('C', 'major')!;
+      const dDorian = getScale('D', 'dorian')!;
+      const ePhrygian = getScale('E', 'phrygian')!;
+      const fLydian = getScale('F', 'lydian')!;
+      const gMixo = getScale('G', 'mixolydian')!;
+      const aMinor = getScale('A', 'minor')!;
+      const bLocrian = getScale('B', 'locrian')!;
+
+      const sortedNotes = (notes: string[]) => [...notes].sort();
+      const cMajorNotes = sortedNotes(cMajor.notes);
+
+      expect(sortedNotes(dDorian.notes)).toEqual(cMajorNotes);
+      expect(sortedNotes(ePhrygian.notes)).toEqual(cMajorNotes);
+      expect(sortedNotes(fLydian.notes)).toEqual(cMajorNotes);
+      expect(sortedNotes(gMixo.notes)).toEqual(cMajorNotes);
+      expect(sortedNotes(aMinor.notes)).toEqual(cMajorNotes);
+      expect(sortedNotes(bLocrian.notes)).toEqual(cMajorNotes);
+    });
+  });
+
+  describe('getParentScale', () => {
+    it('returns C Major as parent of D Dorian', () => {
+      const parent = getParentScale('D', 'dorian');
+      expect(parent).not.toBeNull();
+      expect(parent?.parentRoot).toBe('C');
+      expect(parent?.parentDisplay).toBe('C Major');
+      expect(parent?.modeLabel).toBe('2nd mode');
+      expect(parent?.modeDegree).toBe(2);
+    });
+
+    it('returns C Major as parent of E Phrygian', () => {
+      const parent = getParentScale('E', 'phrygian');
+      expect(parent?.parentRoot).toBe('C');
+      expect(parent?.modeDegree).toBe(3);
+    });
+
+    it('returns C Major as parent of A minor', () => {
+      const parent = getParentScale('A', 'minor');
+      expect(parent?.parentRoot).toBe('C');
+      expect(parent?.modeDegree).toBe(6);
+    });
+
+    it('returns null for major (parent is itself)', () => {
+      expect(getParentScale('C', 'major')).toBeNull();
+    });
+
+    it('returns null for pentatonic scales', () => {
+      expect(getParentScale('A', 'minor-pentatonic')).toBeNull();
+      expect(getParentScale('C', 'blues')).toBeNull();
+    });
+
+    it('handles sharp roots correctly', () => {
+      const parent = getParentScale('F#', 'dorian');
+      expect(parent?.parentRoot).toBe('E');
+      expect(parent?.parentDisplay).toBe('E Major');
     });
   });
 });
