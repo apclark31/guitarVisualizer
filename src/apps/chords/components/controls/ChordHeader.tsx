@@ -18,7 +18,7 @@ import { useSharedStore } from '../../../../shared/store';
 import { IntervalMap, type IntervalEntry } from '../../../../shared/components/IntervalMap/IntervalMap';
 import { Note } from '@tonaljs/tonal';
 import type { StringIndex } from '../../types';
-import { getRomanNumeral } from '../../config/constants';
+import { getRomanNumeral, QUALITY_TO_SYMBOL } from '../../config/constants';
 import styles from './ChordHeader.module.css';
 
 interface ChordHeaderProps {
@@ -60,10 +60,62 @@ function formatVoicingType(type: string | null): string | null {
   return labels[type] || null;
 }
 
-/** Format missing intervals for display (e.g., ["5", "R"] -> "no 5, R") */
-function formatMissingIntervals(missing: string[]): string | null {
+/** Convert interval label to readable form: "5" -> "5th", "b3" -> "♭3rd", "R" -> "root". */
+function formatIntervalLabel(label: string): string {
+  if (label === 'R') return 'root';
+  const match = label.match(/^([b#]?)(\d+)$/);
+  if (!match) return label;
+  const [, accidental, digits] = match;
+  const n = parseInt(digits, 10);
+  const suffix = n % 100 >= 11 && n % 100 <= 13
+    ? 'th'
+    : ['th', 'st', 'nd', 'rd'][n % 10] ?? 'th';
+  const accent = accidental === 'b' ? '♭' : accidental === '#' ? '♯' : '';
+  return `${accent}${n}${suffix}`;
+}
+
+/** Semitone offset from the root for each interval label used by the analyzer. */
+const INTERVAL_TO_SEMITONES: Record<string, number> = {
+  'R': 0, 'b2': 1, '2': 2, 'b3': 3, '3': 4, '4': 5, 'b5': 6, '5': 7,
+  '#5': 8, '6': 9, 'b7': 10, '7': 11,
+  // Compound — collapsed into the same octave for display purposes
+  'b9': 1, '9': 2, '#9': 3, '11': 5, '#11': 6, 'b13': 8, '13': 9,
+};
+
+/** Resolve an interval label to a pitch class name relative to a root. */
+function intervalToPitchClass(root: string, intervalLabel: string): string | null {
+  const semitones = INTERVAL_TO_SEMITONES[intervalLabel];
+  if (semitones === undefined) return null;
+  const rootMidi = Note.midi(root + '4');
+  if (rootMidi === null) return null;
+  return Note.pitchClass(Note.fromMidi(rootMidi + semitones)) || null;
+}
+
+/**
+ * Format missing intervals for display.
+ * Single missing -> "No 5th · D" (names the specific note to teach the mapping)
+ * Multiple missing -> "No 5th, ♭7th" (lists only, to keep the line compact)
+ */
+function formatMissingIntervals(root: string, missing: string[]): string | null {
   if (!missing || missing.length === 0) return null;
-  return `no ${missing.join(', ')}`;
+  if (missing.length === 1) {
+    const label = formatIntervalLabel(missing[0]);
+    const note = intervalToPitchClass(root, missing[0]);
+    return note ? `No ${label} \u00B7 ${note}` : `No ${label}`;
+  }
+  return `No ${missing.map(formatIntervalLabel).join(', ')}`;
+}
+
+/**
+ * Build the display name for a chord in the header.
+ * Mirrors Tonal's symbols but forces an explicit "maj" for plain major,
+ * so a two-note root+3rd voicing reads as "Gmaj" instead of the ambiguous "G".
+ */
+function formatChordDisplayName(root: string, quality: string): string {
+  if (quality === 'Major') return `${root}maj`;
+  const symbol = QUALITY_TO_SYMBOL[quality];
+  if (symbol === undefined || symbol === 'M') return `${root}maj`;
+  return `${root}${symbol}`;
 }
 
 export function ChordHeader({ intervalEntries }: ChordHeaderProps) {
@@ -100,10 +152,11 @@ export function ChordHeader({ intervalEntries }: ChordHeaderProps) {
   const getDisplayContent = () => {
     // State 4: Chord selected
     if (targetRoot && targetQuality) {
+      const baseName = formatChordDisplayName(targetRoot, targetQuality);
       const isInversion = currentVoicing?.isInversion && currentVoicing?.bassNote;
       const chordName = isInversion
-        ? `${targetRoot} ${targetQuality}/${currentVoicing.bassNote}`
-        : `${targetRoot} ${targetQuality}`;
+        ? `${baseName}/${currentVoicing.bassNote}`
+        : baseName;
 
       // Get Roman numeral if key context is active
       let keySubtitle: string | null = null;
@@ -125,27 +178,30 @@ export function ChordHeader({ intervalEntries }: ChordHeaderProps) {
 
     // State 3: Notes with matches (2+ notes and has suggestions)
     if (hasNotes && noteCount >= 2 && hasSuggestions && topSuggestion) {
-      const chordName = topSuggestion.displayName;
-      const missingText = formatMissingIntervals(topSuggestion.missingIntervals);
+      const chordName = formatChordDisplayName(topSuggestion.root, topSuggestion.quality);
+      const missingText = formatMissingIntervals(topSuggestion.root, topSuggestion.missingIntervals);
       const voicingLabel = formatVoicingType(topSuggestion.voicingType);
 
-      // Build secondary text: voicing info only (notes are in chips now)
-      const parts: string[] = [];
+      // Lead with a description of the voicing (missing note or shape name),
+      // then parenthesize the match-count aside so the count reads as supporting info.
+      let lead: string | null = null;
       if (missingText) {
-        parts.push(missingText);
+        lead = missingText;
       } else if (voicingLabel && voicingLabel !== 'Partial') {
-        parts.push(voicingLabel);
+        lead = `${voicingLabel} voicing`;
       }
 
-      const matchCount = suggestions.length;
-      if (matchCount > 1) {
-        parts.push(`+${matchCount - 1} more`);
-      }
+      const otherCount = suggestions.length - 1;
+      const aside = otherCount > 0
+        ? `(${otherCount} other ${otherCount === 1 ? 'match' : 'matches'})`
+        : null;
+
+      const secondaryText = [lead, aside].filter(Boolean).join(' ') || null;
 
       return {
         state: 'notes-with-match' as const,
         primaryText: chordName,
-        secondaryText: parts.length > 0 ? parts.join(' \u00B7 ') : null,
+        secondaryText,
         chipEntries: intervalEntries,
       };
     }
@@ -198,11 +254,12 @@ export function ChordHeader({ intervalEntries }: ChordHeaderProps) {
             <IntervalMap intervals={display.chipEntries} variant="inline" />
           )}
         </div>
-        <span className={`${styles.secondaryText} ${!display.secondaryText ? styles.secondaryHidden : ''}`}>
+        <span className={`${styles.secondaryText} ${
+          display.state === 'notes-with-match' ? styles.secondarySuggestion : ''
+        } ${!display.secondaryText ? styles.secondaryHidden : ''}`}>
           {display.secondaryText || '\u00A0'}
         </span>
       </button>
-
     </div>
   );
 }
